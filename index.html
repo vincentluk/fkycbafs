@@ -167,6 +167,20 @@ body.light .log-line{border-left-color:#cbd5e1}
 .stage-sum li.muted{color:var(--muted);font-weight:600}
 body.light .stage-sum li.ok{color:#15803d}
 body.light .stage-sum li.bad{color:#b91c1c}
+.stage-sum .sg.miss{opacity:.92}
+.stage-sum .sg-miss{display:inline-block;margin-left:.35rem;font-size:.72rem;font-weight:800;color:var(--muted);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:1px 7px;vertical-align:middle}
+.stage-sum .sg-k{font-size:.75rem;font-weight:900;color:var(--muted);margin:.28rem 0 .12rem}
+.stage-sum .sg-need p{font-size:.8rem;line-height:1.45;font-weight:600;color:var(--text);margin:0}
+.stage-sum .sg-fi{font-size:.82rem;font-weight:700;color:var(--accent);margin:0 0 .45rem;line-height:1.4}
+.growth-chart{margin:.45rem 0 .7rem;background:var(--panel2);border-radius:12px;padding:.55rem .6rem .5rem}
+.growth-chart svg{width:100%;height:auto;display:block}
+.growth-leg{display:flex;flex-wrap:wrap;gap:6px;margin:.4rem 0 .15rem}
+.growth-leg button{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:999px;padding:3px 9px;font-size:.75rem;font-weight:800;font-family:inherit;cursor:pointer}
+.growth-leg button .sw{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:middle}
+.growth-leg button.off{opacity:.38;text-decoration:line-through}
+.growth-marks{display:flex;flex-wrap:wrap;gap:4px 10px;margin-top:.3rem}
+.growth-marks span{font-size:.72rem;font-weight:700;color:var(--muted)}
+body.light .growth-leg button{background:#fff}
 
 .field{margin:.45rem 0}
 .field label{display:block;font-size:.78rem;font-weight:800;color:var(--muted);margin-bottom:4px}
@@ -267,7 +281,9 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
   <p class="sub" id="endingBlurb"></p>
   <div class="final-grid" id="finalStats"></div>
   <p class="sub" id="goalResult"></p>
-  <h2 style="font-size:1rem;margin-top:.4rem">本局回顧</h2>
+  <h2 style="font-size:1rem;margin-top:.4rem">成長圖</h2>
+  <div class="growth-chart" id="growthChart"></div>
+  <h2 style="font-size:1rem;margin-top:.4rem">人生階段與財務需要</h2>
   <div class="stage-sum" id="stageSummary"></div>
   <h2 style="font-size:1rem;margin-top:.4rem">重大決策</h2>
   <ul class="review" id="reviewList"></ul>
@@ -681,7 +697,7 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
       opts: [
         { k: "A", lab: "盛大婚禮", tip: "開支大", d: [-1, -8, -4, 12, 12, -6], marry: true },
         { k: "B", lab: "從簡結婚", tip: "保留儲蓄", d: [-1, -2, -1, 8, 10, 5], marry: true },
-        { k: "C", lab: "暫時不結", tip: "獨立財務；可走寵物／單身線", d: [0, 3, 2, 1, -6, 2], declinedMarry: true }
+        { k: "C", lab: "暫時不結", tip: "獨立財務；可走寵物／單身線；之後仍可再考慮結婚", d: [0, 3, 2, 1, -6, 2], declinedMarry: true, deferMarry: true }
       ]
     },
     29: {
@@ -705,8 +721,8 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
       tag: "理財決策", fin: true, title: "是否生育？", sit: "成家階段。", needMarried: true, needNoKids: true,
       opts: [
         { k: "A", lab: "計劃生育", tip: "往後開支↑", d: [-5, -3, -8, 10, 12, 2], kids: true },
-        { k: "B", lab: "稍後再決定", tip: "先穩固", d: [0, 2, 0, 0, -2, 4] },
-        { k: "C", lab: "不生育", tip: "資源改投", d: [1, 5, 5, 2, -6, 3] }
+        { k: "B", lab: "稍後再決定", tip: "先穩固", d: [0, 2, 0, 0, -2, 4], deferKids: true },
+        { k: "C", lab: "不生育", tip: "資源改投；此局不再提示生孩子", d: [1, 5, 5, 2, -6, 3], declinedKids: true }
       ]
     },
     36: {
@@ -744,13 +760,13 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     41: {
       tag: "理財決策", fin: true, title: "提早財務自由？", sit: "戶口餘額看起來夠支撐一段時間，要不要提早享受人生？", needWealth: 36, needJob: true,
       opts: [
-        { k: "A", lab: "宣佈財務自由（FIRE），半退休享生活", tip: "停全職；空閒大增", d: [2, -6, 18, 8, 2, -4], semiRetire: true, earlyFI: true, lifestyle: 2 },
-        { k: "B", lab: "再做幾年、先保本", tip: "繼續累積", d: [-1, 4, -2, -1, 0, 6], prudence: 1 },
+        { k: "A", lab: "宣佈財務自由（FIRE），減少工作享生活", tip: "停全職；空閒大增", d: [2, -6, 18, 8, 2, -4], semiRetire: true, earlyFI: true, lifestyle: 2 },
+        { k: "B", lab: "再做幾年、先保本", tip: "繼續累積", d: [-1, 4, -2, -1, 0, 6], prudence: 1, deferFI: true },
         { k: "C", lab: "財務自由（FIRE）＋加大旅遊／嗜好開支", tip: "空閒／開心↑、金錢風險", d: [0, -12, 16, 12, 3, -8], semiRetire: true, earlyFI: true, lifestyle: 3, risk: "med", riskLoss: 10, riskMild: 4, riskWin: 3 }
       ]
     },
     47: {
-      tag: "理財決策", fin: true, title: "財務自由後點過？", sit: "手上有餘裕，生活方式要定錨。", needEarlyFI: true,
+      tag: "理財決策", fin: true, title: "財務自由後怎樣生活？", sit: "手上有餘裕，生活方式要定錨。", needEarlyFI: true,
       opts: [
         { k: "A", lab: "節制享樂、守住本金", tip: "空閒仍充裕", d: [2, 2, 4, 2, 2, 8], lifestyle: 1 },
         { k: "B", lab: "環遊世界、嚐盡美食", tip: "開心↑開支大", d: [1, -10, 6, 14, 4, -6], lifestyle: 3, travel: true },
@@ -760,9 +776,9 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     43: {
       tag: "理財決策", fin: true, title: "置業還是租住？", sit: "住屋決策。",
       opts: [
-        { k: "A", lab: "高成數按揭", tip: "高槓桿", d: [-3, -5, -2, 5, 4, 2], lever: true },
-        { k: "B", lab: "租住並投資", tip: "流動＋市場風險", d: [0, 1, 1, 0, -2, -3], invest: 1, risk: "med", riskLoss: 8, riskMild: 2, riskWin: 7 },
-        { k: "C", lab: "低槓桿置業", tip: "量力而為", d: [-2, 1, -2, 4, 6, 10] }
+        { k: "A", lab: "高成數按揭", tip: "高槓桿", d: [-3, -5, -2, 5, 4, 2], lever: true, hasHome: true },
+        { k: "B", lab: "租住並投資", tip: "流動＋市場風險", d: [0, 1, 1, 0, -2, -3], invest: 1, risk: "med", riskLoss: 8, riskMild: 2, riskWin: 7, renting: true },
+        { k: "C", lab: "低槓桿置業", tip: "量力而為", d: [-2, 1, -2, 4, 6, 10], hasHome: true }
       ]
     },
     46: {
@@ -871,7 +887,7 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
       { k: "B", lab: "犒賞自己", d: [0, -2, 1, 6, 1, -1] },
       { k: "C", lab: "一半儲一半用", d: [0, 1, 0, 3, 0, 1] }
     ]},
-    { sit: "連續幾晚失眠，胸口隱隱不適。", opts: [
+    { sit: "連續幾晚失眠，胸口隱隱不適。", needJob: true, opts: [
       { k: "A", lab: "立刻請假去看醫生", d: [6, -3, -1, 2, 0, 2] },
       { k: "B", lab: "吞止痛藥硬頂上班", d: [-12, 0, 0, -4, 0, -3] },
       { k: "C", lab: "休息兩天再算", d: [-4, -1, 2, 0, 0, 0] }
@@ -931,7 +947,7 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
       { k: "B", lab: "婉拒，保住休息", d: [2, 0, 3, 2, -2, 0] },
       { k: "C", lab: "接下，但先談期限與人手", tip: "溝通後量力", d: [-2, 2, -3, -1, 1, 2] }
     ]},
-    { sit: "屋企要維修。", fin: true, opts: [
+    { sit: "屋企要維修。", fin: true, needDwelling: true, opts: [
       { k: "A", lab: "用儲蓄修", d: [0, -3, -1, -1, 1, 1] },
       { k: "B", lab: "分期／借貸", d: [0, -1, 0, 0, 0, -4], lever: true },
       { k: "C", lab: "先比較報價，用儲蓄修必要部分", tip: "量力", d: [0, -2, -1, 0, 1, 2], prudence: 1 }
@@ -947,9 +963,9 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
       { k: "C", lab: "列入觀察，不立刻投入", tip: "先查證", d: [0, 0, 0, 0, 0, 3], prudence: 1 }
     ]},
     { sit: "家人鬧意見。", opts: [
-      { k: "A", lab: "冷靜傾", d: [0, 0, -1, 1, 5, 1] },
-      { k: "B", lab: "冷戰", d: [-1, 0, 1, -3, -6, -1] },
-      { k: "C", lab: "先冷靜一天，再約時間傾談", tip: "留空間", d: [0, 0, 0, 1, 3, 1] }
+      { k: "A", lab: "主動約家人坐下傾談", d: [0, 0, -1, 1, 5, 1] },
+      { k: "B", lab: "暫時少來往，避免正面衝突", d: [-1, 0, 1, -3, -6, -1] },
+      { k: "C", lab: "請長輩或朋友幫忙調解", tip: "第三者協助", d: [0, 0, 0, 1, 3, 1] }
     ]},
     { sit: "獵頭突然來訊：另一間公司開出更高薪，問你要不要面談。", fin: true, needJob: true, opts: [
       { k: "A", lab: "去面談、準備跳槽", d: [-1, 4, -2, 3, -1, -2], jobChange: true, jobLevel: 1 },
@@ -1001,7 +1017,7 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
       { k: "B", lab: "照常消費", d: [0, -2, 0, 2, 0, -3] },
       { k: "C", lab: "檢視應急金，並更新履歷備用", tip: "有備無患", d: [0, 0, -1, -1, 0, 3], prudence: 1 }
     ]},
-    { sit: "同事阿傑約你一齊報健身。", opts: [
+    { sit: "同事阿傑約你一齊報健身。", needJob: true, opts: [
       { k: "A", lab: "報名並堅持去", d: [6, -2, -2, 2, 2, 1] },
       { k: "B", lab: "自己在公園跑", d: [3, 0, -1, 1, 0, 0] },
       { k: "C", lab: "婉拒，繼續宅", d: [-3, 1, 1, -1, -1, 0] }
@@ -1021,12 +1037,12 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
       { k: "B", lab: "囤一堆「抵買」", d: [0, -3, -1, 2, 0, -1] },
       { k: "C", lab: "只囤近期會用完、而且確實較便宜的", tip: "不浪費", d: [0, -1, 0, 1, 0, 1], prudence: 1 }
     ]},
-    { sit: "連續加班後，晨早起來头晕。", opts: [
+    { sit: "連續加班後，晨早起來頭暈。", needJob: true, opts: [
       { k: "A", lab: "早睡、拒絕額外加班", d: [5, -1, 3, 3, 0, 1] },
       { k: "B", lab: "靠咖啡硬撐", d: [-8, 1, -3, -3, 0, -2] },
       { k: "C", lab: "先休息一天，再商量合理工時", tip: "先照顧身體", d: [4, 0, 1, 2, 1, 1] }
     ]},
-    { sit: "物業管理費上調。", fin: true, opts: [
+    { sit: "物業管理費上調。", fin: true, needHomeOwner: true, opts: [
       { k: "A", lab: "調整預算", d: [0, -1, 0, -1, 0, 1] },
       { k: "B", lab: "用信用卡頂", d: [0, 0, 0, 0, 0, -3], lever: true },
       { k: "C", lab: "調整預算，並查詢加幅理由", tip: "了解後再適應", d: [0, -1, -1, 0, 0, 2], prudence: 1 }
@@ -1051,7 +1067,7 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
       { k: "B", lab: "改短途、量力", d: [1, -2, 1, 3, 2, 1] },
       { k: "C", lab: "婉拒，守住計劃", d: [1, 1, 0, -1, -2, 3] }
     ]},
-    { sit: "提早退休後覺得日子太空。", needEarlyFI: true, opts: [
+    { sit: "財務自由後覺得日子太空。", needEarlyFI: true, opts: [
       { k: "A", lab: "做義工／學新技能", d: [2, -1, -2, 3, 3, 2] },
       { k: "B", lab: "終日娛樂消磨", d: [-3, -3, 2, 2, -2, -2], lifestyle: 2 },
       { k: "C", lab: "接少量顧問工作", d: [-1, 2, -2, 2, 1, 2] }
@@ -1473,18 +1489,18 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
       emo: "📚", tag: "", log: "子女公開試／升學相關費用突然增加一筆。", d: [-1, -5, -1, -2, 1, -2] },
     { id: "older_pride", need: s => kidsOlder(s) && s.prudence >= 1, chance: 0.07, kind: "good",
       emo: "🏅", tag: "", log: "子女在學校有好表現，家裡氣氛一下子亮起來。", d: [1, 0, 0, 4, 4, 1] },
-    { id: "near_checkup_ok", need: s => s.age >= 55 && s.age < 65 && !s.retired && s.prudence >= 2, chance: 0.08, kind: "good",
-      emo: "🩺", tag: "", log: "臨退體檢報告大致理想，醫生鼓勵你保持習慣。", d: [4, -1, 0, 3, 0, 3] },
-    { id: "near_joint", need: s => s.age >= 55 && !s.retired && s.h < 60, chance: 0.11, kind: "bad",
+    { id: "near_checkup_ok", need: s => s.age >= 55 && s.age < 65 && !s.retired && !s.earlyFI && s.prudence >= 2, chance: 0.08, kind: "good",
+      emo: "🩺", tag: "", log: "體檢報告大致理想，醫生鼓勵你保持習慣。", d: [4, -1, 0, 3, 0, 3] },
+    { id: "near_joint", need: s => s.age >= 55 && !s.retired && !s.earlyFI && s.h < 60, chance: 0.11, kind: "bad",
       emo: "🦴", tag: "", log: "關節／血壓亮紅燈，要跟進治療與改變作息。", d: [-8, -4, -2, -3, 0, -2] },
     { id: "retire_lonely", need: s => (s.retired || s.earlyFI) && s.rel < 50, chance: 0.11, kind: "bad",
-      emo: "🫖", tag: "", log: "退休後日程變空，偶爾感到孤單與無用。", d: [-1, 0, 1, -6, -4, -2] },
+      emo: "🫖", tag: "", log: "離開全職工作後日程變空，偶爾感到孤單與無用。", d: [-1, 0, 1, -6, -4, -2] },
     { id: "retire_club", need: s => (s.retired || s.earlyFI) && s.prudence >= 1, chance: 0.09, kind: "good",
       emo: "🀄", tag: "", log: "你加入社區興趣班，認識了新朋友。", d: [1, -1, -1, 4, 5, 2] },
     { id: "retire_med_bill", need: s => (s.retired || s.age >= 62) && !s.emergency, chance: 0.10, kind: "bad",
       emo: "🏥", tag: "", log: "一筆門診／藥物開支沒有充足醫療儲備，戶口被咬一口。", d: [-3, -7, -1, -3, 0, -5] },
     { id: "mpf_market", need: s => (s.retired || s.earlyFI || s.age >= 60) && s.mpf, chance: 0.08, kind: "fin",
-      emo: "📉", tag: "", log: "退休組合跟隨市場波動，今年提款額要小心一點。", d: [0, -3, 0, -1, 0, -2] },
+      emo: "📉", tag: "", log: "資產組合跟隨市場波動，今年提款額要小心一點。", d: [0, -3, 0, -1, 0, -2] },
     { id: "low_mood_sick", need: s => s.t < 35 && s.hap < 40, chance: 0.14, kind: "bad",
       emo: "🤒", tag: "", log: "長期抽不出時間、心情又差，身體開始連連小病。", d: [-6, -1, 0, -2, 0, -2] },
 
@@ -1627,7 +1643,7 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
       ]},
     { id: "retire_scam", need: s => s.age >= 55 || s.retired || s.earlyFI, chance: 0.09, kind: "bad",
       emo: "👴", tag: "", log: "接到「退休理財專線」。",
-      sit: "來電自稱銀行經理：「您的退休戶口要升級，請提供驗證碼。」你會？",
+      sit: "來電自稱銀行經理：「您的戶口要升級，請提供驗證碼。」你會？",
       opts: [
         { k: "A", lab: "照做提供資料", tip: "被盜——損失慘重", d: [-2, -18, 0, -6, 0, -12], scamHit: true },
         { k: "B", lab: "掛線打官方熱線確認", tip: "識破騙局", d: [0, 0, -1, 2, 0, 4], prudence: 1 },
@@ -1742,8 +1758,12 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
       hasCar: false, leverage: 0, leverageStock: 0, prudence: 0, yearlyFX: {},
       renting: false, savingHome: false, hasHome: false, biggerHome: false,
       insured: false, spouseStayHome: false, studentPartTime: false, honeymoonDone: false,
-      lastTravelAge: null, declinedKids: false,
+      lastTravelAge: null, lastTravelOfferAge: null, declinedKids: false,
+      deferredMarry: false, deferredKids: false, deferredFI: false,
+      missedMarry: false, missedKids: false, missedFI: false,
+      lateMarryOffered: false, lateKidsOffered: false, lateFIOffered: false,
       doneKey: {}, history: [], stageVerdicts: [], lifeLog: [], logAge: null, decisions: 0,
+      statHistory: [], lifeMarks: [], stagesSeen: { "1": true },
       phase: "idle", randUsed: [], conseqUsed: {}, lastConseqId: null, themeUsed: {},
       sideJob: 0, exercising: false, critOffered: {},
       jobLevel: 0, gotFirstJob: false, jobTitle: null
@@ -1751,6 +1771,22 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
   }
 
   function clamp(v) { return Math.max(0, Math.min(100, Math.round(v))); }
+
+  function snapshotStats(s) {
+    if (!s) return;
+    const rec = { age: s.age, h: s.h, w: s.w, t: s.t, hap: s.hap, rel: s.rel, sec: s.sec };
+    if (!s.statHistory) s.statHistory = [];
+    const hist = s.statHistory;
+    if (hist.length && hist[hist.length - 1].age === s.age) hist[hist.length - 1] = rec;
+    else hist.push(rec);
+  }
+
+  function addLifeMark(s, kind, label) {
+    if (!s) return;
+    if (!s.lifeMarks) s.lifeMarks = [];
+    if (s.lifeMarks.some(m => m.kind === kind && m.age === s.age)) return;
+    s.lifeMarks.push({ age: s.age, kind: kind, label: label });
+  }
 
   function apply(d) {
     S.h = clamp(S.h + d[0]);
@@ -1774,37 +1810,62 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     return { word: m.bands[idx], tier: tiers[idx] };
   }
 
-  function bafsStage(s) {
-    /* BAFS 3.3 六個人生階段（以旗標為主、年齡為輔） */
-    if (!s) return "起步";
-    if (s.retired || (s.earlyFI && s.age >= 60)) return "⑥ 退休";
-    if (s.age >= 55 && !s.retired) return "⑤ 接近退休";
-    if (s.kids && kidsOlder(s)) return "④ 已婚・年長子女";
-    if (s.kids && kidsYoung(s)) return "③ 已婚・年幼子女";
-    if (s.married && !s.kids) return "② 新婚無子女";
-    if (!s.married && !s.partner) return "① 年輕而單身";
-    if (s.partner && !s.married) return "① 單身／戀愛中";
-    if (s.age >= 55) return "⑤ 接近退休";
-    return "人生階段";
-  }
-
-  const BAFS_STAGES = [
-    { id: "1", name: "① 年輕而單身" },
-    { id: "2", name: "② 新婚而無子女" },
-    { id: "3", name: "③ 已婚並育有較年幼子女" },
-    { id: "4", name: "④ 已婚並育有較年長子女" },
-    { id: "5", name: "⑤ 接近退休" },
-    { id: "6", name: "⑥ 退休" }
-  ];
-
-  function bafsStageId(s) {
+  function curriculumStageId(s) {
+    /* 課綱六階段（不理財務自由顯示）；正式退休才算第 6 階段 */
     if (!s) return "1";
-    if (s.retired || (s.earlyFI && s.age >= 60)) return "6";
-    if (s.age >= 55 && !s.retired) return "5";
+    if (s.retired) return "6";
+    if (s.age >= 55) return "5";
     if (s.kids && kidsOlder(s)) return "4";
     if (s.kids && kidsYoung(s)) return "3";
     if (s.married && !s.kids) return "2";
     return "1";
+  }
+
+  function noteStageSeen(s) {
+    if (!s) return;
+    if (!s.stagesSeen) s.stagesSeen = { "1": true };
+    const id = curriculumStageId(s);
+    if (s.earlyFI && !s.retired && (id === "5" || id === "6") && !s.stagesSeen[id]) return;
+    s.stagesSeen[id] = true;
+  }
+
+  function bafsStage(s) {
+    /* 顯示用：退休與財務自由互斥；FI 後不因年齡改稱退休 */
+    if (!s) return "起步";
+    if (s.retired) return "⑥ 退休";
+    if (s.earlyFI) return "財務自由生活";
+    if (s.age >= 55) return "⑤ 接近退休";
+    if (s.kids && kidsOlder(s)) return "④ 已婚並育有較年長的子女";
+    if (s.kids && kidsYoung(s)) return "③ 已婚並育有較年幼的孩子";
+    if (s.married && !s.kids) return "② 新婚而沒有子女";
+    if (!s.married) return "① 年輕而單身";
+    return "人生階段";
+  }
+
+  const BAFS_STAGES = [
+    { id: "1", name: "① 年輕而單身", need: "主要財務目標是創造和累積財富；須計劃消費，並參與長期投資；因風險承受能力較高，可考慮較高風險的投資；建議購買人壽保險。" },
+    { id: "2", name: "② 新婚而沒有子女", need: "應了解彼此的財務狀況，並共同計劃財務；應購買保險，以保障意外引致的財務需求；應為退休計劃作出打算，以享複息效應。" },
+    { id: "3", name: "③ 已婚並育有較年幼的孩子", need: "應計劃日常家庭支出，並尋求更大的保險保障；應審視並更新投資計劃，以承擔對子女和父母的更多財務責任；強烈建議為退休計劃作出安排。" },
+    { id: "4", name: "④ 已婚並育有較年長的子女", need: "財務目標包括償還按揭貸款、子女升學、供養年老的父母及休閒娛樂開支；風險承受能力較低，應增加儲蓄以實現退休計劃。" },
+    { id: "5", name: "⑤ 接近退休", need: "最優先考慮是退休計劃；須確保儲蓄或醫療保險足夠應付突發的醫療開支。" },
+    { id: "6", name: "⑥ 退休", need: "須妥善管理積蓄，以應付退休生活和醫療開支；須考慮遺產策劃。" }
+  ];
+
+  function bafsStageId(s) {
+    /* 決策歸檔用：FI 後不把年齡升格成 5／6；已進入的接近退休仍可沿用 */
+    if (!s) return "1";
+    if (s.retired) return "6";
+    if (s.earlyFI) {
+      const cur = curriculumStageId(s);
+      if (cur !== "5" && cur !== "6") return cur;
+      if (s.stagesSeen && s.stagesSeen["5"]) return "5";
+      const fallback = ["4", "3", "2", "1"];
+      for (let i = 0; i < fallback.length; i++) {
+        if (s.stagesSeen && s.stagesSeen[fallback[i]]) return fallback[i];
+      }
+      return "1";
+    }
+    return curriculumStageId(s);
   }
 
   function verdictItemsFromOpt(opt) {
@@ -1831,7 +1892,8 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     if (opt.cutLifestyle || (opt.setLifestyle != null && opt.setLifestyle === 0)) add(true, "削減過度開支");
     if ((opt.lifestyle || 0) >= 2 && opt.d && (opt.d[1] || 0) <= -4) add(false, "生活開支升級偏快");
     if (opt.exercising) add(true, "堅持運動護健康");
-    if (opt.earlyFI || opt.retire) add(true, "規劃財務自由／退休");
+    if (opt.earlyFI && !opt.retire) add(true, "規劃財務自由");
+    if (opt.retire) add(true, "規劃退休");
     if (opt.kidsAllowance) add(true, "接受子女家用（關係回饋）");
     if (opt.pet) add(true, "養寵物並預算開支");
     if (opt.refusePartner) add(true, "選擇單身路線");
@@ -1853,17 +1915,24 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
   }
 
   function stagesReached(s) {
-    const set = new Set(["1"]);
-    if (s.married && !s.kids) set.add("2");
+    if (!s) return [BAFS_STAGES[0]];
+    noteStageSeen(s);
+    const set = new Set();
+    const seen = s.stagesSeen || { "1": true };
+    Object.keys(seen).forEach(id => { if (seen[id]) set.add(id); });
+    if (s.married) set.add("2");
     if (s.kids) { set.add("2"); set.add("3"); }
     if (s.kids && kidYears(s) >= 10) set.add("4");
-    if (s.age >= 55 || s.retired || s.earlyFI) set.add("5");
-    if (s.retired || (s.earlyFI && s.age >= 60) || s.age >= 68) set.add("6");
     if (!s.married) { set.delete("2"); set.delete("3"); set.delete("4"); }
     if (s.married && !s.kids) { set.delete("3"); set.delete("4"); }
     if (s.kids && kidYears(s) < 10) set.delete("4");
-    if (s.age < 55 && !s.retired && !s.earlyFI) set.delete("5");
-    if (!(s.retired || (s.earlyFI && s.age >= 60) || s.age >= 68)) set.delete("6");
+    /* 財務自由本身不算進入第 5／6 階段；若選 FI 前已到 55 歲（工作中）則保留接近退休 */
+    if (s.retired || (s.age >= 55 && !(s.earlyFI && !seen["5"]))) set.add("5");
+    else set.delete("5");
+    if (seen["5"]) set.add("5");
+    if (s.retired) set.add("6");
+    else set.delete("6");
+    set.add("1");
     return BAFS_STAGES.filter(st => set.has(st.id));
   }
 
@@ -1875,13 +1944,13 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     if ((s.leverageStock >= 1 || s.leverage >= 2) && !hasText(/高風險|高槓桿投資/))
       s.stageVerdicts.push({ stage: "1", ok: false, text: "高風險／高槓桿投資", age: s.age });
     if ((s.will || s.estate) && !hasText(/遺囑|身後/))
-      s.stageVerdicts.push({ stage: (s.retired || (s.earlyFI && s.age >= 60)) ? "6" : "5", ok: true, text: "訂立遺囑／身後安排", age: s.age });
+      s.stageVerdicts.push({ stage: s.retired ? "6" : ((s.stagesSeen && s.stagesSeen["5"]) ? "5" : (bafsStageId(s) || "1")), ok: true, text: "訂立遺囑／身後安排", age: s.age });
     if (s.mpf && !hasText(/強積金/))
-      s.stageVerdicts.push({ stage: "5", ok: true, text: "檢視強積金／退休金", age: s.age });
+      s.stageVerdicts.push({ stage: (s.stagesSeen && s.stagesSeen["5"]) ? "5" : (bafsStageId(s) === "6" ? "5" : (bafsStageId(s) || "1")), ok: true, text: "檢視強積金／退休金", age: s.age });
     if (s.eduSave && s.kids && !hasText(/教育儲蓄/))
       s.stageVerdicts.push({ stage: "3", ok: true, text: "為子女教育儲蓄", age: s.age });
     if (s.kidsAllowance && !hasText(/子女家用/))
-      s.stageVerdicts.push({ stage: "6", ok: true, text: "接受子女家用（關係回饋）", age: s.age });
+      s.stageVerdicts.push({ stage: s.retired ? "6" : (bafsStageId(s) || "1"), ok: true, text: "接受子女家用（關係回饋）", age: s.age });
     if (s.hasPet && !hasText(/寵物/))
       s.stageVerdicts.push({ stage: "1", ok: true, text: "養寵物並預算開支", age: s.age });
     if (s.refusedPartner && !hasText(/單身/))
@@ -1906,27 +1975,54 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     const seen = new Set();
     let uniq = items.filter(v => { if (seen.has(v.text)) return false; seen.add(v.text); return true; });
     uniq.sort((a, b) => stageItemScore(b) - stageItemScore(a) || (a.age || 0) - (b.age || 0));
-    return uniq.slice(0, 3);
+    return uniq; /* 學習用：不再只留 3 條 */
+  }
+
+  function historyItemsForStage(s, stageId) {
+    return (s.history || []).filter(h => String(h.stage || "") === String(stageId)).map(h => ({
+      ok: null, text: (h.age != null ? (h.age + "歲　") : "") + (h.title || "決策") + " → " + (h.choice || ""), age: h.age
+    }));
   }
 
   function renderStageSummaryHTML(s) {
     synthesizeStageVerdicts(s);
     const reached = stagesReached(s);
-    if (!reached.length) return "<p class='sub'>本局無階段紀錄</p>";
-    return reached.map(st => {
-      const items = pickStageItems((s.stageVerdicts || []).filter(v => v.stage === st.id));
-      const body = items.length
-        ? "<ul>" + items.map(v => "<li class='" + (v.ok ? "ok" : "bad") + "'>" + (v.ok ? "✓ " : "✗ ") + v.text + "</li>").join("") + "</ul>"
-        : "<ul><li class='muted'>本階段無特別理財紀錄</li></ul>";
-      return "<div class='sg'><div class='sg-h'>" + st.name + "</div>" + body + "</div>";
+    const reachedIds = new Set(reached.map(st => st.id));
+    let html = "";
+    if (s.earlyFI && !s.retired) html += "<p class='sg-fi'>本局選擇了財務自由生活。以下六個階段仍按課綱列出，方便對照學習。</p>";
+    html += BAFS_STAGES.map(st => {
+      const entered = reachedIds.has(st.id);
+      const verdicts = pickStageItems((s.stageVerdicts || []).filter(v => v.stage === st.id));
+      const histItems = historyItemsForStage(s, st.id);
+      const seenTxt = new Set(verdicts.map(v => v.text));
+      const extra = histItems.filter(h => !seenTxt.has(h.text));
+      let body = "<div class='sg-need'><div class='sg-k'>此階段常見財務需要</div><p>" + st.need + "</p></div>";
+      body += "<div class='sg-dec'><div class='sg-k'>你在此階段的重要決策</div>";
+      if (!entered && !verdicts.length && !extra.length) {
+        body += "<ul><li class='muted'>本局未進入此階段，沒有決策紀錄。</li></ul>";
+      } else if (!verdicts.length && !extra.length) {
+        body += "<ul><li class='muted'>此階段沒有特別的重要決策紀錄。</li></ul>";
+      } else {
+        body += "<ul>";
+        body += verdicts.map(v => "<li class='" + (v.ok ? "ok" : "bad") + "'>" + (v.ok ? "✓ " : "✗ ") + v.text + "</li>").join("");
+        body += extra.map(v => "<li>" + v.text + "</li>").join("");
+        body += "</ul>";
+      }
+      body += "</div>";
+      return "<div class='sg" + (entered ? "" : " miss") + "'><div class='sg-h'>" + st.name +
+        (entered ? "" : "<span class='sg-miss'>本局未進入</span>") + "</div>" + body + "</div>";
     }).join("");
+    return html;
   }
 
   function stageSummaryPayload(s) {
     synthesizeStageVerdicts(s);
-    return stagesReached(s).map(st => ({
-      id: st.id, name: st.name,
-      items: pickStageItems((s.stageVerdicts || []).filter(v => v.stage === st.id))
+    const reached = stagesReached(s);
+    const reachedIds = new Set(reached.map(st => st.id));
+    return BAFS_STAGES.map(st => ({
+      id: st.id, name: st.name, need: st.need, entered: reachedIds.has(st.id),
+      items: pickStageItems((s.stageVerdicts || []).filter(v => v.stage === st.id)),
+      decisions: historyItemsForStage(s, st.id)
     }));
   }
 
@@ -1939,7 +2035,8 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
   }
 
   function careerLab(c) {
-    return c === "edu" ? "升學" : c === "work" ? "早職" : c === "mix" ? "半工讀" : "";
+    if (c === "edu") return (S && S.age >= 22) ? "高學歷" : "升學";
+    return c === "work" ? "早職" : c === "mix" ? "半工讀" : "";
   }
 
   function isStudent() {
@@ -2198,7 +2295,7 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
   function autoIdleHint() {
     if (S.age >= 68) return "即將進入一生回顧…";
     if (agePaused) return "已暫停。選速度或按「快轉到下一個抉擇」繼續。";
-    if (hasAnyFreeAction()) return "可選自由行動，或撳「繼續長大」";
+    if (hasAnyFreeAction()) return "可選擇去旅行；歲數會繼續自動推進";
     if (ageSpeed === 1) return "自動長大中…";
     return "自動長大中（每次跳 " + ageSpeed + " 歲；關鍵決策會在跳歲後出現）";
   }
@@ -2233,7 +2330,7 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
   }
 
   function resumeIdleTimer(delay) {
-    if (!S || S.phase !== "idle" || agePaused || hasAnyFreeAction() || S.age >= 68) return;
+    if (!S || S.phase !== "idle" || agePaused || S.age >= 68) return;
     clearAutoAge();
     autoAgeTimer = setTimeout(() => { autoAgeTimer = null; doAgeUp(); }, delay || 400);
   }
@@ -2270,7 +2367,7 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     if (S.age >= 68) return true;
     if (checkKO()) return true;
     if (keyEligible(S.age)) return true;
-    if (typeof hasAnyFreeAction === "function" && hasAnyFreeAction()) return true;
+    /* 財務自由／結婚／生孩子改為常駐，不再打斷自動長大或快轉 */
     if (typeof canOfferKidsAllowance === "function" && canOfferKidsAllowance()) return true;
     if (typeof buildCriticalHelp === "function" && buildCriticalHelp()) return true;
     return false;
@@ -2340,6 +2437,11 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
           (opt.tip ? '<span class="tip">' + opt.tip + "</span>" : "");
         btn.onclick = () => {
           choiceBox.querySelectorAll("button").forEach(b => { b.disabled = true; });
+          if (opts.skipApply) {
+            hidePopupImmediate();
+            if (typeof done === "function") done(opt);
+            return;
+          }
           resolvePopupChoice(opts, opt, done);
         };
         choiceBox.appendChild(btn);
@@ -2670,6 +2772,8 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     agingLock = false;
     S.lifeLog = [];
     logEvent("獨立人生開始了。", "note");
+    snapshotStats(S);
+    noteStageSeen(S);
     /* 18 歲開局即出第一個關鍵決策 */
     beginYearEvent(true);
     renderHUD();
@@ -2685,11 +2789,17 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     if ((S.leverage || 0) >= 2 && S.w < 42) return false; /* 高槓桿時要求更高淨資產 */
     return true;
   }
+  function markTravelOffered() {
+    if (!S) return;
+    if (S.lastTravelOfferAge == null || S.age > S.lastTravelOfferAge) S.lastTravelOfferAge = S.age;
+  }
   function canTravelFree() {
     if (!S) return false;
     if (S.w < 28) return false;
     if (!(fiEligible() || S.earlyFI || S.retired)) return false;
     if (S.lastTravelAge != null && (S.age - S.lastTravelAge) < 2) return false;
+    /* 該年見到提示但沒出發，同樣等兩年才再出現；同年內仍可出發 */
+    if (S.lastTravelOfferAge != null && S.age > S.lastTravelOfferAge && (S.age - S.lastTravelOfferAge) < 2) return false;
     return true;
   }
   function canRetireFree() {
@@ -2701,10 +2811,14 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     return true;
   }
   function canShowFI() {
-    return canRetireFree() || canTravelFree();
+    /* 已不再作為常駐按鈕；保留函式供測試／資格判斷（= 可否宣佈財務自由） */
+    return canRetireFree();
+  }
+  function canShowTravel() {
+    return canTravelFree();
   }
   function canShowMarry() {
-    /* 必須真正交往（partner）；「先做朋友」不會設 partner */
+    /* 必須真正交往（partner）；不再作為常駐按鈕 */
     return !!(S && S.partner && !S.married && !S.refusedPartner);
   }
   function canShowKids() {
@@ -2714,72 +2828,220 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     return true;
   }
   function hasAnyFreeAction() {
-    return canShowFI() || canShowMarry() || canShowKids();
+    /* 畫面只保留「去旅行」常駐按鈕 */
+    return canShowTravel();
   }
-  function buildFIFreeEvent() {
-    const opts = [];
-    let k = 0;
-    const nextK = () => String.fromCharCode(65 + (k++));
-    if (canRetireFree()) {
-      opts.push({ k: nextK(), lab: "提前退休（FIRE）", tip: "停全職；空閒↑；晚年仍有開支／健康下滑", d: [2, -6, 18, 8, 2, -4], semiRetire: true, earlyFI: true, lifestyle: 2 });
-      opts.push({ k: nextK(), lab: "提前退休＋去旅行", tip: "開心↑、本金↓；仍面對晚年成本", d: [1, -12, 16, 12, 3, -8], retire: true, travel: true, lifestyle: 3, freeTravel: true });
-    }
-    if (canTravelFree()) {
-      opts.push({ k: nextK(), lab: "去旅行", tip: "花費一筆；開心／關係↑（約兩年後可再去）", d: [1, -8, -1, 10, 4, -2], travel: true, freeTravel: true });
-    }
-    opts.push({ k: nextK(), lab: "暫時再說", tip: "維持現狀", d: [0, 0, 0, 0, 0, 0] });
-    const pn = S.earlyFI || S.retired ? "你已有財務餘裕。" : "戶口與資產看起來夠支撐一段時間。";
-    return {
-      tag: "自由行動", fin: true, title: "財務自由",
-      sit: pn + "要提前退休，還是先去旅行？",
-      major: true, freeAction: true, freeKind: "fi",
-      opts: opts
-    };
+
+  const LIFE_D_NO_ADD = [30, 34, 41, 58];
+  const LIFE_D_MARRY_THEME = [36, 43];
+  const LIFE_D_KIDS_THEME = [36, 38, 43];
+  const LIFE_D_FI_THEME = [46, 48, 52];
+  const LIFE_D_LATE = [48, 50, 55];
+
+  function noteSkippedOfficialKey(age) {
+    if (!S) return;
+    const n = Number(age);
+    if (n === 30 && !S.married) S.missedMarry = true;
+    if (n === 34 && !S.kids && !S.declinedKids) S.missedKids = true;
+    if (n === 41 && !S.earlyFI && !S.retired) S.missedFI = true;
   }
-  function buildMarryFreeEvent() {
-    const pn = S.partnerName || who().partner;
+
+  function canOfferMarryD() {
+    return !!(S && S.partner && !S.married && !S.refusedPartner);
+  }
+  function canOfferKidsD() {
+    if (!S || !S.married || S.kids || S.declinedKids) return false;
+    if (S.age < 22 || S.age > 48) return false;
+    return true;
+  }
+  function canOfferFID() {
+    return canRetireFree();
+  }
+
+  function marryDPending() { return !!(S && (S.missedMarry || S.deferredMarry)); }
+  function kidsDPending() { return !!(S && (S.missedKids || S.deferredKids)); }
+  function fiDPending() { return !!(S && (S.missedFI || S.deferredFI)); }
+
+  function isLateLifeD(kind, age) {
+    age = Number(age);
+    if (LIFE_D_LATE.indexOf(age) < 0) return false;
+    if (kind === "marry") return LIFE_D_MARRY_THEME.indexOf(age) < 0 && age > 43;
+    if (kind === "kids") return LIFE_D_KIDS_THEME.indexOf(age) < 0 && age > 43;
+    if (kind === "fi") return LIFE_D_FI_THEME.indexOf(age) < 0 && age > 52;
+    return false;
+  }
+
+  function chooseLifeD(age, able) {
+    /* able: { marry, kids, fi }；同一張卡只加一個 D */
+    age = Number(age);
+    if (!able) able = {};
+    if (LIFE_D_NO_ADD.indexOf(age) >= 0) return null;
+    const marry = !!able.marry, kids = !!able.kids, fi = !!able.fi;
+    if (LIFE_D_MARRY_THEME.indexOf(age) >= 0 || LIFE_D_KIDS_THEME.indexOf(age) >= 0) {
+      if (marry) return "marry";
+      if (kids) return "kids";
+      if (fi) return "fi";
+      return null;
+    }
+    if (LIFE_D_FI_THEME.indexOf(age) >= 0) {
+      /* 46／48／52 較相關財務自由；若本題只待補家庭項則走家庭 */
+      if (fi) return "fi";
+      if (marry) return "marry";
+      if (kids) return "kids";
+      return null;
+    }
+    if (LIFE_D_LATE.indexOf(age) >= 0) {
+      if (marry) return "marry";
+      if (kids) return "kids";
+      if (fi) return "fi";
+    }
+    return null;
+  }
+
+  function lifeDAbleAt(age) {
+    age = Number(age);
+    const able = { marry: false, kids: false, fi: false };
+    if (!S || LIFE_D_NO_ADD.indexOf(age) >= 0) return able;
+    if (canOfferMarryD() && marryDPending()) {
+      if (LIFE_D_MARRY_THEME.indexOf(age) >= 0) able.marry = true;
+      else if (isLateLifeD("marry", age) && !S.lateMarryOffered) able.marry = true;
+    }
+    if (canOfferKidsD() && kidsDPending()) {
+      if (LIFE_D_KIDS_THEME.indexOf(age) >= 0) able.kids = true;
+      else if (isLateLifeD("kids", age) && !S.lateKidsOffered) able.kids = true;
+    }
+    if (canOfferFID() && fiDPending()) {
+      if (LIFE_D_FI_THEME.indexOf(age) >= 0) able.fi = true;
+      else if (isLateLifeD("fi", age) && !S.lateFIOffered) able.fi = true;
+    }
+    return able;
+  }
+
+  function pickLifeDKind(age) {
+    return chooseLifeD(age, lifeDAbleAt(age));
+  }
+
+  function buildLifeDOption(kind) {
+    if (kind === "marry") {
+      return { k: "D", lab: "現在結婚", tip: "接着選擇婚禮形式", d: [0, 0, 0, 0, 0, 0], lifeD: "marry" };
+    }
+    if (kind === "kids") {
+      return { k: "D", lab: "現在計劃生育", tip: "往後開支↑；可命名", d: [-5, -3, -8, 10, 12, 2], kids: true, lifeD: "kids" };
+    }
+    return { k: "D", lab: "宣佈財務自由", tip: "固定收入將停止或大減；先確認", d: [0, 0, 0, 0, 0, 0], lifeD: "fi" };
+  }
+
+  function attachLifeD(ev, age) {
+    if (!ev || !S) return ev;
+    const kind = pickLifeDKind(age);
+    if (!kind) return ev;
+    if ((ev.opts || []).some(o => o.k === "D" || o.lifeD)) return ev;
+    ev.opts = (ev.opts || []).concat([buildLifeDOption(kind)]);
+    ev.lifeDKind = kind;
+    if (isLateLifeD(kind, age)) {
+      if (kind === "marry") S.lateMarryOffered = true;
+      if (kind === "kids") S.lateKidsOffered = true;
+      if (kind === "fi") S.lateFIOffered = true;
+    }
+    return ev;
+  }
+
+  function buildFILifestyleEvent(sourceEv) {
     return {
-      tag: "自由行動", fin: true, title: "是否結婚？", marry: true,
-      sit: "你和 " + pn + " 正在交往。想現在結婚嗎？",
-      major: true, freeAction: true, freeKind: "marry",
+      tag: "理財決策", fin: true, title: "財務自由後的生活方式",
+      sit: "你已確定宣佈財務自由。想怎樣安排往後的生活？",
+      major: true, freeAction: true, freeKind: "fi", fiLifestyleFollowup: true,
+      keyAge: sourceEv && sourceEv.keyAge != null ? sourceEv.keyAge : undefined,
+      sourceEv: sourceEv || null,
       opts: [
-        { k: "A", lab: "盛大婚禮", tip: "開支大", d: [-1, -8, -4, 12, 12, -6], marry: true },
-        { k: "B", lab: "從簡結婚", tip: "保留儲蓄", d: [-1, -2, -1, 8, 10, 5], marry: true },
-        { k: "C", lab: "暫時不結", tip: "繼續拍拖", d: [0, 1, 1, 1, -2, 2], declinedMarry: true }
+        { k: "A", lab: "減少全職工作、享受生活", tip: "停全職；空閒↑；生活與醫療開支仍在", d: [2, -6, 18, 8, 2, -4], semiRetire: true, earlyFI: true, lifestyle: 2, _fiConfirmed: true },
+        { k: "B", lab: "加大旅遊／嗜好開支", tip: "開心↑、本金↓；固定收入將大減", d: [1, -12, 16, 12, 3, -8], semiRetire: true, earlyFI: true, travel: true, lifestyle: 3, freeTravel: true, _fiConfirmed: true }
       ]
     };
   }
-  function buildKidsFreeEvent() {
-    const pn = S.partnerName || who().partner;
-    return {
-      tag: "自由行動", fin: true, title: "是否生育？",
-      sit: "你和 " + pn + " 已結婚。想現在計劃生孩子嗎？",
-      major: true, freeAction: true, freeKind: "kids", needMarried: true,
+
+  function presentMarryFollowUp(sourceEv) {
+    const pn = (S && (S.partnerName || (typeof who === "function" ? who().partner : ""))) || "另一半";
+    presentEvent({
+      tag: "理財決策", fin: true, title: "婚禮形式",
+      sit: "你決定現在和 " + pn + " 結婚。想舉辦盛大婚禮，還是從簡結婚？",
+      major: true, marryFollowup: true,
+      keyAge: sourceEv && sourceEv.keyAge != null ? sourceEv.keyAge : undefined,
+      sourceEv: sourceEv,
       opts: [
-        { k: "A", lab: "計劃生育", tip: "往後開支↑；可命名", d: [-5, -3, -8, 10, 12, 2], kids: true },
-        { k: "B", lab: "稍後再決定", tip: "先穩固", d: [0, 2, 0, 0, -2, 4] },
-        { k: "C", lab: "不生育", tip: "資源改投；此局不再提示生孩子", d: [1, 5, 5, 2, -6, 3], declinedKids: true }
+        { k: "A", lab: "盛大婚禮", tip: "開支大", d: [-1, -8, -4, 12, 12, -6], marry: true, _marryStyle: true },
+        { k: "B", lab: "從簡結婚", tip: "保留儲蓄", d: [-1, -2, -1, 8, 10, 5], marry: true, _marryStyle: true },
+        { k: "C", lab: "返回", tip: "回到原題，可改選其他選項", d: [0, 0, 0, 0, 0, 0], backToSource: true }
+      ]
+    });
+  }
+
+  function showFIConfirmFromEvent(sourceEv, chosenOpt) {
+    if (!S) return;
+    clearAutoAge();
+    S.phase = "fi-confirm";
+    agingLock = false;
+    showPopup({
+      kind: "fin", major: true, emo: "🌅", tag: "財務自由確認",
+      main: "確定要宣佈財務自由嗎？",
+      sub: "固定工作收入將停止或大幅減少；往後主要依靠已有資產、投資或少量兼職；生活和醫療等開支仍在。",
+      skipApply: true,
+      opts: [
+        { k: "A", lab: "確定", tip: "接着選擇生活方式" },
+        { k: "B", lab: "返回", tip: "回到原題，可改選其他選項" }
+      ]
+    }, function (opt) {
+      if (opt && opt.k === "A") {
+        if (chosenOpt && chosenOpt.lifeD === "fi") {
+          const ev = buildFILifestyleEvent(sourceEv);
+          if (ev && ev.opts && ev.opts.length) presentEvent(ev);
+          else showIdle();
+        } else {
+          const confirmed = Object.assign({}, chosenOpt, { _fiConfirmed: true });
+          pick(sourceEv, confirmed);
+        }
+      } else if (sourceEv) {
+        presentEvent(sourceEv);
+      } else {
+        showIdle();
+      }
+    });
+  }
+
+  function showFIConfirm() {
+    /* 保留入口：無原題時的確認卡（測試／後備）；返回不改狀態 */
+    showFIConfirmFromEvent(null, { lifeD: "fi" });
+  }
+
+  function buildTravelFreeEvent() {
+    return {
+      tag: "自由行動", fin: true, title: "去旅行",
+      sit: "想現在用一筆儲蓄去旅行嗎？（約兩年後可再去）",
+      major: true, freeAction: true, freeKind: "travel",
+      opts: [
+        { k: "A", lab: "去旅行", tip: "花費一筆；開心／關係↑", d: [1, -8, -1, 10, 4, -2], travel: true, freeTravel: true },
+        { k: "B", lab: "暫時再說", tip: "維持現狀", d: [0, 0, 0, 0, 0, 0], travelOffer: true }
       ]
     };
   }
   function openFreeAction(kind) {
     if (!S || S.phase !== "idle" || agingLock) return;
     clearAutoAge();
-    let ev = null;
-    if (kind === "fi" && canShowFI()) ev = buildFIFreeEvent();
-    else if (kind === "marry" && canShowMarry()) ev = buildMarryFreeEvent();
-    else if (kind === "kids" && canShowKids()) ev = buildKidsFreeEvent();
-    if (!ev || !ev.opts.length) { showIdle(); return; }
-    presentEvent(ev);
+    if (kind === "travel" && canShowTravel()) {
+      const ev = buildTravelFreeEvent();
+      if (ev && ev.opts.length) { presentEvent(ev); return; }
+    }
+    showIdle();
   }
   function renderFreeActions() {
     const bar = document.getElementById("freeBar");
     if (!bar || !S) return;
     bar.innerHTML = "";
     const items = [];
-    if (canShowMarry()) items.push({ kind: "marry", cls: "marry", lab: "💍 結婚" });
-    if (canShowKids()) items.push({ kind: "kids", cls: "kids", lab: "👶 生孩子" });
-    if (canShowFI()) items.push({ kind: "fi", cls: "fi", lab: "🌅 財務自由" });
+    if (canShowTravel()) {
+      items.push({ kind: "travel", cls: "cont", lab: "✈️ 去旅行" });
+      markTravelOffered();
+    }
     if (!items.length) {
       bar.classList.add("hidden");
       return;
@@ -2790,8 +3052,8 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
       b.type = "button";
       b.className = "free-btn " + it.cls;
       b.textContent = it.lab;
-      b.onclick = () => openFreeAction(it.kind);
       bar.appendChild(b);
+      b.onclick = () => openFreeAction(it.kind);
     });
     const cont = document.createElement("button");
     cont.type = "button";
@@ -2825,8 +3087,6 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
       autoAgeTimer = setTimeout(() => { autoAgeTimer = null; doAgeUp(); }, 500);
     } else if (agePaused) {
       /* 已暫停：等學生選速度或快轉 */
-    } else if (hasAnyFreeAction()) {
-      /* 有自由行動時暫停自動長大，等學生撳行動或「繼續長大」 */
     } else {
       autoAgeTimer = setTimeout(() => {
         autoAgeTimer = null;
@@ -2894,7 +3154,7 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
 
   function buildKeyEvent(age) {
     const src = KEY[age];
-    return {
+    const ev = {
       tag: src.tag, fin: !!src.fin, title: src.title, sit: src.sit,
       marry: !!src.marry,
       storyConfess: !!src.storyConfess,
@@ -2909,6 +3169,8 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
       theme: src.theme,
       opts: src.opts.map(o => Object.assign({}, o, { d: o.d.slice() }))
     };
+    attachLifeD(ev, age);
+    return ev;
   }
 
   function markTheme(src) {
@@ -2923,8 +3185,8 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     if (src.needStudyStage && !(isStudent() || (S.age <= 24 && S.career))) return false;
     if (src.needNewlywed && !(S.married && !S.kids && S.age <= 42)) return false;
     if (src.needYoungSingle && !(!S.married && !S.partner && !S.retired && S.age < 35)) return false;
-    if (src.needNearRetire && !(S.age >= 55 && S.age < 65 && !S.retired)) return false;
-    if (src.needRetiredLife && !(S.retired || (S.earlyFI && S.age >= 58))) return false;
+    if (src.needNearRetire && !(S.age >= 55 && S.age < 65 && !S.retired && !S.earlyFI)) return false;
+    if (src.needRetiredLife && !S.retired) return false;
     if (src.needKidsGrown && !(S.kids && kidYears(S) >= 18)) return false;
     if (src.hasHomeMaybe && !(S.hasHome || S.biggerHome || S.renting || S.age >= 55)) return false;
     if (src.needNoHome && (S.hasHome || S.biggerHome)) return false;
@@ -2934,6 +3196,16 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     if (src.needWealth != null && S.w < src.needWealth) return false;
     if (src.needEarlyFI && !S.earlyFI) return false;
     if (src.needRetired && !S.retired) return false;
+    if (S.earlyFI && !S.retired) {
+      if (src.theme === "retireMPFDraw" || src.theme === "chronicMed" || src.theme === "retireMedicalPrep") return false;
+      const evTxt = (src.title || "") + (src.sit || "");
+      if (evTxt.indexOf("退休") >= 0) return false;
+    }
+    if (S.retired && src.needEarlyFI) return false;
+    if (S.retired) {
+      const evTxt2 = (src.title || "") + (src.sit || "");
+      if (/財務自由|FIRE/.test(evTxt2)) return false;
+    }
     /* 遺產／遺囑：一生只問一次（任何選項後皆標記已問） */
     if (src.needEstateAsk && (S.will || S.estate || S.estateAsked)) return false;
     /* 寵物：拒拍拖／單身／不結婚（無婚無子女）可認養；有寵物後才出護理事件 */
@@ -2961,6 +3233,8 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     /* 退休／FIRE 後不再出在職事件（雙重保險） */
     if (src.needJob && (S.retired || S.earlyFI)) return false;
     if (src.needNotRetired && (S.retired || S.earlyFI)) return false;
+    if (src.needHomeOwner && !(S.hasHome || S.biggerHome)) return false;
+    if (src.needDwelling && !(S.hasHome || S.biggerHome || S.renting)) return false;
     if (src.needRenter) {
       const assumed = S.renting || (!S.hasHome && !S.biggerHome && S.age >= 22 && S.age <= 55 && !S.retired);
       if (!assumed) return false;
@@ -3131,7 +3405,7 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
       return { title: "", sit: n.friend + " 約一班單身朋友去飯聚／活動，人人都在問你去不去。" };
     }
     if (src.storyKidsAllowance) {
-      return { title: "子女家用", sit: n.kid + " 說：「爸媽，你們退休了，我們想每月給一點家用。」你會？" };
+      return { title: "子女家用", sit: n.kid + " 說：「爸媽，你們" + (S.retired ? "退休了" : "已財務自由") + "，我們想每月給一點家用。」你會？" };
     }
     return null;
   }
@@ -3254,6 +3528,7 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     }
     /* 若有關鍵但不合資格（如已退休唔再問轉工），標記跳過免卡住 */
     if (KEY[S.age] && !S.doneKey[S.age] && !eventAllowed(KEY[S.age])) {
+      noteSkippedOfficialKey(S.age);
       S.doneKey[S.age] = true;
     }
     if (isStart || Math.random() < 0.92) {
@@ -3457,7 +3732,8 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     S.phase = "event";
     S.kidsAllowanceAsked = true;
     const kn = who().kid;
-    const sit = kn + " 鄭重地說：「你們退休了，我們想每月給一點家用。」這是關係良好的回饋。你會？";
+    const lifeWord = S.retired ? "退休了" : "已財務自由";
+    const sit = kn + " 鄭重地說：「你們" + lifeWord + "，我們想每月給一點家用。」這是關係良好的回饋。你會？";
     logEvent("【大事】子女提出每月家用。", "good");
     const opts = [
       { k: "A", lab: "欣然接受", tip: "小額穩定支援、關係／安全感↑", d: [1, 4, 0, 3, 4, 3], kidsAllowance: true },
@@ -3583,6 +3859,8 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
       if (pass.d) pass.d.forEach((v, i) => { sumD[i] += v; });
       sumInc += pass.income || 0;
       sumCost += pass.cost || 0;
+      snapshotStats(S);
+      noteStageSeen(S);
 
       if (checkKO()) break;
 
@@ -3591,6 +3869,7 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
 
       /* 跳過本年關鍵但不合資格的歲數，避免日後卡住 */
       if (KEY[S.age] && !S.doneKey[S.age] && !eventAllowed(KEY[S.age])) {
+        noteSkippedOfficialKey(S.age);
         S.doneKey[S.age] = true;
       }
 
@@ -3699,8 +3978,27 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
   }
 
   function pick(ev, opt) {
+    if (!opt) return;
+    if (opt.backToSource) {
+      const src = (ev && ev.sourceEv) || null;
+      if (src) presentEvent(src);
+      else showIdle();
+      return;
+    }
+    if (opt.lifeD === "marry" && !opt._marryStyle) {
+      presentMarryFollowUp(ev);
+      return;
+    }
+    const needsFIConfirm = !opt._fiConfirmed && (
+      opt.lifeD === "fi" ||
+      (opt.earlyFI && ev && ev.keyAge === 41 && !ev.fiLifestyleFollowup)
+    );
+    if (needsFIConfirm) {
+      showFIConfirmFromEvent(ev, opt);
+      return;
+    }
     document.querySelectorAll(".choice").forEach(b => { b.disabled = true; });
-    let d = opt.d.slice();
+    let d = (opt.d || [0, 0, 0, 0, 0, 0]).slice();
     d = resolveRisk(opt, d);
     apply(d);
     const stageBefore = bafsStageId(S);
@@ -3713,15 +4011,19 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     if (opt.cert != null) { S.cert = opt.cert; if (opt.cert >= 1) S.prudence += 1; }
     if (opt.travel) S.travel = true;
     if (opt.freeTravel) S.lastTravelAge = S.age;
+    if (opt.travelOffer) markTravelOffered();
     if (opt.declinedKids) S.declinedKids = true;
+    if (opt.deferMarry) S.deferredMarry = true;
+    if (opt.deferKids) S.deferredKids = true;
+    if (opt.deferFI) S.deferredFI = true;
     if (opt.partner) {
       S.partner = true; S.refusedPartner = false;
       if (!S.partnerName) S.partnerName = (ev.storyConfess ? who().crush : who().crush2);
     }
     if (opt.refusePartner) { S.refusedPartner = true; S.partner = false; S.partnerName = null; }
     if (opt.declinedMarry) S.declinedMarry = true;
-    if (opt.marry) { S.married = true; S.partner = true; S.refusedPartner = false; S.declinedMarry = false; }
-    if (opt.kids) { S.kids = true; if (S.kidsBirthAge == null) S.kidsBirthAge = S.age; if (!S.kidName) S.kidName = defaultKidName(); }
+    if (opt.marry) { S.married = true; S.partner = true; S.refusedPartner = false; S.declinedMarry = false; S.deferredMarry = false; addLifeMark(S, "marry", "結婚"); }
+    if (opt.kids) { S.kids = true; if (S.kidsBirthAge == null) S.kidsBirthAge = S.age; if (!S.kidName) S.kidName = defaultKidName(); S.deferredKids = false; addLifeMark(S, "kids", "生孩子"); }
     if (opt.pet) {
       S.hasPet = true;
       if (!S.petName) S.petName = defaultPetName();
@@ -3734,12 +4036,17 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     if (opt.mpf) { S.mpf = opt.mpf; S.prudence += 1; }
     if (opt.invest) S.invest = (S.invest || 0) + opt.invest;
     if (opt.eduSave) S.eduSave = opt.eduSave;
-    if (opt.retire) { S.retired = true; S.semiRetired = false; S.earlyFI = true; }
-    if (opt.semiRetire) { S.semiRetired = true; S.retired = false; }
-    if (opt.earlyFI) {
-      S.earlyFI = true; S.semiRetired = true;
-      /* FIRE 當下空閒明顯回升 */
-      S.t = clamp(Math.max(S.t, 55) + 8);
+    if (opt.retire) {
+      S.retired = true; S.semiRetired = false; S.earlyFI = false;
+      addLifeMark(S, "retire", "退休");
+    } else {
+      if (opt.semiRetire) { S.semiRetired = true; S.retired = false; }
+      if (opt.earlyFI) {
+        S.earlyFI = true; S.semiRetired = true; S.deferredFI = false;
+        /* 財務自由當下空閒明顯回升 */
+        S.t = clamp(Math.max(S.t, 55) + 8);
+        addLifeMark(S, "fi", "財務自由");
+      }
     }
     if (opt.lightWork) S.lightWorkOnly = true;
     if (opt.lifestyle) S.lifestyle = Math.max(S.lifestyle || 0, opt.lifestyle);
@@ -3750,7 +4057,7 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     if (opt.car) S.hasCar = true;
     if (opt.renting) S.renting = true;
     if (opt.savingHome) S.savingHome = true;
-    if (opt.hasHome) { S.hasHome = true; S.renting = false; }
+    if (opt.hasHome) { S.hasHome = true; S.renting = false; addLifeMark(S, "home", "置業"); }
     if (opt.biggerHome) S.biggerHome = true;
     if (opt.insured) S.insured = true;
     if (opt.spouseStayHome) S.spouseStayHome = true;
@@ -3776,6 +4083,7 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     if (opt.risk === "high") S.leverage = (S.leverage || 0) + 1;
     /* 審慎選擇：安全感加成明顯且非高風險 */
     if (!opt.risk && !opt.lever && (opt.d[5] || 0) >= 5) S.prudence += 1;
+    noteStageSeen(S);
     pushStageVerdicts(opt, stageBefore);
 
     if (ev.keyAge != null) S.doneKey[ev.keyAge] = true;
@@ -3873,19 +4181,9 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
       logEvent("事業變動：" + (opt.lab || "轉工／升職") + "。", "fin");
     }
     if (opt.earlyFI && !opt.retire) {
-      majors.push({
-        kind: "fin", major: true, emo: "🌅", tag: "人生大事・財務自由",
-        main: "你宣佈提早財務自由（FIRE）！",
-        sub: "全職收入大減、空閒大增；仍可享受生活，但健康與關係風險不會消失。",
-        okLabel: "繼續", d: null
-      });
+      logEvent("你宣佈財務自由：固定工作收入將停止或大幅減少，往後主要依靠已有資產、投資或少量兼職。", "fin");
     } else if (opt.retire) {
-      majors.push({
-        kind: "fin", major: true, emo: "🏖️", tag: "人生大事・退休",
-        main: "你踏入退休生活。",
-        sub: "工作收入停止；臨退／退休階段會出現醫療、旅行、護理等財務決策。",
-        okLabel: "繼續", d: null
-      });
+      logEvent("你踏入退休生活：工作收入停止，須妥善管理積蓄以應付生活和醫療開支。", "fin");
     }
 
     if (opt.refusePartner) logEvent("婉拒了追求，選擇繼續單身。", "note");
@@ -3914,7 +4212,7 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
 
     if (ev.major || ev.keyAge != null) {
       S.history.push({
-        age: S.age, title: title, choice: opt.lab,
+        age: S.age, title: title, choice: opt.lab, stage: stageBefore,
         after: { h: S.h, w: S.w, t: S.t, hap: S.hap, rel: S.rel, sec: S.sec }
       });
       scheduleSync("playing");
@@ -3982,11 +4280,130 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     return "balanced";
   }
 
+
+  const GROWTH_LINES = [
+    { key: "h", lab: "健康", color: "#f87171", light: "#dc2626" },
+    { key: "w", lab: "金錢", color: "#fbbf24", light: "#d97706" },
+    { key: "t", lab: "空閒時間", color: "#60a5fa", light: "#2563eb" },
+    { key: "hap", lab: "開心", color: "#c084fc", light: "#7c3aed" },
+    { key: "rel", lab: "關係", color: "#34d399", light: "#059669" },
+    { key: "sec", lab: "安全感", color: "#fb923c", light: "#ea580c" }
+  ];
+  const MARK_META = {
+    fi: { short: "自", label: "財務自由", color: "#fbbf24" },
+    retire: { short: "退", label: "退休", color: "#94a3b8" },
+    marry: { short: "婚", label: "結婚", color: "#f472b6" },
+    home: { short: "業", label: "置業", color: "#38bdf8" },
+    kids: { short: "子", label: "生孩子", color: "#86efac" }
+  };
+
+  function growthLineColor(row) {
+    return (typeof document !== "undefined" && document.body && document.body.classList.contains("light"))
+      ? row.light : row.color;
+  }
+
+  function renderGrowthChart(host, s) {
+    if (!host) return "";
+    const hist = (s && s.statHistory) ? s.statHistory.slice() : [];
+    if (!hist.length) {
+      host.innerHTML = "<p class='sub'>本局沒有年度指標紀錄。</p>";
+      return host.innerHTML;
+    }
+    const hidden = host._hiddenKeys || (host._hiddenKeys = {});
+    const W = 640, H = 260;
+    const pad = { l: 36, r: 14, t: 16, b: 28 };
+    const ages = hist.map(r => r.age);
+    const minAge = Math.min.apply(null, ages);
+    const maxAge = Math.max.apply(null, ages);
+    const ageSpan = Math.max(1, maxAge - minAge);
+    let ymin = 0, ymax = 100;
+    hist.forEach(r => {
+      GROWTH_LINES.forEach(row => {
+        const v = r[row.key];
+        if (typeof v === "number") {
+          if (v < ymin) ymin = v;
+          if (v > ymax) ymax = v;
+        }
+      });
+    });
+    if (ymax === ymin) ymax = ymin + 1;
+    const innerW = W - pad.l - pad.r;
+    const innerH = H - pad.t - pad.b;
+    const xOf = age => pad.l + ((age - minAge) / ageSpan) * innerW;
+    const yOf = val => pad.t + (1 - (val - ymin) / (ymax - ymin)) * innerH;
+    const isLight = document.body.classList.contains("light");
+    const axis = isLight ? "#64748b" : "#939bb0";
+    const grid = isLight ? "#e2e8f0" : "#353d55";
+    const txt = isLight ? "#0f172a" : "#f1f3f8";
+
+    let svg = '<svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="六項指標成長圖">';
+    /* grid + y ticks */
+    const yTicks = [];
+    const yStep = ymax - ymin > 140 ? 40 : 20;
+    for (let v = Math.ceil(ymin / yStep) * yStep; v <= ymax; v += yStep) yTicks.push(v);
+    yTicks.forEach(v => {
+      const y = yOf(v);
+      svg += '<line x1="' + pad.l + '" y1="' + y + '" x2="' + (W - pad.r) + '" y2="' + y + '" stroke="' + grid + '" stroke-width="1"/>';
+      svg += '<text x="' + (pad.l - 4) + '" y="' + (y + 3) + '" text-anchor="end" font-size="10" fill="' + axis + '">' + v + "</text>";
+    });
+    const xTicks = [];
+    for (let a = Math.ceil(minAge / 10) * 10; a <= maxAge; a += 10) xTicks.push(a);
+    if (xTicks.indexOf(minAge) < 0) xTicks.unshift(minAge);
+    if (xTicks.indexOf(maxAge) < 0) xTicks.push(maxAge);
+    xTicks.forEach(a => {
+      const x = xOf(a);
+      svg += '<line x1="' + x + '" y1="' + pad.t + '" x2="' + x + '" y2="' + (H - pad.b) + '" stroke="' + grid + '" stroke-width="1"/>';
+      svg += '<text x="' + x + '" y="' + (H - 8) + '" text-anchor="middle" font-size="10" fill="' + axis + '">' + a + "</text>";
+    });
+
+    GROWTH_LINES.forEach(row => {
+      if (hidden[row.key]) return;
+      const pts = hist.map(r => xOf(r.age) + "," + yOf(typeof r[row.key] === "number" ? r[row.key] : 0));
+      svg += '<polyline fill="none" stroke="' + growthLineColor(row) + '" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="' + pts.join(" ") + '"/>';
+    });
+
+    const marks = (s.lifeMarks || []).slice();
+    marks.forEach(m => {
+      const meta = MARK_META[m.kind] || { short: "＊", label: m.label || m.kind, color: "#94a3b8" };
+      const x = xOf(m.age);
+      svg += '<line x1="' + x + '" y1="' + pad.t + '" x2="' + x + '" y2="' + (H - pad.b) + '" stroke="' + meta.color + '" stroke-width="1" stroke-dasharray="3 3" opacity="0.85"/>';
+      svg += '<circle cx="' + x + '" cy="' + pad.t + '" r="7" fill="' + meta.color + '"><title>' + m.age + "歲　" + meta.label + "</title></circle>";
+      svg += '<text x="' + x + '" y="' + (pad.t + 3) + '" text-anchor="middle" font-size="9" font-weight="700" fill="#0f172a">' + meta.short + "</text>";
+    });
+    svg += "</svg>";
+
+    let leg = '<div class="growth-leg">';
+    GROWTH_LINES.forEach(row => {
+      const on = !hidden[row.key];
+      leg += '<button type="button" data-gkey="' + row.key + '" class="' + (on ? "" : "off") + '">' +
+        '<span class="sw" style="background:' + growthLineColor(row) + '"></span>' + row.lab + "</button>";
+    });
+    leg += "</div>";
+    let cap = "";
+    if (marks.length) {
+      cap = '<div class="growth-marks">' + marks.map(m => {
+        const meta = MARK_META[m.kind] || { label: m.label || m.kind };
+        return "<span>" + m.age + "歲　" + (meta.label || m.label) + "</span>";
+      }).join("") + "</div>";
+    }
+    host.innerHTML = svg + leg + cap;
+    host.querySelectorAll(".growth-leg button").forEach(btn => {
+      btn.onclick = function () {
+        const k = btn.getAttribute("data-gkey");
+        hidden[k] = !hidden[k];
+        renderGrowthChart(host, s);
+      };
+    });
+    return host.innerHTML;
+  }
+
   function endGame() {
     clearAutoAge();
     if (!S.bankrupt && !S.dead && S.age < 68) S.age = 68;
     agingLock = false;
     S.phase = "end";
+    snapshotStats(S);
+    noteStageSeen(S);
     renderHUD();
     show("end");
     const en = ENDINGS[pickEnding()];
@@ -4001,6 +4418,8 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     document.getElementById("goalResult").textContent =
       "目標達成度：" + Math.round(sc * 100) + "%　｜　" +
       (S.goals.map(g => GOALS.find(x => x.id === g).label).join("、") || "無");
+    const chartHost = document.getElementById("growthChart");
+    if (chartHost) renderGrowthChart(chartHost, S);
     document.getElementById("stageSummary").innerHTML = renderStageSummaryHTML(S);
     document.getElementById("reviewList").innerHTML = S.history.length
       ? S.history.map(h => {
@@ -4044,11 +4463,17 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     if (opt.save) { S.save = opt.save; S.prudence += 1; }
     if (opt.cert != null) { S.cert = opt.cert; if (opt.cert >= 1) S.prudence += 1; }
     if (opt.travel) S.travel = true;
+    if (opt.freeTravel) S.lastTravelAge = S.age;
+    if (opt.travelOffer) markTravelOffered();
     if (opt.partner) { S.partner = true; S.refusedPartner = false; if (!S.partnerName) S.partnerName = who().crush; }
     if (opt.refusePartner) { S.refusedPartner = true; S.partner = false; S.partnerName = null; }
     if (opt.declinedMarry) S.declinedMarry = true;
-    if (opt.marry) { S.married = true; S.partner = true; S.refusedPartner = false; S.declinedMarry = false; }
-    if (opt.kids) { S.kids = true; if (S.kidsBirthAge == null) S.kidsBirthAge = age; if (!S.kidName) S.kidName = defaultKidName(); }
+    if (opt.declinedKids) S.declinedKids = true;
+    if (opt.deferMarry) S.deferredMarry = true;
+    if (opt.deferKids) S.deferredKids = true;
+    if (opt.deferFI) S.deferredFI = true;
+    if (opt.marry) { S.married = true; S.partner = true; S.refusedPartner = false; S.declinedMarry = false; S.deferredMarry = false; addLifeMark(S, "marry", "結婚"); }
+    if (opt.kids) { S.kids = true; if (S.kidsBirthAge == null) S.kidsBirthAge = age; if (!S.kidName) S.kidName = defaultKidName(); S.deferredKids = false; addLifeMark(S, "kids", "生孩子"); }
     if (opt.pet) { S.hasPet = true; if (!S.petName) S.petName = defaultPetName(); S.petAsked = true; }
     if (opt.petAsk || opt._petAsk) S.petAsked = true;
     if (opt.kidsAllowance) { S.kidsAllowance = true; S.kidsAllowanceAsked = true; }
@@ -4056,9 +4481,18 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     if (opt.mpf) { S.mpf = opt.mpf; S.prudence += 1; }
     if (opt.invest) S.invest = (S.invest || 0) + opt.invest;
     if (opt.eduSave) S.eduSave = opt.eduSave;
-    if (opt.retire) { S.retired = true; S.semiRetired = false; S.earlyFI = true; S.t = clamp(Math.max(S.t, 55) + 8); }
-    if (opt.semiRetire) { S.semiRetired = true; S.retired = false; }
-    if (opt.earlyFI) { S.earlyFI = true; S.semiRetired = true; S.t = clamp(Math.max(S.t, 55) + 8); }
+    if (opt.retire) {
+      S.retired = true; S.semiRetired = false; S.earlyFI = false;
+      S.t = clamp(Math.max(S.t, 55) + 8);
+      addLifeMark(S, "retire", "退休");
+    } else {
+      if (opt.semiRetire) { S.semiRetired = true; S.retired = false; }
+      if (opt.earlyFI) {
+        S.earlyFI = true; S.semiRetired = true; S.deferredFI = false;
+        S.t = clamp(Math.max(S.t, 55) + 8);
+        addLifeMark(S, "fi", "財務自由");
+      }
+    }
     if (opt.lightWork) S.lightWorkOnly = true;
     if (opt.lifestyle) S.lifestyle = Math.max(S.lifestyle || 0, opt.lifestyle);
     if (opt.prudence) S.prudence += opt.prudence;
@@ -4068,7 +4502,7 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     if (opt.car) S.hasCar = true;
     if (opt.renting) S.renting = true;
     if (opt.savingHome) S.savingHome = true;
-    if (opt.hasHome) { S.hasHome = true; S.renting = false; }
+    if (opt.hasHome) { S.hasHome = true; S.renting = false; addLifeMark(S, "home", "置業"); }
     if (opt.biggerHome) S.biggerHome = true;
     if (opt.insured) S.insured = true;
     if (opt.spouseStayHome) S.spouseStayHome = true;
@@ -4104,8 +4538,12 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
       if (age > 18) {
         S.age = age;
         yearlyPass(age);
+        snapshotStats(S);
+        noteStageSeen(S);
       } else {
         S.age = 18;
+        snapshotStats(S);
+        noteStageSeen(S);
       }
       if (S.w <= DEBT_KO) { S.bankrupt = true; break; }
       if (S.h <= 0) { S.dead = true; S.h = 0; break; }
@@ -4139,6 +4577,7 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
       if (S.doneKey[age]) continue;
       if (!eventAllowed(src)) {
         skipped.push({ age, title: src.title, reason: "gated" });
+        noteSkippedOfficialKey(age);
         S.doneKey[age] = true;
         continue;
       }
@@ -4152,6 +4591,7 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
       const stageBefore = bafsStageId(S);
       apply(dd);
       applyOptFlags(opt, age);
+      noteStageSeen(S);
       pushStageVerdicts(opt, stageBefore);
       if (src.estateAsk) S.estateAsked = true;
       if (src.petAsk) S.petAsked = true;
@@ -4164,7 +4604,8 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
       S.doneKey[age] = true;
       S.decisions++;
       hit.push({ age, title: src.title || src.sit, choice: opt.lab, w: S.w, t: S.t });
-      S.history.push({ age, title: src.title, choice: opt.lab, after: { w: S.w, t: S.t } });
+      S.history.push({ age, title: src.title, choice: opt.lab, stage: stageBefore, after: { w: S.w, t: S.t } });
+      snapshotStats(S);
 
       /* 即時矛盾檢查 */
       if (src.needJob && isStudentState({ career: S.career, age: age, retired: false, earlyFI: false })) {
@@ -4268,6 +4709,8 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     return {
       label, age: S.age, w: S.w, h: S.h, t: S.t, hap: S.hap, rel: S.rel, sec: S.sec, career: S.career,
       earlyFI: S.earlyFI, retired: S.retired, married: S.married, kids: S.kids,
+      statHistory: (S.statHistory || []).slice(), stagesSeen: Object.assign({}, S.stagesSeen || {}),
+      lifeMarks: (S.lifeMarks || []).slice(),
       hasPet: S.hasPet, petName: S.petName, kidsAllowance: S.kidsAllowance,
       hasCar: S.hasCar, leverageStock: S.leverageStock, refusedPartner: S.refusedPartner,
       will: S.will, estate: S.estate, estateAsked: S.estateAsked,
@@ -4650,7 +5093,7 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
       "親戚結婚禮金。",
       "舊同事找你幫手做一個短期項目，酬勞不錯但會食掉週末。",
       "超市大減價。",
-      "連續加班後，晨早起來头晕。",
+      "連續加班後，晨早起來頭暈。",
       "物業管理費上調。",
       "退休後想兼職？",
       "友人推介高息「穩陣」產品。"
@@ -4742,26 +5185,36 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     const layoffC = layoffRand && layoffRand.opts && layoffRand.opts.find(o => o.k === "C");
     if (layoffC && layoffC.emergency) contra("layoff_C_has_emergency");
 
-    /* —— 結局本局回顧：階段摘要 —— */
+    /* —— 結局本局回顧：六階段學習區塊 —— */
     function assertStageSummary(r, expectIds, mustHaveRe, labelExtra) {
       const sum = r.stageSummary || [];
+      if (sum.length !== 6) r.contradictions.push("stage_summary_not_6:" + sum.length + (labelExtra || ""));
       const ids = sum.map(x => x.id);
-      expectIds.forEach(id => {
+      ["1", "2", "3", "4", "5", "6"].forEach(id => {
         if (ids.indexOf(id) < 0) r.contradictions.push("stage_summary_missing_" + id + (labelExtra || ""));
       });
-      /* 跳過嘅婚姻階段唔應出現 */
+      const byId = {};
+      sum.forEach(st => { byId[st.id] = st; });
+      BAFS_STAGES.forEach(st => {
+        if (!byId[st.id] || byId[st.id].need !== st.need)
+          r.contradictions.push("stage_need_mismatch_" + st.id);
+        if (!byId[st.id] || byId[st.id].name !== st.name)
+          r.contradictions.push("stage_name_mismatch_" + st.id);
+      });
+      expectIds.forEach(id => {
+        if (!byId[id] || byId[id].entered !== true)
+          r.contradictions.push("stage_summary_missing_" + id + (labelExtra || ""));
+      });
+      /* 未結婚路徑仍列出階段 2—4，並標本局未進入 */
       if (!r.married) {
         ["2", "3", "4"].forEach(id => {
-          if (ids.indexOf(id) >= 0) r.contradictions.push("stage_summary_unexpected_" + id);
+          if (byId[id] && byId[id].entered)
+            r.contradictions.push("stage_summary_unexpected_" + id);
         });
       }
-      const flat = sum.flatMap(st => st.items.map(it => (it.ok ? "✓" : "✗") + it.text));
+      const flat = sum.flatMap(st => (st.items || []).map(it => (it.ok ? "✓" : "✗") + it.text));
       (mustHaveRe || []).forEach(re => {
         if (!flat.some(t => re.test(t))) r.contradictions.push("stage_summary_missing_item:" + re);
-      });
-      /* 每段最多 3 條 */
-      sum.forEach(st => {
-        if (st.items.length > 3) r.contradictions.push("stage_summary_too_many:" + st.id + ":" + st.items.length);
       });
       /* 須有 ✓ 或 ✗ 標記語意 */
       flat.forEach(t => {
@@ -4775,8 +5228,432 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     /* 結局畫面 HTML 須含本局回顧容器 */
     if (!document.getElementById("stageSummary"))
       results[0].contradictions.push("stageSummary_dom_missing");
+    if (!document.getElementById("growthChart"))
+      results[0].contradictions.push("growthChart_dom_missing");
+
+    function contra0(msg) { results[0].contradictions.push(msg); }
+
+    /* —— 五點改動覆蓋 —— */
+    /* 1. opt.retire 不設 earlyFI；opt.earlyFI 不設 retired */
+    S = fresh(); S.gender = "male"; S.age = 65; S.career = "work";
+    applyOptFlags({ retire: true, d: [0,0,0,0,0,0] }, 65);
+    if (!S.retired) contra0("opt_retire_did_not_set_retired");
+    if (S.earlyFI) contra0("opt_retire_set_earlyFI");
+    S = fresh(); S.gender = "male"; S.age = 45; S.career = "work";
+    applyOptFlags({ earlyFI: true, semiRetire: true, d: [0,0,0,0,0,0] }, 45);
+    if (!S.earlyFI) contra0("opt_earlyFI_did_not_set_earlyFI");
+    if (S.retired) contra0("opt_earlyFI_set_retired");
+
+    /* 退休後 canShowFI 為假，畫面沒有財務自由按鈕 */
+    S = fresh(); S.gender = "male"; S.age = 66; S.career = "work"; S.retired = true; S.w = 50; S.earlyFI = false;
+    if (canShowFI()) contra0("canShowFI_true_when_retired");
+    renderFreeActions();
+    const barRetire = document.getElementById("freeBar");
+    const barTextRetire = barRetire ? barRetire.textContent : "";
+    if (barTextRetire.indexOf("財務自由") >= 0) contra0("fi_button_shown_when_retired");
+
+    /* earlyFI 後 bafsStage／HUD 不含「退休」，即使 age>=60 或 65 */
+    S = fresh(); S.gender = "male"; S.age = 65; S.career = "work"; S.earlyFI = true; S.retired = false; S.w = 50;
+    const st65 = bafsStage(S);
+    if (/退休/.test(st65)) contra0("earlyFI_age65_stage_has_retire:" + st65);
+    if (st65 !== "財務自由生活") contra0("earlyFI_age65_stage_not_fi_life:" + st65);
+    renderHUD();
+    const stageLab = (document.getElementById("stageLabel") || {}).textContent || "";
+    const flagLab = (document.getElementById("flagLabel") || {}).textContent || "";
+    if (/退休/.test(stageLab)) contra0("earlyFI_hud_stage_has_retire:" + stageLab);
+    if (/已退休/.test(flagLab)) contra0("earlyFI_hud_flag_says_retired:" + flagLab);
+    if (canShowFI()) contra0("canShowFI_true_after_earlyFI");
+
+    /* 65 歲 FI 玩家不應再抽到標題含「退休」的 KEY */
+    S = fresh(); S.gender = "male"; S.age = 65; S.career = "work"; S.earlyFI = true; S.retired = false; S.semiRetired = true; S.w = 50;
+    Object.keys(KEY).forEach(function (age) {
+      const ev = KEY[age];
+      if (!eventAllowed(ev)) return;
+      const txt = (ev.title || "") + (ev.sit || "");
+      if (txt.indexOf("退休") >= 0) contra0("fi_allowed_retire_key:" + age + ":" + ev.title);
+    });
+    if (keyEligible(65) || eventAllowed(KEY[65]) || eventAllowed(KEY[66]) || eventAllowed(KEY[67]))
+      contra0("fi_age65_formal_retire_keys_still_allowed");
+
+    /* 達標時亦可有旅行按鈕，但不因此暫停自動長大；畫面沒有結婚／生育／財務自由常駐鈕 */
+    S = fresh(); S.gender = "male"; S.age = 42; S.career = "work"; S.phase = "idle"; S.w = 50;
+    S.partner = true; S.married = false; S.refusedPartner = false; S.gotFirstJob = true;
+    agePaused = false; agingLock = false;
+    if (!canShowFI() && !canShowMarry()) contra0("free_action_setup_failed_for_autoage");
+    showIdle();
+    if (S.phase !== "idle") contra0("showIdle_phase_not_idle:" + S.phase);
+    if (!autoAgeTimer) contra0("auto_age_not_scheduled_with_free_actions");
+    const barIdle = document.getElementById("freeBar");
+    const barIdleText = barIdle ? barIdle.textContent : "";
+    if (/結婚/.test(barIdleText) || /生孩子/.test(barIdleText) || /財務自由/.test(barIdleText))
+      contra0("idle_has_removed_free_buttons:" + barIdleText);
+    clearAutoAge();
+
+    /* KEY 41 宣佈 FI 必出確認卡；返回留在原題、不改狀態 */
+    S = fresh(); S.gender = "male"; S.age = 41; S.career = "work"; S.phase = "idle"; S.w = 50;
+    S.gotFirstJob = true; agePaused = false; agingLock = false;
+    if (!canShowFI()) contra0("fi_confirm_setup_cannot_show_fi");
+    const ev41 = buildKeyEvent(41);
+    if ((ev41.opts || []).some(o => o.k === "D")) contra0("key41_has_unexpected_D");
+    presentEvent(ev41);
+    const fiBefore = { earlyFI: S.earlyFI, retired: S.retired, w: S.w, decisions: S.decisions };
+    const btn41A = Array.from(document.querySelectorAll("#choices button")).find(b => /宣佈財務自由/.test(b.textContent || ""));
+    if (!btn41A) contra0("key41_announce_btn_missing");
+    else btn41A.click();
+    const mask = document.getElementById("popupMask");
+    const popupMain = (document.getElementById("popupMain") || {}).textContent || "";
+    const popupSub = (document.getElementById("popupSub") || {}).textContent || "";
+    const popupChoices = (document.getElementById("popupChoices") || {}).textContent || "";
+    if (!mask || mask.classList.contains("hidden")) contra0("fi_confirm_popup_not_shown");
+    if (popupMain.indexOf("財務自由") < 0) contra0("fi_confirm_missing_title");
+    if (popupSub.indexOf("固定工作收入將停止或大幅減少") < 0) contra0("fi_confirm_missing_income_warning");
+    if (popupSub.indexOf("已有資產、投資或少量兼職") < 0) contra0("fi_confirm_missing_asset_line");
+    if (popupSub.indexOf("生活和醫療等開支仍在") < 0) contra0("fi_confirm_missing_expense_line");
+    if (popupChoices.indexOf("確定") < 0 || popupChoices.indexOf("返回") < 0) contra0("fi_confirm_missing_buttons");
+    if (S.earlyFI || S.retired) contra0("fi_confirm_changed_state_before_choice");
+    if (S.decisions !== fiBefore.decisions) contra0("fi_confirm_incremented_decisions");
+    const retBtn = Array.from((document.getElementById("popupChoices") || document.createElement("div")).querySelectorAll("button"))
+      .find(b => /返回/.test(b.textContent || ""));
+    if (!retBtn) contra0("fi_confirm_return_btn_missing");
+    else retBtn.click();
+    if (S.earlyFI || S.retired) contra0("fi_confirm_return_changed_flags");
+    if (S.w !== fiBefore.w) contra0("fi_confirm_return_changed_wealth");
+    if (S.decisions !== fiBefore.decisions) contra0("fi_confirm_return_incremented_decisions");
+    if (S.phase === "idle") contra0("fi_confirm_return_went_idle_instead_of_key");
+    const backLabs = Array.from(document.querySelectorAll("#choices button")).map(b => b.textContent || "").join("|");
+    if (backLabs.indexOf("再做幾年") < 0) contra0("fi_confirm_return_missing_key41_opts:" + backLabs);
+    clearAutoAge();
+
+    /* 每年都有六指標快照；結局 HTML 含折線圖與六階段區塊；六段短句一字不差 */
+    results.forEach(function (r) {
+      const hist = r.statHistory || [];
+      if (!hist.length) r.contradictions.push("statHistory_empty");
+      else {
+        if (hist[0].age !== 18) r.contradictions.push("statHistory_missing_start18:" + hist[0].age);
+        const ages = hist.map(h => h.age);
+        for (let i = 1; i < ages.length; i++) {
+          if (ages[i] < ages[i - 1]) r.contradictions.push("statHistory_not_increasing");
+        }
+        hist.forEach(h => {
+          ["h", "w", "t", "hap", "rel", "sec"].forEach(k => {
+            if (typeof h[k] !== "number") r.contradictions.push("statHistory_missing_" + k + "_at_" + h.age);
+          });
+        });
+        /* 完整活到 68 的路徑，快照應覆蓋每年 */
+        if (!r.dead && !r.bankrupt && r.age >= 68 && hist.length < 40)
+          r.contradictions.push("statHistory_too_short:" + hist.length);
+      }
+    });
+
+    const familySum = eduR && eduR.stageSummary;
+    const htmlFamily = eduR ? renderStageSummaryHTML({
+      stageVerdicts: eduR.stageVerdicts || [],
+      history: [],
+      stagesSeen: eduR.stagesSeen,
+      married: eduR.married,
+      kids: eduR.kids,
+      retired: eduR.retired,
+      earlyFI: eduR.earlyFI,
+      age: eduR.age,
+      kidsBirthAge: 34,
+      will: eduR.will, estate: eduR.estate, estateAsked: eduR.estateAsked,
+      mpf: 1, emergency: true, insured: true, eduSave: 1, kidsAllowance: eduR.kidsAllowance
+    }) : "";
+    /* 直接用路徑結果的 payload 與 HTML 生成函數檢查短句 */
+    const sampleState = {
+      age: 68, retired: true, earlyFI: false, married: true, kids: true, kidsBirthAge: 34,
+      stagesSeen: { "1": true, "2": true, "3": true, "4": true, "5": true, "6": true },
+      stageVerdicts: (eduR && eduR.stageVerdicts) || [], history: [],
+      will: true, estate: false, mpf: 1, emergency: true, insured: true, eduSave: 1,
+      kidsAllowance: !!(eduR && eduR.kidsAllowance)
+    };
+    const stageHTML = renderStageSummaryHTML(sampleState);
+    BAFS_STAGES.forEach(st => {
+      if (stageHTML.indexOf(st.need) < 0) contra0("stage_html_missing_need_" + st.id);
+      if (stageHTML.indexOf("此階段常見財務需要") < 0) contra0("stage_html_missing_need_heading");
+      if (stageHTML.indexOf("你在此階段的重要決策") < 0) contra0("stage_html_missing_decision_heading");
+    });
+    const chartBox = document.createElement("div");
+    const fireR2 = results.find(r => r.label === "FIRE+travel");
+    const chartHTML = renderGrowthChart(chartBox, {
+      statHistory: (fireR2 && fireR2.statHistory) || (eduR && eduR.statHistory) || [],
+      lifeMarks: (fireR2 && fireR2.lifeMarks) || []
+    });
+    if (!chartHTML || chartHTML.indexOf("<svg") < 0) contra0("growth_chart_missing_svg");
+    if (!chartHTML || chartHTML.indexOf("健康") < 0 || chartHTML.indexOf("金錢") < 0)
+      contra0("growth_chart_missing_legend");
+
+    /* 未結婚路徑仍列出階段 2—4 並標未進入 */
+    const singleR = results.find(r => r.label === "refuse+dating");
+    if (singleR) {
+      const shtml = renderStageSummaryHTML({
+        age: singleR.age, retired: singleR.retired, earlyFI: singleR.earlyFI,
+        married: false, kids: false, stagesSeen: singleR.stagesSeen,
+        stageVerdicts: singleR.stageVerdicts || [], history: [],
+        hasPet: singleR.hasPet, refusedPartner: true
+      });
+      ["② 新婚而沒有子女", "③ 已婚並育有較年幼的孩子", "④ 已婚並育有較年長的子女"].forEach(function (name) {
+        if (shtml.indexOf(name) < 0) singleR.contradictions.push("single_html_missing_stage:" + name);
+      });
+      const missCount = (shtml.match(/本局未進入/g) || []).length;
+      if (missCount < 3) singleR.contradictions.push("single_html_unentered_too_few:" + missCount);
+    }
+
+    /* FI 而未退休路徑：階段 6 未進入但仍顯示常見需要 */
+    if (fireR2) {
+      if (fireR2.retired) fireR2.contradictions.push("FIRE_path_unexpected_retired");
+      if (!fireR2.earlyFI) fireR2.contradictions.push("FIRE_path_missing_earlyFI");
+      const fsum = fireR2.stageSummary || [];
+      const st6 = fsum.find(st => st.id === "6");
+      if (!st6) fireR2.contradictions.push("FIRE_missing_stage6_block");
+      else {
+        if (st6.entered) fireR2.contradictions.push("FIRE_stage6_marked_entered");
+        if (st6.need !== BAFS_STAGES[5].need) fireR2.contradictions.push("FIRE_stage6_need_mismatch");
+      }
+      const fhtml = renderStageSummaryHTML({
+        age: fireR2.age, retired: false, earlyFI: true, married: fireR2.married, kids: fireR2.kids,
+        stagesSeen: fireR2.stagesSeen, stageVerdicts: fireR2.stageVerdicts || [], history: [],
+        kidsBirthAge: 34
+      });
+      if (fhtml.indexOf("本局選擇了財務自由生活") < 0) fireR2.contradictions.push("FIRE_html_missing_fi_note");
+      if (fhtml.indexOf("⑥ 退休") < 0) fireR2.contradictions.push("FIRE_html_renamed_stage6");
+      if (fhtml.indexOf(BAFS_STAGES[5].need) < 0) fireR2.contradictions.push("FIRE_html_missing_stage6_need");
+      if (!/⑥ 退休[\s\S]*本局未進入/.test(fhtml) && fhtml.indexOf("本局未進入") < 0)
+        fireR2.contradictions.push("FIRE_html_stage6_not_marked_unentered");
+      /* 階段 5 亦不應僅因 FI 而進入 */
+      const st5 = fsum.find(st => st.id === "5");
+      if (st5 && st5.entered) fireR2.contradictions.push("FIRE_stage5_entered_despite_early_fi");
+    }
+
+
+    /* —— 選擇 D：拿掉常駐按鈕、補問與確認卡 —— */
+    function clickChoice(re) {
+      const btn = Array.from(document.querySelectorAll("#choices button")).find(b => re.test(b.textContent || ""));
+      if (btn) btn.click();
+      return btn;
+    }
+    function choiceLabs() {
+      return Array.from(document.querySelectorAll("#choices button")).map(b => b.textContent || "");
+    }
+    function dKindAt(age) {
+      const ev = buildKeyEvent(age);
+      const d = (ev.opts || []).find(o => o.k === "D");
+      return d ? d.lifeD : null;
+    }
+    function dCountAt(age) {
+      return (buildKeyEvent(age).opts || []).filter(o => o.k === "D" || o.lifeD).length;
+    }
+    function setupWork(age, extra) {
+      S = fresh();
+      S.gender = "male";
+      S.age = age;
+      S.career = "work";
+      S.gotFirstJob = true;
+      S.phase = "idle";
+      S.w = 50;
+      agePaused = false;
+      agingLock = false;
+      if (extra) Object.assign(S, extra);
+    }
+
+    /* idle 畫面沒有結婚／生孩子／財務自由常駐按鈕；達標時仍可有旅行按鈕 */
+    setupWork(45, { lastTravelAge: null });
+    showIdle();
+    const bar1 = document.getElementById("freeBar");
+    const t1 = bar1 ? bar1.textContent : "";
+    if (/結婚/.test(t1) || /生孩子/.test(t1) || /財務自由/.test(t1))
+      contra0("idle_bar_has_removed_buttons:" + t1);
+    if (!canShowTravel()) contra0("travel_button_should_be_available_when_eligible");
+    else if (t1.indexOf("去旅行") < 0) contra0("travel_button_missing_when_eligible:" + t1);
+    clearAutoAge();
+
+    /* KEY 30/34/41 仍是三選正問，沒有多出一個 D */
+    setupWork(30, { partner: true, married: false });
+    if (dCountAt(30) !== 0 || (buildKeyEvent(30).opts || []).length !== 3)
+      contra0("key30_not_plain_abc:" + (buildKeyEvent(30).opts || []).map(o => o.k).join(""));
+    setupWork(34, { married: true, partner: true, kids: false });
+    if (dCountAt(34) !== 0 || (buildKeyEvent(34).opts || []).length !== 3)
+      contra0("key34_not_plain_abc:" + (buildKeyEvent(34).opts || []).map(o => o.k).join(""));
+    setupWork(41);
+    if (dCountAt(41) !== 0 || (buildKeyEvent(41).opts || []).length !== 3)
+      contra0("key41_not_plain_abc:" + (buildKeyEvent(41).opts || []).map(o => o.k).join(""));
+    setupWork(58);
+    if (dKindAt(58) === "fi" || dCountAt(58) !== 0)
+      contra0("key58_should_not_have_fi_D");
+
+    /* 結婚推遲後，36 或 43 出現選擇 D；不在推遲的下一年（32）亂加 D */
+    setupWork(36, { partner: true, married: false, deferredMarry: true, declinedMarry: true });
+    if (dKindAt(36) !== "marry") contra0("defer_marry_missing_D_at_36:" + dKindAt(36));
+    if (dCountAt(36) !== 1) contra0("defer_marry_not_single_D_at_36:" + dCountAt(36));
+    setupWork(32, { partner: true, married: false, deferredMarry: true, declinedMarry: true });
+    if (dKindAt(32)) contra0("defer_marry_D_on_non_theme_32:" + dKindAt(32));
+    setupWork(43, { partner: true, married: false, deferredMarry: true });
+    if (dKindAt(43) !== "marry") contra0("defer_marry_missing_D_at_43:" + dKindAt(43));
+
+    /* 生育推遲後，在 36/38/43 出現 D；選了不生育後不再出 */
+    setupWork(36, { married: true, partner: true, kids: false, deferredKids: true });
+    if (dKindAt(36) !== "kids") contra0("defer_kids_missing_D_at_36:" + dKindAt(36));
+    setupWork(38, { married: true, partner: true, kids: false, deferredKids: true });
+    if (dKindAt(38) !== "kids") contra0("defer_kids_missing_D_at_38:" + dKindAt(38));
+    setupWork(43, { married: true, partner: true, kids: false, deferredKids: true });
+    if (dKindAt(43) !== "kids") contra0("defer_kids_missing_D_at_43:" + dKindAt(43));
+    setupWork(36, { married: true, partner: true, kids: false, declinedKids: true, deferredKids: true });
+    if (dKindAt(36)) contra0("declinedKids_still_has_D:" + dKindAt(36));
+
+    /* 30 歲未交往、後來才有伴侶：第一個適當 KEY（36 或 43）補 D */
+    setupWork(36, { partner: true, married: false, missedMarry: true });
+    if (dKindAt(36) !== "marry") contra0("missed_marry_missing_D_at_36:" + dKindAt(36));
+    setupWork(43, { partner: true, married: false, missedMarry: true });
+    if (dKindAt(43) !== "marry") contra0("missed_marry_missing_D_at_43:" + dKindAt(43));
+    setupWork(48, { partner: true, married: false, missedMarry: true });
+    if (dKindAt(48) !== "marry") contra0("late_marry_missing_D_at_48:" + dKindAt(48));
+
+    /* 41 歲未達 FI 門檻、後來達標：46/48/52 補 D */
+    setupWork(46, { missedFI: true, w: 50 });
+    if (dKindAt(46) !== "fi") contra0("missed_fi_missing_D_at_46:" + dKindAt(46));
+    setupWork(48, { missedFI: true, w: 50 });
+    if (dKindAt(48) !== "fi") contra0("missed_fi_missing_D_at_48:" + dKindAt(48));
+    setupWork(52, { missedFI: true, w: 50 });
+    if (dKindAt(52) !== "fi") contra0("missed_fi_missing_D_at_52:" + dKindAt(52));
+    setupWork(46, { missedFI: true, w: 20 });
+    if (dKindAt(46)) contra0("fi_D_with_low_wealth:" + dKindAt(46));
+
+    /* 同一張卡最多一個 D；36 歲若同時可結婚又可生育，優先結婚 */
+    if (chooseLifeD(36, { marry: true, kids: true, fi: false }) !== "marry")
+      contra0("priority_36_should_be_marry");
+    setupWork(36, { partner: true, married: false, deferredMarry: true, deferredKids: true });
+    if (dKindAt(36) !== "marry") contra0("live_36_unmarried_should_be_marry_D:" + dKindAt(36));
+    if (dCountAt(36) !== 1) contra0("live_36_more_than_one_D:" + dCountAt(36));
+
+    /* 選 D 宣佈 FI 必出確認卡；返回後可選回 A/B/C，且 earlyFI/retired 不變 */
+    setupWork(46, { missedFI: true, w: 50 });
+    presentEvent(buildKeyEvent(46));
+    if (!clickChoice(/宣佈財務自由/)) contra0("fi_D_btn_missing_at_46");
+    const dFiBefore = { earlyFI: S.earlyFI, retired: S.retired, w: S.w, decisions: S.decisions };
+    const maskD = document.getElementById("popupMask");
+    const subD = (document.getElementById("popupSub") || {}).textContent || "";
+    if (!maskD || maskD.classList.contains("hidden")) contra0("fi_D_confirm_not_shown");
+    if (subD.indexOf("固定工作收入將停止或大幅減少") < 0) contra0("fi_D_confirm_text_missing");
+    const retD = Array.from((document.getElementById("popupChoices") || document.createElement("div")).querySelectorAll("button"))
+      .find(b => /返回/.test(b.textContent || ""));
+    if (!retD) contra0("fi_D_confirm_return_missing");
+    else retD.click();
+    if (S.earlyFI !== dFiBefore.earlyFI || S.retired !== dFiBefore.retired)
+      contra0("fi_D_return_changed_flags");
+    if (S.w !== dFiBefore.w || S.decisions !== dFiBefore.decisions)
+      contra0("fi_D_return_changed_wealth_or_decisions");
+    const labsBack = choiceLabs().join("|");
+    if (labsBack.indexOf("跳槽") < 0 || labsBack.indexOf("宣佈財務自由") < 0)
+      contra0("fi_D_return_not_back_to_abc:" + labsBack);
+
+    /* 確定後 earlyFI 為真、retired 為假，且不再出 FI 的 D */
+    setupWork(46, { missedFI: true, w: 50 });
+    presentEvent(buildKeyEvent(46));
+    clickChoice(/宣佈財務自由/);
+    const okD = Array.from((document.getElementById("popupChoices") || document.createElement("div")).querySelectorAll("button"))
+      .find(b => /確定/.test(b.textContent || ""));
+    if (!okD) contra0("fi_D_confirm_ok_missing");
+    else okD.click();
+    const lifeLabs = choiceLabs().join("|");
+    if (lifeLabs.indexOf("減少全職") < 0 || lifeLabs.indexOf("加大旅遊") < 0)
+      contra0("fi_lifestyle_opts_missing:" + lifeLabs);
+    if (lifeLabs.indexOf("暫時再說") >= 0) contra0("fi_lifestyle_still_has_postpone");
+    if (!clickChoice(/減少全職/)) contra0("fi_lifestyle_A_missing");
+    if (!S.earlyFI) contra0("fi_confirm_ok_did_not_set_earlyFI");
+    if (S.retired) contra0("fi_confirm_ok_set_retired");
+    S.age = 48;
+    if (dKindAt(48)) contra0("fi_D_still_offered_after_announce:" + dKindAt(48));
+    S.age = 52;
+    if (dKindAt(52)) contra0("fi_D_still_offered_at_52_after_announce:" + dKindAt(52));
+
+    /* 已退休不出 FI 的 D */
+    setupWork(48, { missedFI: true, retired: true, earlyFI: false, w: 50 });
+    if (dKindAt(48)) contra0("retired_has_fi_D:" + dKindAt(48));
+    setupWork(55, { missedFI: true, retired: true, earlyFI: false, w: 50 });
+    if (dKindAt(55)) contra0("retired_has_fi_D_at_55:" + dKindAt(55));
+    if (canShowFI()) contra0("canShowFI_true_when_retired_in_D_tests");
+
+    /* 合理性修正：在職題不可在升學期出現；「晕」已改為「暈」 */
+    S = fresh(); S.gender = "male"; S.age = 21; S.career = "edu"; S.w = 12;
+    const overtime = findRand(e => e.sit && e.sit.indexOf("連續加班後") >= 0);
+    const gymBuddy = findRand(e => e.sit && e.sit.indexOf("同事阿傑約你一齊報健身") >= 0);
+    const insomnia = findRand(e => e.sit && e.sit.indexOf("連續幾晚失眠") >= 0);
+    if (!overtime || !overtime.needJob) contra0("overtime_missing_needJob");
+    if (overtime && eventAllowed(overtime)) contra0("overtime_allowed_while_student");
+    if (!gymBuddy || !gymBuddy.needJob) contra0("gym_buddy_missing_needJob");
+    if (gymBuddy && eventAllowed(gymBuddy)) contra0("gym_buddy_allowed_while_student");
+    if (!insomnia || !insomnia.needJob) contra0("insomnia_missing_needJob");
+    if (insomnia && eventAllowed(insomnia)) contra0("insomnia_allowed_while_student");
+    if (overtime && /晕/.test(overtime.sit)) contra0("overtime_simplified_晕");
+    if (overtime && overtime.sit.indexOf("頭暈") < 0) contra0("overtime_missing_traditional_暈");
+    S.age = 25; S.career = "work"; S.gotFirstJob = true;
+    if (overtime && !eventAllowed(overtime)) contra0("overtime_blocked_when_employed");
+    if (gymBuddy && !eventAllowed(gymBuddy)) contra0("gym_buddy_blocked_when_employed");
+    if (insomnia && !eventAllowed(insomnia)) contra0("insomnia_blocked_when_employed");
+
+    /* 家人鬧意見：三種不同做法 */
+    const familyRow = findRand(e => e.sit === "家人鬧意見。");
+    if (!familyRow || !familyRow.opts || familyRow.opts.length !== 3) contra0("family_row_missing");
+    else {
+      const labs = familyRow.opts.map(o => o.lab).join("|");
+      if (labs.indexOf("主動約家人坐下傾談") < 0 || labs.indexOf("暫時少來往，避免正面衝突") < 0 || labs.indexOf("請長輩或朋友幫忙調解") < 0)
+        contra0("family_row_labs_not_updated:" + labs);
+      if (/冷靜傾|冷戰|先冷靜一天/.test(labs)) contra0("family_row_old_labs_remain:" + labs);
+    }
+
+    /* KEY 43 置業／租住須寫入住屋狀態 */
+    const k43 = KEY[43];
+    const k43A = k43 && k43.opts.find(o => o.k === "A");
+    const k43B = k43 && k43.opts.find(o => o.k === "B");
+    const k43C = k43 && k43.opts.find(o => o.k === "C");
+    if (!(k43A && k43A.hasHome && k43A.lever)) contra0("key43_A_missing_hasHome");
+    if (!(k43B && k43B.renting && !k43B.hasHome)) contra0("key43_B_missing_renting");
+    if (!(k43C && k43C.hasHome && !k43C.lever)) contra0("key43_C_missing_hasHome");
+    setupWork(43, { renting: true, hasHome: false });
+    applyOptFlags(k43A, 43);
+    if (!S.hasHome || S.renting) contra0("key43_A_did_not_mark_home");
+    setupWork(43, { renting: false, hasHome: false });
+    applyOptFlags(k43B, 43);
+    if (!S.renting || S.hasHome) contra0("key43_B_did_not_mark_renting");
+    setupWork(43);
+    applyOptFlags(k43C, 43);
+    if (!S.hasHome) contra0("key43_C_did_not_mark_home");
+
+    /* 物業管理費只在已置業時出現；屋企維修只在已置業或租住時出現 */
+    const mgmt = findRand(e => e.sit === "物業管理費上調。");
+    const repair = findRand(e => e.sit === "屋企要維修。");
+    if (!mgmt || !mgmt.needHomeOwner) contra0("mgmt_fee_missing_needHomeOwner");
+    if (!repair || !repair.needDwelling) contra0("home_repair_missing_needDwelling");
+    S = fresh(); S.gender = "male"; S.age = 21; S.career = "edu";
+    if (mgmt && eventAllowed(mgmt)) contra0("mgmt_fee_allowed_while_student_no_home");
+    if (repair && eventAllowed(repair)) contra0("home_repair_allowed_while_student_no_home");
+    S.age = 35; S.career = "work"; S.gotFirstJob = true; S.hasHome = true;
+    if (mgmt && !eventAllowed(mgmt)) contra0("mgmt_fee_blocked_when_hasHome");
+    if (repair && !eventAllowed(repair)) contra0("home_repair_blocked_when_hasHome");
+    S.hasHome = false; S.renting = true;
+    if (mgmt && eventAllowed(mgmt)) contra0("mgmt_fee_allowed_when_renting_only");
+    if (repair && !eventAllowed(repair)) contra0("home_repair_blocked_when_renting");
+
+    /* 畢業入職後，頂欄「升學」改為「高學歷」 */
+    S = fresh(); S.age = 21; S.career = "edu";
+    if (careerLab("edu") !== "升學") contra0("careerLab_student_not_升學:" + careerLab("edu"));
+    S.age = 47; S.career = "edu";
+    if (careerLab("edu") !== "高學歷") contra0("careerLab_grad_not_高學歷:" + careerLab("edu"));
+
+    /* 見到旅行提示但沒出發，兩年內不再出現；同年仍可出發 */
+    setupWork(45, { lastTravelAge: null, lastTravelOfferAge: null, w: 50 });
+    showIdle();
+    if (!canShowTravel()) contra0("travel_button_should_remain_same_year_after_offer");
+    if (S.lastTravelOfferAge !== 45) contra0("travel_offer_not_marked:" + S.lastTravelOfferAge);
+    S.age = 46;
+    if (canShowTravel()) contra0("travel_button_reappeared_next_year");
+    S.age = 47;
+    if (!canShowTravel()) contra0("travel_button_missing_after_two_years");
+    setupWork(45, { lastTravelAge: 45, lastTravelOfferAge: 45, w: 50 });
+    if (canShowTravel()) contra0("travel_button_after_travel_same_year");
 
     const allC = results.flatMap(r => r.contradictions.map(c => r.label + ": " + c));
+
     console.log("=== lifeSim path tests ===");
     results.forEach(r => {
       console.log(r.label, "age", r.age, "w", r.w, "h", r.h, "t", r.t, "rel", r.rel, "hap", r.hap, "FI", r.earlyFI,
