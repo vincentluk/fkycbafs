@@ -839,7 +839,7 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
       ]
     },
     65: {
-      tag: "理財決策", fin: true, title: "退休金提取", sit: "怎樣用退休金？",
+      tag: "理財決策", fin: true, title: "退休金提取", sit: "怎樣用退休金？", theme: "retireMPFDraw",
       opts: [
         { k: "A", lab: "年金／分期提取", tip: "細水長流", d: [1, 1, 3, 2, 1, 8], retire: true },
         { k: "B", lab: "一次過提取揮霍", tip: "短期開心", d: [-1, -10, 4, 10, 2, -10], retire: true, risk: "med", riskLoss: 12, riskMild: 8, riskWin: 2 },
@@ -847,7 +847,7 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
       ]
     },
     66: {
-      tag: "理財決策", fin: true, title: "慢性病與藥費", sit: "醫生說你需要長期服藥控制慢性病。",
+      tag: "理財決策", fin: true, title: "慢性病與藥費", sit: "醫生說你需要長期服藥控制慢性病。", theme: "chronicMed",
       opts: [
         { k: "A", lab: "按時覆診並備足藥物", tip: "健康較穩、開支↑", d: [4, -5, -1, 1, 0, 4], prudence: 1, emergency: true },
         { k: "B", lab: "以公營醫療為主", tip: "較省錢、或需輪候", d: [0, 1, -2, -1, 0, 1] },
@@ -855,7 +855,7 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
       ]
     },
     67: {
-      tag: "理財決策", fin: true, title: "晚年醫療儲備", sit: "長期護理開支可能很高。",
+      tag: "理財決策", fin: true, title: "晚年醫療儲備", sit: "長期護理開支可能很高。", theme: "retireMedicalPrep",
       opts: [
         { k: "A", lab: "預留醫療／護理基金", tip: "安全感↑", d: [2, -5, 0, 1, 1, 8], emergency: true },
         { k: "B", lab: "依賴公營醫療", tip: "省錢但排隊", d: [-1, 2, 0, -1, 0, -2] },
@@ -878,11 +878,13 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     ]},
     { sit: "朋友約週末活動。", opts: [
       { k: "A", lab: "去", d: [0, -1, -2, 5, 4, 0] },
-      { k: "B", lab: "休息儲錢", d: [1, 1, 2, -1, -2, 1] }
+      { k: "B", lab: "休息儲錢", d: [1, 1, 2, -1, -2, 1] },
+      { k: "C", lab: "去，但設開支上限", tip: "可控", d: [0, -1, -1, 3, 3, 1], prudence: 1 }
     ]},
     { sit: "", fin: true, needSingle: true, minAge: 22, maxAge: 38, storyBlind: true, opts: [
       { k: "A", lab: "答應見面看看", tip: "開始有開支", d: [0, -2, -2, 5, 6, 1], partner: true },
-      { k: "B", lab: "婉拒，說時機未到", tip: "維持單身", d: [0, 1, 1, -1, -2, 0], refusePartner: true }
+      { k: "B", lab: "婉拒，說時機未到", tip: "維持單身", d: [0, 1, 1, -1, -2, 0], refusePartner: true },
+      { k: "C", lab: "先在團體活動見面，暫不單獨約會", tip: "先觀察，未正式交往", d: [0, 0, -1, 2, 2, 1] }
     ]},
     { sit: "", fin: true, needPetOffer: true, minAge: 27, maxAge: 45, petAsk: true, storyPetAdopt: true, opts: [
       { k: "A", lab: "領養一隻毛孩", tip: "年費／醫療；關係／開心小幅↑", d: [1, -4, -2, 6, 5, 1], pet: true },
@@ -901,7 +903,8 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     ]},
     { sit: "", needHasPet: true, storyPetJoy: true, opts: [
       { k: "A", lab: "帶毛孩去公園／獸醫健檢日", tip: "開心／關係小↑", d: [1, -2, -1, 4, 3, 1] },
-      { k: "B", lab: "在家陪玩就好", tip: "省錢", d: [0, 0, 1, 2, 2, 0] }
+      { k: "B", lab: "在家陪玩就好", tip: "省錢", d: [0, 0, 1, 2, 2, 0] },
+      { k: "C", lab: "帶下樓散步就好", tip: "開支少", d: [1, 0, 0, 3, 2, 0] }
     ]},
     { sit: "", fin: true, needSingleLife: true, minAge: 26, maxAge: 55, storySingleSocial: true, opts: [
       { k: "A", lab: "參加朋友聚會／飯局", tip: "應酬開支↑、關係略回", d: [0, -3, -2, 3, 4, 0] },
@@ -915,7 +918,8 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     ]},
     { sit: "", needPartner: true, needUnmarried: true, storyFriction: true, opts: [
       { k: "A", lab: "請假溝通、少加班", d: [-1, -1, -2, 2, 5, 1] },
-      { k: "B", lab: "先冷處理、埋頭工作", d: [0, 1, 1, -2, -5, -1] }
+      { k: "B", lab: "先冷處理、埋頭工作", d: [0, 1, 1, -2, -5, -1] },
+      { k: "C", lab: "約定一晚專心商量，平日先維持工作", tip: "溝通＋平衡", d: [0, 0, -1, 1, 3, 1] }
     ]},
     { sit: "新聞全是股市大上大落，你的投資帳戶也在閃紅綠燈。", fin: true, needInvestor: true, opts: [
       { k: "A", lab: "保持定投", tip: "結果視市場", d: [0, 0, 0, 0, 0, 3], risk: "med", riskLoss: 5, riskMild: 1, riskWin: 4 },
@@ -924,27 +928,33 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     ]},
     { sit: "上司陳生突然派一個趕期項目給你。", needJob: true, opts: [
       { k: "A", lab: "接下，連續加班", d: [-5, 3, -6, -3, -1, 2] },
-      { k: "B", lab: "婉拒，保住休息", d: [2, 0, 3, 2, -2, 0] }
+      { k: "B", lab: "婉拒，保住休息", d: [2, 0, 3, 2, -2, 0] },
+      { k: "C", lab: "接下，但先談期限與人手", tip: "溝通後量力", d: [-2, 2, -3, -1, 1, 2] }
     ]},
     { sit: "屋企要維修。", fin: true, opts: [
       { k: "A", lab: "用儲蓄修", d: [0, -3, -1, -1, 1, 1] },
-      { k: "B", lab: "分期／借貸", d: [0, -1, 0, 0, 0, -4], lever: true }
+      { k: "B", lab: "分期／借貸", d: [0, -1, 0, 0, 0, -4], lever: true },
+      { k: "C", lab: "先比較報價，用儲蓄修必要部分", tip: "量力", d: [0, -2, -1, 0, 1, 2], prudence: 1 }
     ]},
     { sit: "同事請病假，要頂上。", needJob: true, opts: [
       { k: "A", lab: "幫忙頂", d: [-2, 1, -3, -1, 2, 1] },
-      { k: "B", lab: "按本分", d: [0, 0, 0, 0, -1, 0] }
+      { k: "B", lab: "按本分", d: [0, 0, 0, 0, -1, 0] },
+      { k: "C", lab: "只幫忙處理緊急部分", tip: "有界線", d: [-1, 0, -1, 0, 1, 1] }
     ]},
     { sit: "網上看到投資宣傳。", fin: true, opts: [
       { k: "A", lab: "拒絕，查證", d: [0, 0, 0, 0, 0, 3] },
-      { k: "B", lab: "小注一試", tip: "多數蝕", d: [0, -5, 0, 2, 0, -4], risk: "high", riskLoss: 12, riskMild: 5, riskWin: 4 }
+      { k: "B", lab: "小注一試", tip: "多數蝕", d: [0, -5, 0, 2, 0, -4], risk: "high", riskLoss: 12, riskMild: 5, riskWin: 4 },
+      { k: "C", lab: "列入觀察，不立刻投入", tip: "先查證", d: [0, 0, 0, 0, 0, 3], prudence: 1 }
     ]},
     { sit: "家人鬧意見。", opts: [
       { k: "A", lab: "冷靜傾", d: [0, 0, -1, 1, 5, 1] },
-      { k: "B", lab: "冷戰", d: [-1, 0, 1, -3, -6, -1] }
+      { k: "B", lab: "冷戰", d: [-1, 0, 1, -3, -6, -1] },
+      { k: "C", lab: "先冷靜一天，再約時間傾談", tip: "留空間", d: [0, 0, 0, 1, 3, 1] }
     ]},
     { sit: "獵頭突然來訊：另一間公司開出更高薪，問你要不要面談。", fin: true, needJob: true, opts: [
       { k: "A", lab: "去面談、準備跳槽", d: [-1, 4, -2, 3, -1, -2], jobChange: true, jobLevel: 1 },
-      { k: "B", lab: "婉拒，留低求穩", d: [0, 0, 1, -1, 1, 3] }
+      { k: "B", lab: "婉拒，留低求穩", d: [0, 0, 1, -1, 1, 3] },
+      { k: "C", lab: "先了解條件，暫不辭職", tip: "先掌握資訊", d: [0, 0, -1, 1, 0, 2] }
     ]},
     { sit: "人事約你面談：部門有一個主管空缺，問你有沒有興趣爭取。", fin: true, needJob: true, minAge: 29, maxAge: 50, opts: [
       { k: "A", lab: "爭取晉升", tip: "責任↑收入↑空閒↓", d: [-2, 4, -4, 2, -1, 2], jobChange: true, jobLevel: 1 },
@@ -963,28 +973,33 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     ]},
     { sit: "電費／通脹上升。", fin: true, opts: [
       { k: "A", lab: "削減非必要開支", d: [0, 1, -1, -2, 0, 2] },
-      { k: "B", lab: "照舊生活", d: [0, -3, 0, 2, 0, -2] }
+      { k: "B", lab: "照舊生活", d: [0, -3, 0, 2, 0, -2] },
+      { k: "C", lab: "先減部分非必要開支，保留少量享受", tip: "平衡", d: [0, -1, 0, 1, 0, 1] }
     ]},
     { sit: "銀行推銷貸款。", fin: true, opts: [
       { k: "A", lab: "拒絕", d: [0, 0, 0, 0, 0, 2] },
-      { k: "B", lab: "借來消費", d: [0, 5, 1, 5, 0, -8], lever: true }
+      { k: "B", lab: "借來消費", d: [0, 5, 1, 5, 0, -8], lever: true },
+      { k: "C", lab: "了解條款後暫不借，不用於消費", tip: "守住界線", d: [0, 0, 0, 0, 0, 3], prudence: 1 }
     ]},
-    { sit: "朋友借錢。", fin: true, opts: [
+    { sit: "朋友借錢。", fin: true, theme: "friendBorrow", opts: [
       { k: "A", lab: "小額借出", d: [0, -2, 0, 0, 3, -1] },
       { k: "B", lab: "婉拒並解釋", d: [0, 0, 0, -1, -2, 1] },
       { k: "C", lab: "大額借出", d: [0, -6, 0, 1, 4, -4] }
     ]},
     { sit: "手機／電腦壞了。", fin: true, opts: [
       { k: "A", lab: "換新機", d: [0, -4, 1, 4, 0, -1] },
-      { k: "B", lab: "修理延用", d: [0, -1, 0, -1, 0, 1] }
+      { k: "B", lab: "修理延用", d: [0, -1, 0, -1, 0, 1] },
+      { k: "C", lab: "先修理，維修費過高再考慮更換", tip: "先評估", d: [0, -2, 0, 1, 0, 1], prudence: 1 }
     ]},
-    { sit: "收到可疑短訊「中獎」。", fin: true, opts: [
+    { sit: "收到可疑短訊「中獎」。", fin: true, theme: "prizePhish", opts: [
       { k: "A", lab: "不理／舉報", d: [0, 0, 0, 0, 0, 2] },
-      { k: "B", lab: "點連結一試", d: [0, -6, 0, -2, 0, -5] }
+      { k: "B", lab: "點連結一試", d: [0, -6, 0, -2, 0, -5] },
+      { k: "C", lab: "不要點連結，向官方渠道查證", tip: "正確做法", d: [0, 0, -1, 1, 0, 3], prudence: 1 }
     ]},
-    { sit: "茶水間流傳部門可能裁員，氣氛一下子凝住。", fin: true, needJob: true, opts: [
+    { sit: "茶水間流傳部門可能裁員，氣氛一下子凝住。", fin: true, needJob: true, theme: "layoffRumor", opts: [
       { k: "A", lab: "儲多兩個月糧", d: [-1, -1, -1, -2, 0, 4], emergency: true },
-      { k: "B", lab: "照常消費", d: [0, -2, 0, 2, 0, -3] }
+      { k: "B", lab: "照常消費", d: [0, -2, 0, 2, 0, -3] },
+      { k: "C", lab: "檢視應急金，並更新履歷備用", tip: "有備無患", d: [0, 0, -1, -1, 0, 3], prudence: 1 }
     ]},
     { sit: "同事阿傑約你一齊報健身。", opts: [
       { k: "A", lab: "報名並堅持去", d: [6, -2, -2, 2, 2, 1] },
@@ -993,23 +1008,28 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     ]},
     { sit: "親戚結婚禮金。", fin: true, opts: [
       { k: "A", lab: "量力封合理", d: [0, -2, 0, 0, 2, 0] },
-      { k: "B", lab: "打腫臉充胖子", d: [0, -5, 0, 1, 3, -2] }
+      { k: "B", lab: "打腫臉充胖子", d: [0, -5, 0, 1, 3, -2] },
+      { k: "C", lab: "先了解慣例，再按自己的預算封", tip: "量力", d: [0, -2, 0, 0, 2, 1], prudence: 1 }
     ]},
     { sit: "舊同事找你幫手做一個短期項目，酬勞不錯但會食掉週末。", fin: true, needJob: true, opts: [
       { k: "A", lab: "接下兼職", d: [-3, 3, -4, 1, 0, 2] },
-      { k: "B", lab: "專注主業", d: [1, 0, 2, 0, 0, 1] }
+      { k: "B", lab: "專注主業", d: [1, 0, 2, 0, 0, 1] },
+      { k: "C", lab: "只接部分工時，並先議定範圍", tip: "可控", d: [-1, 2, -2, 1, 0, 2] }
     ]},
     { sit: "超市大減價。", fin: true, opts: [
       { k: "A", lab: "只買需要的", d: [0, 1, 0, 0, 0, 1] },
-      { k: "B", lab: "囤一堆「抵買」", d: [0, -3, -1, 2, 0, -1] }
+      { k: "B", lab: "囤一堆「抵買」", d: [0, -3, -1, 2, 0, -1] },
+      { k: "C", lab: "只囤近期會用完、而且確實較便宜的", tip: "不浪費", d: [0, -1, 0, 1, 0, 1], prudence: 1 }
     ]},
     { sit: "連續加班後，晨早起來头晕。", opts: [
       { k: "A", lab: "早睡、拒絕額外加班", d: [5, -1, 3, 3, 0, 1] },
-      { k: "B", lab: "靠咖啡硬撐", d: [-8, 1, -3, -3, 0, -2] }
+      { k: "B", lab: "靠咖啡硬撐", d: [-8, 1, -3, -3, 0, -2] },
+      { k: "C", lab: "先休息一天，再商量合理工時", tip: "先照顧身體", d: [4, 0, 1, 2, 1, 1] }
     ]},
     { sit: "物業管理費上調。", fin: true, opts: [
       { k: "A", lab: "調整預算", d: [0, -1, 0, -1, 0, 1] },
-      { k: "B", lab: "用信用卡頂", d: [0, 0, 0, 0, 0, -3], lever: true }
+      { k: "B", lab: "用信用卡頂", d: [0, 0, 0, 0, 0, -3], lever: true },
+      { k: "C", lab: "調整預算，並查詢加幅理由", tip: "了解後再適應", d: [0, -1, -1, 0, 0, 2], prudence: 1 }
     ]},
     { sit: "", fin: true, needKids: true, storyKidsTutor: true, opts: [
       { k: "A", lab: "按預算支持", d: [0, -3, -2, 1, 3, 0] },
@@ -1023,7 +1043,8 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     ]},
     { sit: "退休後想兼職？", fin: true, needRetired: true, opts: [
       { k: "A", lab: "接輕鬆兼職", d: [-1, 2, -2, 2, 1, 1] },
-      { k: "B", lab: "專心休息", d: [2, -1, 3, 3, 1, 1] }
+      { k: "B", lab: "專心休息", d: [2, -1, 3, 3, 1, 1] },
+      { k: "C", lab: "先試短期或每週數小時，再決定是否持續", tip: "先試水", d: [1, 1, 1, 2, 1, 1] }
     ]},
     { sit: "財務自由後，朋友拉你去奢華假期。", fin: true, needEarlyFI: true, opts: [
       { k: "A", lab: "去，大灑金錢", tip: "開心↑本金↓", d: [-2, -8, 2, 8, 3, -5], lifestyle: 3 },
@@ -1042,7 +1063,8 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     ]},
     { sit: "友人推介高息「穩陣」產品。", fin: true, minAge: 55, opts: [
       { k: "A", lab: "拒絕，查牌照", d: [0, 0, 0, 0, 0, 3] },
-      { k: "B", lab: "投入一大筆", tip: "高風險", d: [0, -8, 0, 2, 0, -6], risk: "high", riskLoss: 20, riskMild: 8, riskWin: 6 }
+      { k: "B", lab: "投入一大筆", tip: "高風險", d: [0, -8, 0, 2, 0, -6], risk: "high", riskLoss: 20, riskMild: 8, riskWin: 6 },
+      { k: "C", lab: "查證後暫不投入，資金留在自己了解的工具", tip: "先查證", d: [0, 0, -1, 0, 0, 4], prudence: 1 }
     ]},
 
     /* —— 求學／起步：人生需要（隨機但合邏輯） —— */
@@ -1193,12 +1215,12 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     ]},
 
     /* —— BAFS ⑥ 退休 —— */
-    { sit: "", fin: true, needRetiredLife: true, storyRetireMPFDraw: true, opts: [
+    { sit: "", fin: true, needRetiredLife: true, storyRetireMPFDraw: true, theme: "retireMPFDraw", opts: [
       { k: "A", lab: "分期／年金式提取", tip: "細水長流", d: [1, 1, 2, 1, 1, 6], prudence: 1 },
       { k: "B", lab: "一次過提取大部分", tip: "靈活但易揮霍", d: [0, 5, 1, 3, 0, -5], risk: "med", riskLoss: 10, riskMild: 4, riskWin: 2 },
       { k: "C", lab: "只提取生活所需", tip: "保守", d: [1, 0, 1, 0, 1, 4] }
     ]},
-    { sit: "", fin: true, needRetiredLife: true, storyRetireMedical: true, opts: [
+    { sit: "", fin: true, needRetiredLife: true, storyRetireMedical: true, theme: "retireMedicalPrep", opts: [
       { k: "A", lab: "加強醫療／長期護理儲備", tip: "保障", d: [3, -5, 0, 1, 1, 7], emergency: true, prudence: 1 },
       { k: "B", lab: "依賴公營＋小額私家", tip: "省錢", d: [0, -1, 0, -1, 0, 1] },
       { k: "C", lab: "有痛才求醫、不做預防", tip: "風險", d: [-4, 1, 0, -1, 0, -3] }
@@ -1238,7 +1260,7 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
       { k: "B", lab: "謝絕，說自己還應付得來", tip: "獨立、金錢不變", d: [0, 0, 0, 1, 2, 2] },
       { k: "C", lab: "只收象徵式小額", tip: "心意＋小補貼", d: [0, 2, 0, 2, 3, 2], kidsAllowance: true }
     ]},
-    { sit: "", fin: true, needRetiredLife: true, storyRetireChronic: true, opts: [
+    { sit: "", fin: true, needRetiredLife: true, storyRetireChronic: true, theme: "chronicMed", opts: [
       { k: "A", lab: "按醫囑長期服藥覆診", tip: "健康管理、藥費↑", d: [3, -4, -1, 1, 0, 3], prudence: 1 },
       { k: "B", lab: "只買基本藥物、少覆診", tip: "省錢", d: [-2, 1, 0, -1, 0, -1] },
       { k: "C", lab: "偏方／拖延求醫", tip: "高風險", d: [-6, 2, 0, -2, 0, -3] }
@@ -1248,7 +1270,7 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
       { k: "B", lab: "公立醫院跟進", tip: "較省、或需輪候", d: [2, -1, -2, -1, 0, 1] },
       { k: "C", lab: "出院後自行調理", tip: "省錢風險高", d: [-5, 2, 1, -2, -1, -2] }
     ]},
-    { sit: "", fin: true, needRetiredLife: true, storyRetireLTC: true, opts: [
+    { sit: "", fin: true, needRetiredLife: true, storyRetireLTC: true, theme: "retireMedicalPrep", opts: [
       { k: "A", lab: "投保／加碼長期護理保險", tip: "保費換保障", d: [1, -4, 0, 0, 1, 7], emergency: true, prudence: 1 },
       { k: "B", lab: "自設護理儲備金", tip: "靈活", d: [1, -5, 0, 0, 0, 5], emergency: true, prudence: 1 },
       { k: "C", lab: "依賴家人與公營服務", tip: "省保費、保障較薄", d: [0, 2, 0, -1, -1, -3] }
@@ -1262,6 +1284,118 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
       { k: "A", lab: "用保險／儲備應付醫療與復康", tip: "動用緩衝", d: [2, -6, -2, -1, 1, 2], prudence: 1 },
       { k: "B", lab: "向家人借錢應急", tip: "關係壓力", d: [1, 2, -1, -2, -3, -2], lever: true },
       { k: "C", lab: "減少治療以求慳錢", tip: "健康↓", d: [-6, 1, 0, -3, -1, -4] }
+    ]},
+
+    /* —— 重玩變化：各階段加題（同一局仍不重複） —— */
+    { sit: "合租的室友連續兩個月未付公用開支，帳單還在增加。", fin: true, needYoungSingle: true, minAge: 18, maxAge: 34, opts: [
+      { k: "A", lab: "先代付並要求補回", d: [0, -3, 0, -1, -2, 0] },
+      { k: "B", lab: "立刻搬出", d: [-1, -4, -2, 0, -3, 1], prudence: 1 },
+      { k: "C", lab: "先書面約定還款期，逾期再另作安排", tip: "有界線", d: [0, -1, -1, 0, 1, 2], prudence: 1 }
+    ]},
+    { sit: "父母希望你每月交一筆家用，分擔家裡開支。", fin: true, minAge: 18, maxAge: 32, opts: [
+      { k: "A", lab: "按要求定額交", d: [0, -3, 0, 0, 3, 1] },
+      { k: "B", lab: "說明暫未能負擔", d: [0, 1, 0, -1, -3, 0] },
+      { k: "C", lab: "先商量一個雙方可接受的數額", tip: "量力", d: [0, -2, 0, 0, 2, 2], prudence: 1 }
+    ]},
+    { sit: "朋友邀請你入股開一間小店，說前景不錯，但要先拿出一筆資金。", fin: true, minAge: 20, maxAge: 40, opts: [
+      { k: "A", lab: "投入可觀資金合夥", d: [0, -10, -2, 4, 3, -6], risk: "med", riskLoss: 8, riskMild: 3, riskWin: 6, lever: true },
+      { k: "B", lab: "婉拒", d: [0, 0, 0, -1, -2, 2] },
+      { k: "C", lab: "先看計劃與風險，只考慮小額、可損失的部分", tip: "量力", d: [0, -3, -1, 1, 1, 2], prudence: 1 }
+    ]},
+    { sit: "你收到薪俸稅通知，第一次要決定如何處理這筆稅款。", fin: true, needJob: true, maxAge: 30, opts: [
+      { k: "A", lab: "每月預留稅款，按時繳交", tip: "紀律", d: [0, -2, 0, 0, 0, 4], prudence: 1 },
+      { k: "B", lab: "先把錢用掉，到時再想辦法", d: [0, 2, 1, 2, 0, -5] },
+      { k: "C", lab: "先查清楚應繳多少，再訂預留計劃", tip: "先掌握資訊", d: [0, -1, -1, 0, 0, 3], prudence: 1 }
+    ]},
+    { sit: "另一半提議開聯名戶口，把收入放在一起管理。", fin: true, needNewlywed: true, opts: [
+      { k: "A", lab: "大部分收入放入聯名戶口", d: [0, 0, -1, 1, 4, 1] },
+      { k: "B", lab: "維持完全分開", d: [0, 1, 0, 0, -2, 2] },
+      { k: "C", lab: "必要家庭開支用聯名，其餘各自管理", tip: "平衡", d: [0, 0, 0, 1, 3, 3], prudence: 1 }
+    ]},
+    { sit: "兩邊家庭對節日禮金和來往開支的期望不一樣，預算開始拉扯。", fin: true, needNewlywed: true, opts: [
+      { k: "A", lab: "盡量兩邊都做足", d: [0, -5, -2, 1, 4, -2] },
+      { k: "B", lab: "減少來往以免開支", d: [0, 2, 1, -1, -4, 1] },
+      { k: "C", lab: "先訂家庭禮金預算，再與雙方商量", tip: "量力", d: [0, -2, -1, 0, 2, 3], prudence: 1 }
+    ]},
+    { sit: "結婚後，週末應酬和親友邀約明顯增加。", fin: true, needNewlywed: true, opts: [
+      { k: "A", lab: "盡量參加", d: [0, -4, -3, 3, 4, -1] },
+      { k: "B", lab: "全部推掉", d: [1, 2, 3, -1, -3, 1] },
+      { k: "C", lab: "選重要的參加，並設每月應酬預算", tip: "可控", d: [0, -2, -1, 2, 2, 2], prudence: 1 }
+    ]},
+    { sit: "孩子已經在上興趣班，又想再加新班，收費不輕。", fin: true, needKidsYoung: true, opts: [
+      { k: "A", lab: "照單全收", d: [0, -5, -2, 2, 3, -2] },
+      { k: "B", lab: "全部停掉", d: [0, 2, 1, -2, -3, 1] },
+      { k: "C", lab: "與孩子選一兩項堅持，其餘先暫停", tip: "量力", d: [0, -2, -1, 1, 2, 2], prudence: 1 }
+    ]},
+    { sit: "照顧孩子使兩人都很疲憊，有人介紹兼職託兒或家務協助。", fin: true, needKidsYoung: true, opts: [
+      { k: "A", lab: "請全職協助", d: [2, -7, 4, 3, 2, -1] },
+      { k: "B", lab: "自己全部承擔", d: [-3, 1, -5, -2, 1, 1] },
+      { k: "C", lab: "先用兼職或短暫託兒，再看家庭預算", tip: "量力", d: [1, -3, 2, 2, 1, 2], prudence: 1 }
+    ]},
+    { sit: "保險顧問推介「子女教育儲蓄保」，聲稱可一筆過解決升學開支。", fin: true, needKids: true, opts: [
+      { k: "A", lab: "立刻投保一大筆", d: [0, -8, 0, 1, 1, 2], insured: true, eduSave: 1 },
+      { k: "B", lab: "不考慮", d: [0, 1, 0, 0, -1, 0] },
+      { k: "C", lab: "先比較教育儲蓄、定期存款與保險的分別，再量力決定", tip: "先查證", d: [0, -1, -1, 0, 0, 4], prudence: 1 }
+    ]},
+    { sit: "子女想參加海外交流或遊學，費用不低，問家裡可不可以資助。", fin: true, needKidsOlder: true, opts: [
+      { k: "A", lab: "全數資助", d: [0, -8, -1, 2, 4, -2] },
+      { k: "B", lab: "不支持", d: [0, 2, 0, -2, -4, 1] },
+      { k: "C", lab: "資助部分，其餘鼓勵子女儲蓄或爭取獎學金", tip: "量力", d: [0, -4, -1, 1, 3, 3], prudence: 1 }
+    ]},
+    { sit: "子女開始兼職，問家裡的家用要不要調整。", fin: true, needKidsOlder: true, opts: [
+      { k: "A", lab: "立刻大幅減少家用", d: [0, 3, 0, -1, -3, 1] },
+      { k: "B", lab: "維持原額", d: [0, -2, 0, 1, 2, 0] },
+      { k: "C", lab: "一起檢視需要，適度調整並教導理財", tip: "理財教育", d: [0, 0, -1, 1, 3, 3], prudence: 1 }
+    ]},
+    { sit: "子女提起將來置業，希望家裡先幫忙儲首期。", fin: true, needKidsOlder: true, opts: [
+      { k: "A", lab: "答應主力代儲", d: [0, -6, 0, 1, 3, -3] },
+      { k: "B", lab: "明確表示要自行準備", d: [0, 2, 0, -1, -3, 2] },
+      { k: "C", lab: "量力作有限資助，並先談清楚條件", tip: "量力", d: [0, -3, -1, 0, 2, 3], prudence: 1 }
+    ]},
+    { sit: "公司推出自願離職計劃，並提供一筆補償金。", fin: true, needNearRetire: true, needJob: true, opts: [
+      { k: "A", lab: "立刻申請離職", tip: "接受補償並退休", d: [1, 4, 4, 2, -1, -2], retire: true },
+      { k: "B", lab: "完全不理", d: [1, 0, 0, 0, 1, 1] },
+      { k: "C", lab: "先計算補償、退休金與生活開支，再作決定", tip: "先掌握資訊", d: [0, 0, -1, 0, 0, 3], prudence: 1 }
+    ]},
+    { sit: "你收到自願醫保或醫療附加保障的加保建議，保費會上升。", fin: true, needNearRetire: true, opts: [
+      { k: "A", lab: "加大保額", d: [1, -4, 0, 0, 0, 4], insured: true },
+      { k: "B", lab: "取消以節省保費", d: [-1, 3, 0, 0, 0, -4] },
+      { k: "C", lab: "先核對現有保障是否足夠，再決定是否加購", tip: "先掌握資訊", d: [0, -1, -1, 0, 0, 3], prudence: 1 }
+    ]},
+    { sit: "友人組成「退休投資學習會」，要各人先放一筆資金一齊投資。", fin: true, needNearRetire: true, opts: [
+      { k: "A", lab: "投入較大金額", d: [0, -8, -1, 2, 2, -5], risk: "high", riskLoss: 14, riskMild: 5, riskWin: 6 },
+      { k: "B", lab: "不參加", d: [0, 0, 1, -1, -2, 2] },
+      { k: "C", lab: "可以聽講座學習，資金則自己按計劃管理", tip: "先查證", d: [0, 0, -1, 1, 1, 3], prudence: 1 }
+    ]},
+    { sit: "有人建議賣出現住房，換較易打理的單位或院舍。", fin: true, needRetiredLife: true, hasHomeMaybe: true, opts: [
+      { k: "A", lab: "立刻放售", d: [1, 6, 2, 0, -1, -2] },
+      { k: "B", lab: "維持現況不動", d: [0, 0, 0, 0, 1, 1] },
+      { k: "C", lab: "先了解照顧需要、開支與居住選擇，再慢慢決定", tip: "先掌握資訊", d: [0, 0, -1, 0, 1, 3], prudence: 1 }
+    ]},
+    { sit: "舊同事約你組一個私人放貸計劃，聲稱回報比銀行高。", fin: true, needRetiredLife: true, opts: [
+      { k: "A", lab: "投入一筆", d: [0, -10, 0, 2, 1, -8], risk: "high", riskLoss: 18, riskMild: 6, riskWin: 5 },
+      { k: "B", lab: "直接拒絕", tip: "守住退休金", d: [0, 0, 0, 0, -1, 3], prudence: 1 },
+      { k: "C", lab: "拒絕把退休金投入，只保持聚會來往", tip: "守住界線", d: [0, 0, -1, 1, 2, 3], prudence: 1 }
+    ]},
+    { sit: "社區舉辦長者財商講座，其間夾雜產品推銷環節。", fin: true, needRetiredLife: true, opts: [
+      { k: "A", lab: "聽完即場買產品", d: [0, -6, 0, 1, 0, -4], risk: "med", riskLoss: 8, riskMild: 3, riskWin: 2 },
+      { k: "B", lab: "不去", d: [0, 0, 1, -1, -1, 1] },
+      { k: "C", lab: "去聽知識部分，推銷則回家再查證", tip: "先查證", d: [0, 0, -1, 2, 1, 3], prudence: 1 }
+    ]},
+    { sit: "公司提供股份獎勵，要你用部分積蓄認購，並有鎖定期。", fin: true, needJob: true, minAge: 26, maxAge: 55, opts: [
+      { k: "A", lab: "盡量多認購", d: [0, -8, 0, 2, 0, -4], risk: "med", riskLoss: 8, riskMild: 3, riskWin: 6, invest: 1 },
+      { k: "B", lab: "完全不參加", d: [0, 1, 0, -1, 0, 1] },
+      { k: "C", lab: "只認購可承受波動的部分，並先了解鎖定期與風險", tip: "量力", d: [0, -3, -1, 1, 0, 3], prudence: 1, invest: 1 }
+    ]},
+    { sit: "房東通知大幅加租，或不續現有租約。", fin: true, needRenter: true, opts: [
+      { k: "A", lab: "接受新租金", d: [0, -4, 0, -2, 0, -1], renting: true },
+      { k: "B", lab: "立即搬遷", d: [-1, -3, -3, -2, 0, 0] },
+      { k: "C", lab: "先商量租金或租期，同時比較搬遷成本", tip: "先掌握資訊", d: [0, -2, -1, 0, 0, 2], prudence: 1, renting: true }
+    ]},
+    { sit: "父母希望你資助一筆大額開支，例如裝修或旅行。", fin: true, needNotRetired: true, minAge: 26, maxAge: 55, opts: [
+      { k: "A", lab: "盡力全數資助", d: [0, -8, -1, 1, 4, -3] },
+      { k: "B", lab: "拒絕", d: [0, 2, 0, -1, -4, 1] },
+      { k: "C", lab: "量力資助一部分，並先看自己的應急金是否充足", tip: "量力", d: [0, -3, -1, 0, 2, 3], prudence: 1 }
     ]}
   ];
 
@@ -1419,7 +1553,7 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
         { k: "B", lab: "輪候公營", tip: "省錢但焦慮", d: [2, -1, 0, -3, 0, -2] },
         { k: "C", lab: "先拖一拖再說", tip: "風險自留", d: [-5, 1, 0, -2, 0, -4] }
       ]},
-    { id: "friend_borrow", need: s => s.age >= 24 && s.w >= 8, chance: 0.09, kind: "fin",
+    { id: "friend_borrow", theme: "friendBorrow", need: s => s.age >= 24 && s.w >= 8, chance: 0.09, kind: "fin",
       emo: "🙏", tag: "", log: "朋友開口借錢。",
       sit: "老友深夜訊息：「真的很急，可不可以借一筆？下個月一定還。」你會？",
       opts: [
@@ -1443,7 +1577,7 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
         { k: "B", lab: "分段慳修", tip: "或再壞", d: [0, -3, -1, -2, 0, -1], risk: "med", riskLoss: 8, riskMild: 2, riskWin: 0 },
         { k: "C", lab: "暫時搭車／共用出行", tip: "省錢耗時", d: [1, -1, -3, -1, 0, 1] }
       ]},
-    { id: "layoff_rumor", need: s => isEmployedState(s) && s.age >= 30 && s.age < 60, chance: 0.08, kind: "bad",
+    { id: "layoff_rumor", theme: "layoffRumor", need: s => isEmployedState(s) && s.age >= 30 && s.age < 60, chance: 0.08, kind: "bad",
       emo: "📉", tag: "", log: "公司傳出裁員消息。",
       sit: "茶水間流傳部門要縮編。人事尚未公佈。你會？",
       opts: [
@@ -1475,7 +1609,7 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
         { k: "B", lab: "一起列預算再決定", tip: "溝通＋紀律", d: [0, -2, -1, 2, 3, 2], prudence: 1 },
         { k: "C", lab: "堅持不買", tip: "或引爭執", d: [0, 1, 0, -2, -3, 2] }
       ]},
-    { id: "phish_mail", need: s => s.age >= 25, chance: 0.10, kind: "bad",
+    { id: "phish_mail", theme: "prizePhish", need: s => s.age >= 25, chance: 0.10, kind: "bad",
       emo: "📧", tag: "", log: "收到「銀行緊急驗證」電郵。",
       sit: "一封標示「帳戶異常，請立即點擊驗證」的電郵出現在收件箱。你會？",
       opts: [
@@ -1610,7 +1744,7 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
       insured: false, spouseStayHome: false, studentPartTime: false, honeymoonDone: false,
       lastTravelAge: null, declinedKids: false,
       doneKey: {}, history: [], stageVerdicts: [], lifeLog: [], logAge: null, decisions: 0,
-      phase: "idle", randUsed: [], conseqUsed: {}, lastConseqId: null,
+      phase: "idle", randUsed: [], conseqUsed: {}, lastConseqId: null, themeUsed: {},
       sideJob: 0, exercising: false, critOffered: {},
       jobLevel: 0, gotFirstJob: false, jobTitle: null
     };
@@ -2235,6 +2369,7 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
   }
 
   function resolvePopupChoice(cq, opt, done) {
+    markTheme(cq);
     let d = (opt.d || [0,0,0,0,0,0]).slice();
     d = resolveRisk(opt, d);
     apply(d);
@@ -2351,6 +2486,7 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
         if (!c.need(S)) return false;
         /* 本局出現過嘅機會／風險 id 永不重覆 */
         if (S.conseqUsed[c.id] != null) return false;
+        if (c.theme && S.themeUsed && S.themeUsed[c.theme] != null) return false;
         return true;
       } catch (e) { return false; }
     });
@@ -2371,6 +2507,7 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
   }
 
   function applyConsequence(c) {
+    markTheme(c);
     const d = c.d.slice();
     apply(d);
     if (c.forceDebt && S.w >= 0) {
@@ -2704,6 +2841,7 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
   }
 
   function presentEvent(ev) {
+    markTheme(ev);
     S.phase = "event";
     agingLock = false;
     clearAutoAge();
@@ -2768,12 +2906,18 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
       petAsk: !!src.petAsk,
       needPetOffer: !!src.needPetOffer,
       keyAge: age, major: true,
+      theme: src.theme,
       opts: src.opts.map(o => Object.assign({}, o, { d: o.d.slice() }))
     };
   }
 
+  function markTheme(src) {
+    if (src && src.theme && S) S.themeUsed[src.theme] = S.age;
+  }
+
   function eventAllowed(src) {
     if (!src) return false;
+    if (src.theme && S.themeUsed && S.themeUsed[src.theme] != null) return false;
     if (src.needJob && !isWorking()) return false;
     if (src.needStudent && !isStudent()) return false;
     if (src.needStudyStage && !(isStudent() || (S.age <= 24 && S.career))) return false;
@@ -2816,6 +2960,11 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     if (src.storyHoneymoon && S.honeymoonDone) return false;
     /* 退休／FIRE 後不再出在職事件（雙重保險） */
     if (src.needJob && (S.retired || S.earlyFI)) return false;
+    if (src.needNotRetired && (S.retired || S.earlyFI)) return false;
+    if (src.needRenter) {
+      const assumed = S.renting || (!S.hasHome && !S.biggerHome && S.age >= 22 && S.age <= 55 && !S.retired);
+      if (!assumed) return false;
+    }
     return true;
   }
 
@@ -3015,11 +3164,7 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
       return eventAllowed(RAND[i]);
     });
     if (!pool.length) {
-      S.randUsed = [];
-      pool = RAND.map((_, i) => i).filter(i => eventAllowed(RAND[i]));
-    }
-    if (!pool.length) {
-      /* 後備：平穩年 */
+      /* 後備：平穩年（內聯物件，不記入 randUsed，亦不重問已出過的具體題） */
       return { sit: "今年大致平穩。", fin: true, opts: [
         { k: "A", lab: "繼續儲蓄", d: [0, 2, 0, 0, 0, 2] },
         { k: "B", lab: "輕鬆過", d: [1, -2, 2, 4, 1, 0] }
@@ -3035,7 +3180,6 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
       if (r <= 0) { idx = pool[j]; break; }
     }
     S.randUsed.push(idx);
-    if (S.randUsed.length > 10) S.randUsed.shift();
     return RAND[idx];
   }
 
@@ -3090,6 +3234,7 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
       storyRetireGrand: !!src.storyRetireGrand,
       estateAsk: !!src.estateAsk,
       needEstateAsk: !!src.needEstateAsk,
+      theme: src.theme,
       opts: src.opts.map(o => Object.assign({}, o, { d: o.d.slice() }))
     };
   }
@@ -3370,6 +3515,7 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
         }
         const cq = rollConsequence();
         if (cq) {
+          markTheme(cq);
           if (cq.opts && cq.opts.length) {
             agingLock = false;
             S.phase = "event";
@@ -3378,7 +3524,7 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
             showPopup({
               main: cqText,
               kind: cq.kind, emo: cq.emo, tag: "", hideTag: true,
-              opts: cq.opts, id: cq.id, sit: cqText, log: cqText
+              opts: cq.opts, id: cq.id, sit: cqText, log: cqText, theme: cq.theme
             }, () => {
               if (checkKO()) { endGame(); return; }
               continueYearAfterAge();
@@ -4358,6 +4504,243 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     S = fresh(); S.hasCar = true;
     applyOptFlags({ sellCar: true, d: [0,0,0,0,0,0] }, 40);
     if (S.hasCar) results[0].contradictions.push("sellCar_flag_not_cleared");
+
+    /* —— 同一局不重複、主題互斥、補選項與新題 —— */
+    function setupWorkingSingle(age) {
+      S = fresh();
+      S.gender = "male";
+      S.goals = ["stable"];
+      S.age = age;
+      S.career = "work";
+      S.gotFirstJob = true;
+    }
+    function contra(msg) { results[0].contradictions.push(msg); }
+
+    setupWorkingSingle(28);
+    const drawnKeys = [];
+    let fallbackCount = 0;
+    for (let i = 0; i < 15; i++) {
+      const ev = pickRand();
+      const isFallback = ev && ev.sit === "今年大致平穩。" && RAND.indexOf(ev) < 0;
+      if (isFallback) { fallbackCount++; continue; }
+      const story = resolveStory(ev);
+      const sitKey = (story && story.sit) || ev.sit || "";
+      const key = sitKey || ("idx:" + RAND.indexOf(ev));
+      drawnKeys.push(key);
+    }
+    const uniqKeys = drawnKeys.filter((s, i, a) => a.indexOf(s) === i);
+    if (uniqKeys.length !== drawnKeys.length)
+      contra("rand_repeat_within_15:" + drawnKeys.join("|"));
+    if (new Set(S.randUsed).size !== S.randUsed.length)
+      contra("randUsed_has_duplicate_index");
+    if (S.randUsed.length > 15) contra("randUsed_grew_past_draws:" + S.randUsed.length);
+    if (S.randUsed.length <= 10 && drawnKeys.length > 10)
+      contra("randUsed_capped_at_10:" + S.randUsed.length);
+    /* 若抽滿 15 條具體題，randUsed 必須記住全部，不可截成 10 */
+    if (drawnKeys.length === 15 && S.randUsed.length !== 15)
+      contra("randUsed_not_kept_for_15:" + S.randUsed.length);
+
+    setupWorkingSingle(28);
+    const eligibleIdx = RAND.map((_, i) => i).filter(i => eventAllowed(RAND[i]));
+    if (eligibleIdx.length < 5) contra("working_single_28_pool_too_small:" + eligibleIdx.length);
+    S.randUsed = eligibleIdx.slice();
+    const usedSnap = S.randUsed.slice();
+    const afterEmpty = pickRand();
+    if (S.randUsed.join(",") !== usedSnap.join(","))
+      contra("randUsed_reset_after_pool_empty");
+    if (afterEmpty && afterEmpty.sit !== "今年大致平穩。") {
+      const reused = RAND.some((ev, i) => usedSnap.indexOf(i) >= 0 && ev.sit === afterEmpty.sit && ev !== afterEmpty);
+      if (reused || eligibleIdx.some(i => RAND[i] === afterEmpty))
+        contra("pickRand_replayed_used_event:" + (afterEmpty.sit || ""));
+      if (afterEmpty.sit !== "今年大致平穩。")
+        contra("pickRand_empty_not_fallback:" + (afterEmpty.sit || ""));
+    }
+
+    function findRand(pred) {
+      return RAND.find(pred);
+    }
+    function conseqById(id) {
+      return CONSEQ.find(c => c.id === id);
+    }
+    function themePoolHas(id) {
+      /* 模擬 rollConsequence 的 theme／已用過濾（忽略 chance） */
+      return CONSEQ.filter(c => {
+        try {
+          if (!c.need(S)) return false;
+          if (S.conseqUsed[c.id] != null) return false;
+          if (c.theme && S.themeUsed && S.themeUsed[c.theme] != null) return false;
+          return true;
+        } catch (e) { return false; }
+      }).some(c => c.id === id);
+    }
+
+    setupWorkingSingle(28);
+    S.w = 20;
+    const friendRand = findRand(ev => ev.sit === "朋友借錢。");
+    if (!friendRand) contra("missing_rand_friend_borrow");
+    if (friendRand && !eventAllowed(friendRand)) contra("friend_borrow_rand_blocked_before_theme");
+    markTheme({ theme: "friendBorrow" });
+    if (friendRand && eventAllowed(friendRand)) contra("friendBorrow_rand_still_allowed");
+    if (themePoolHas("friend_borrow")) contra("friendBorrow_conseq_still_in_pool");
+
+    setupWorkingSingle(35);
+    S.w = 20;
+    const layoffRand = findRand(ev => ev.theme === "layoffRumor" || (ev.sit && ev.sit.indexOf("可能裁員") >= 0));
+    if (!layoffRand) contra("missing_rand_layoff");
+    if (layoffRand && !eventAllowed(layoffRand)) contra("layoff_rand_blocked_before_theme");
+    markTheme({ theme: "layoffRumor" });
+    if (layoffRand && eventAllowed(layoffRand)) contra("layoffRumor_rand_still_allowed");
+    if (themePoolHas("layoff_rumor")) contra("layoffRumor_conseq_still_in_pool");
+
+    S = fresh(); S.gender = "male"; S.age = 66; S.retired = true; S.career = "work";
+    const key65 = KEY[65];
+    const mpfRand = findRand(ev => ev.storyRetireMPFDraw);
+    if (!key65) contra("missing_key65");
+    if (key65 && !eventAllowed(key65)) contra("key65_blocked_before_theme");
+    if (mpfRand && !eventAllowed(mpfRand)) contra("mpf_rand_blocked_before_theme");
+    markTheme({ theme: "retireMPFDraw" });
+    if (key65 && eventAllowed(key65)) contra("retireMPFDraw_key65_still_allowed");
+    if (mpfRand && eventAllowed(mpfRand)) contra("retireMPFDraw_rand_still_allowed");
+
+    S = fresh(); S.gender = "male"; S.age = 66; S.retired = true; S.career = "work";
+    const key66 = KEY[66];
+    const chronicRand = findRand(ev => ev.storyRetireChronic);
+    if (key66 && !eventAllowed(key66)) contra("key66_blocked_before_theme");
+    if (chronicRand && !eventAllowed(chronicRand)) contra("chronic_rand_blocked_before_theme");
+    markTheme({ theme: "chronicMed" });
+    if (key66 && eventAllowed(key66)) contra("chronicMed_key66_still_allowed");
+    if (chronicRand && eventAllowed(chronicRand)) contra("chronicMed_rand_still_allowed");
+
+    S = fresh(); S.gender = "male"; S.age = 67; S.retired = true; S.career = "work";
+    const key67 = KEY[67];
+    const ltcRand = findRand(ev => ev.storyRetireLTC);
+    const medRand = findRand(ev => ev.storyRetireMedical);
+    if (key67 && !eventAllowed(key67)) contra("key67_blocked_before_theme");
+    if (ltcRand && !eventAllowed(ltcRand)) contra("ltc_rand_blocked_before_theme");
+    if (medRand && !eventAllowed(medRand)) contra("med_rand_blocked_before_theme");
+    markTheme({ theme: "retireMedicalPrep" });
+    if (key67 && eventAllowed(key67)) contra("retireMedicalPrep_key67_still_allowed");
+    if (ltcRand && eventAllowed(ltcRand)) contra("retireMedicalPrep_ltc_still_allowed");
+    if (medRand && eventAllowed(medRand)) contra("retireMedicalPrep_med_still_allowed");
+
+    setupWorkingSingle(30);
+    const phishRand = findRand(ev => ev.sit === "收到可疑短訊「中獎」。");
+    if (!phishRand) contra("missing_rand_prize_phish");
+    if (phishRand && !eventAllowed(phishRand)) contra("phish_rand_blocked_before_theme");
+    markTheme({ theme: "prizePhish" });
+    if (phishRand && eventAllowed(phishRand)) contra("prizePhish_rand_still_allowed");
+    if (themePoolHas("phish_mail")) contra("prizePhish_conseq_still_in_pool");
+
+    const oldDualSits = [
+      "朋友約週末活動。",
+      "storyBlind",
+      "storyPetJoy",
+      "storyFriction",
+      "上司陳生突然派一個趕期項目給你。",
+      "屋企要維修。",
+      "同事請病假，要頂上。",
+      "網上看到投資宣傳。",
+      "家人鬧意見。",
+      "獵頭突然來訊：另一間公司開出更高薪，問你要不要面談。",
+      "電費／通脹上升。",
+      "銀行推銷貸款。",
+      "手機／電腦壞了。",
+      "收到可疑短訊「中獎」。",
+      "茶水間流傳部門可能裁員，氣氛一下子凝住。",
+      "親戚結婚禮金。",
+      "舊同事找你幫手做一個短期項目，酬勞不錯但會食掉週末。",
+      "超市大減價。",
+      "連續加班後，晨早起來头晕。",
+      "物業管理費上調。",
+      "退休後想兼職？",
+      "友人推介高息「穩陣」產品。"
+    ];
+    oldDualSits.forEach(key => {
+      const ev = key.indexOf("story") === 0 ? findRand(e => e[key]) : findRand(e => e.sit === key);
+      if (!ev) contra("old_dual_missing:" + key);
+      else if (!ev.opts || ev.opts.length !== 3) contra("old_dual_not_3_opts:" + key + ":" + ((ev.opts && ev.opts.length) || 0));
+    });
+
+    const newSits = [
+      "合租的室友連續兩個月未付公用開支，帳單還在增加。",
+      "父母希望你每月交一筆家用，分擔家裡開支。",
+      "朋友邀請你入股開一間小店，說前景不錯，但要先拿出一筆資金。",
+      "你收到薪俸稅通知，第一次要決定如何處理這筆稅款。",
+      "另一半提議開聯名戶口，把收入放在一起管理。",
+      "兩邊家庭對節日禮金和來往開支的期望不一樣，預算開始拉扯。",
+      "結婚後，週末應酬和親友邀約明顯增加。",
+      "孩子已經在上興趣班，又想再加新班，收費不輕。",
+      "照顧孩子使兩人都很疲憊，有人介紹兼職託兒或家務協助。",
+      "保險顧問推介「子女教育儲蓄保」，聲稱可一筆過解決升學開支。",
+      "子女想參加海外交流或遊學，費用不低，問家裡可不可以資助。",
+      "子女開始兼職，問家裡的家用要不要調整。",
+      "子女提起將來置業，希望家裡先幫忙儲首期。",
+      "公司推出自願離職計劃，並提供一筆補償金。",
+      "你收到自願醫保或醫療附加保障的加保建議，保費會上升。",
+      "友人組成「退休投資學習會」，要各人先放一筆資金一齊投資。",
+      "有人建議賣出現住房，換較易打理的單位或院舍。",
+      "舊同事約你組一個私人放貸計劃，聲稱回報比銀行高。",
+      "社區舉辦長者財商講座，其間夾雜產品推銷環節。",
+      "公司提供股份獎勵，要你用部分積蓄認購，並有鎖定期。",
+      "房東通知大幅加租，或不續現有租約。",
+      "父母希望你資助一筆大額開支，例如裝修或旅行。"
+    ];
+    newSits.forEach(sit => {
+      const ev = findRand(e => e.sit === sit);
+      if (!ev) contra("new_rand_missing:" + sit);
+      else if (!ev.opts || ev.opts.length !== 3) contra("new_rand_not_3_opts:" + sit);
+    });
+    RAND.forEach((ev, i) => {
+      if (!ev.opts || ev.opts.length < 2) contra("rand_fewer_than_2_opts:" + i + ":" + (ev.sit || i));
+    });
+
+    /* 階段抽檢 */
+    const roommate = findRand(e => e.sit && e.sit.indexOf("合租的室友") >= 0);
+    const jointAcct = findRand(e => e.sit && e.sit.indexOf("開聯名戶口") >= 0);
+    const sellHome = findRand(e => e.sit && e.sit.indexOf("賣出現住房") >= 0);
+    const volLeave = findRand(e => e.sit && e.sit.indexOf("自願離職計劃") >= 0);
+    const parentAid = findRand(e => e.sit && e.sit.indexOf("資助一筆大額開支") >= 0);
+    const rentHike = findRand(e => e.sit && e.sit.indexOf("房東通知大幅加租") >= 0);
+
+    setupWorkingSingle(24);
+    if (roommate && !eventAllowed(roommate)) contra("roommate_should_allow_young_single");
+    if (jointAcct && eventAllowed(jointAcct)) contra("joint_acct_allowed_when_single");
+    if (sellHome && eventAllowed(sellHome)) contra("sell_home_allowed_at_30_not_retired");
+
+    setupWorkingSingle(30);
+    S.married = true;
+    if (jointAcct && !eventAllowed(jointAcct)) contra("joint_acct_should_allow_newlywed");
+    if (roommate && eventAllowed(roommate)) contra("roommate_allowed_when_married");
+
+    S = fresh(); S.gender = "male"; S.age = 30; S.career = "work"; S.retired = false; S.earlyFI = false;
+    if (sellHome && eventAllowed(sellHome)) contra("retired_life_allowed_at_30");
+    if (parentAid && !eventAllowed(parentAid)) contra("parent_aid_should_allow_working_30");
+
+    S = fresh(); S.gender = "male"; S.age = 66; S.retired = true; S.career = "work"; S.hasHome = true;
+    if (sellHome && !eventAllowed(sellHome)) contra("sell_home_should_allow_retired_with_home");
+    if (parentAid && eventAllowed(parentAid)) contra("parent_aid_allowed_when_retired");
+    if (volLeave && eventAllowed(volLeave)) contra("vol_leave_allowed_when_retired");
+
+    S = fresh(); S.gender = "male"; S.age = 58; S.career = "work"; S.retired = false; S.earlyFI = false;
+    if (volLeave && !eventAllowed(volLeave)) contra("vol_leave_should_allow_near_retire_job");
+
+    S = fresh(); S.gender = "male"; S.age = 30; S.career = "work"; S.renting = true; S.hasHome = false;
+    if (rentHike && !eventAllowed(rentHike)) contra("rent_hike_should_allow_renter");
+    S.renting = false; S.hasHome = true;
+    if (rentHike && eventAllowed(rentHike)) contra("rent_hike_allowed_when_hasHome");
+
+    const leaveA = volLeave && volLeave.opts && volLeave.opts.find(o => o.k === "A");
+    const leaveC = volLeave && volLeave.opts && volLeave.opts.find(o => o.k === "C");
+    if (leaveA && !leaveA.retire) contra("vol_leave_A_missing_retire_flag");
+    if (leaveC && leaveC.retire) contra("vol_leave_C_has_retire_flag");
+    const eduIns = findRand(e => e.sit && e.sit.indexOf("子女教育儲蓄保") >= 0);
+    const eduC = eduIns && eduIns.opts && eduIns.opts.find(o => o.k === "C");
+    if (eduC && (eduC.insured || eduC.eduSave)) contra("edu_save_C_auto_flag");
+    const medAdd = findRand(e => e.sit && e.sit.indexOf("自願醫保") >= 0);
+    const medC = medAdd && medAdd.opts && medAdd.opts.find(o => o.k === "C");
+    if (medC && medC.insured) contra("med_add_C_auto_insured");
+    const layoffC = layoffRand && layoffRand.opts && layoffRand.opts.find(o => o.k === "C");
+    if (layoffC && layoffC.emergency) contra("layoff_C_has_emergency");
 
     /* —— 結局本局回顧：階段摘要 —— */
     function assertStageSummary(r, expectIds, mustHaveRe, labelExtra) {
