@@ -370,8 +370,9 @@ body.teacher-mode{max-width:960px}
       <button type="button" class="btn-ghost" id="btnResumeClass">接續已有代碼</button>
     </div>
     <div class="field">
-      <label for="inpTeacherCode">本堂課室代碼</label>
-      <input id="inpTeacherCode" type="text" maxlength="6" autocomplete="off" spellcheck="false" placeholder="開始本堂後自動產生" />
+      <label for="inpTeacherCode">本堂課室代碼（可自訂）</label>
+      <input id="inpTeacherCode" type="text" maxlength="6" autocomplete="off" spellcheck="false" placeholder="例如 171126，留空則自動產生" />
+      <p class="sub">可自訂 6 位字母或數字，例如 171126；留空再按「開始本堂」則自動產生。</p>
     </div>
     <div class="teacher-code" id="teacherCodeBig">——</div>
     <div class="btn-row">
@@ -472,12 +473,7 @@ body.teacher-mode{max-width:960px}
   }
 
   function isValidRoomCode(c) {
-    const n = normalizeCode(c);
-    if (n.length !== 6) return false;
-    for (let i = 0; i < n.length; i++) {
-      if (CODE_CHARS.indexOf(n.charAt(i)) < 0) return false;
-    }
-    return true;
+    return /^[A-Z0-9]{6}$/.test(normalizeCode(c));
   }
 
   function initFirebase() {
@@ -939,7 +935,17 @@ body.teacher-mode{max-width:960px}
       return;
     }
     if (!initFirebase()) return;
-    const code = genRoomCode();
+    const typed = normalizeCode(document.getElementById("inpTeacherCode") && document.getElementById("inpTeacherCode").value);
+    let code = "";
+    if (typed) {
+      if (!isValidRoomCode(typed)) {
+        alert("自訂代碼須為 6 位英文字母或數字，例如 171126。");
+        return;
+      }
+      code = typed;
+    } else {
+      code = genRoomCode();
+    }
     const payload = {
       owner: teacherUser.uid,
       meta: {
@@ -948,9 +954,22 @@ body.teacher-mode{max-width:960px}
         teacherEmail: teacherUser.email || null
       }
     };
-    fbDb.ref("rooms/" + code).set(payload).then(function () {
-      setTeacherCodeDisplay(code);
-      startTeacherPoll();
+    const roomRef = fbDb.ref("rooms/" + code);
+    roomRef.once("value").then(function (snap) {
+      if (snap.exists()) {
+        const owner = snap.child("owner").val();
+        if (owner === teacherUser.uid) {
+          setTeacherCodeDisplay(code);
+          startTeacherPoll();
+          return;
+        }
+        alert("此代碼已被使用，請換另一個代碼。");
+        return;
+      }
+      return roomRef.set(payload).then(function () {
+        setTeacherCodeDisplay(code);
+        startTeacherPoll();
+      });
     }).catch(function (err) {
       alert("無法建立課室：" + ((err && err.message) || "請重試"));
     });
