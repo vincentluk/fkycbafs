@@ -174,9 +174,10 @@ body.light .stage-sum li.bad{color:#b91c1c}
 .stage-sum .sg-fi{font-size:.82rem;font-weight:700;color:var(--accent);margin:0 0 .45rem;line-height:1.4}
 .growth-chart{margin:.45rem 0 .7rem;background:var(--panel2);border-radius:12px;padding:.55rem .6rem .5rem}
 .growth-chart svg{width:100%;height:auto;display:block}
-.growth-leg{display:flex;flex-wrap:wrap;gap:6px;margin:.4rem 0 .15rem}
-.growth-leg button{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:999px;padding:3px 9px;font-size:.75rem;font-weight:800;font-family:inherit;cursor:pointer}
-.growth-leg button .sw{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:middle}
+
+.growth-leg{display:flex;flex-wrap:wrap;gap:8px;margin:.5rem 0 .2rem}
+.growth-leg button{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:999px;padding:6px 12px;font-size:.88rem;font-weight:800;font-family:inherit;cursor:pointer}
+.growth-leg button .sw{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:middle}
 .growth-leg button.off{opacity:.38;text-decoration:line-through}
 .growth-marks{display:flex;flex-wrap:wrap;gap:4px 10px;margin-top:.3rem}
 .growth-marks span{font-size:.72rem;font-weight:700;color:var(--muted)}
@@ -197,10 +198,39 @@ body.light .growth-leg button{background:#fff}
 .player-card .pn{font-weight:900;font-size:.98rem}
 .player-card .pm{color:var(--muted);font-size:.78rem;margin-top:2px}
 .player-card .pl{color:#cbd5e1;font-size:.8rem;margin-top:4px;line-height:1.35}
+
 .player-card .phist{margin-top:.45rem;border-top:1px solid var(--line);padding-top:.4rem;display:none}
 .player-card.open .phist{display:block}
 .player-card .phist ul{list-style:none;margin:0;padding:0}
 .player-card .phist li{font-size:.75rem;color:#cbd5e1;margin-bottom:4px;line-height:1.35}
+.player-card .pstats{display:grid;grid-template-columns:repeat(3,1fr);gap:4px 6px;margin-top:6px}
+.player-card .pst{font-size:.68rem;color:var(--muted);font-weight:700}
+.player-card .pst strong{color:var(--text);float:right;font-size:.72rem}
+.player-card .pst .bar{height:5px;margin-top:2px}
+.player-card .pneeds{margin-top:.45rem}
+.player-card .pneeds h4,.player-card .pradar-wrap h4{font-size:.8rem;margin:0 0 .25rem}
+.player-card .pneeds li{font-size:.75rem;color:#cbd5e1;margin-bottom:3px}
+.player-card .pradar-wrap{margin-top:.45rem}
+.player-card .pradar-wrap svg{width:100%;max-width:240px;height:auto;display:block;margin:0 auto}
+.class-pause-banner{display:none;background:#78350f;color:#fde68a;border:1px solid #fbbf24;border-radius:10px;padding:.45rem .7rem;font-weight:800;font-size:.88rem;text-align:center;margin:4px 0 6px}
+.class-pause-banner.show{display:block}
+.radar-chart{margin:.45rem 0 .7rem;background:var(--panel2);border-radius:12px;padding:.55rem .6rem .5rem}
+.radar-chart svg{width:100%;max-width:340px;height:auto;display:block;margin:0 auto}
+.radar-legend{display:flex;flex-wrap:wrap;gap:8px 14px;justify-content:center;margin-top:.35rem;font-size:.78rem;font-weight:700;color:var(--muted)}
+.radar-legend i{display:inline-block;width:12px;height:3px;margin-right:5px;vertical-align:middle;border-radius:2px}
+.goal-verdict{margin:.3rem 0 .75rem;background:var(--panel2);border-radius:12px;padding:.55rem .75rem;text-align:left}
+.goal-verdict .gv-h{font-weight:900;font-size:.86rem;color:var(--accent);margin-bottom:.3rem}
+.goal-verdict .gv-group{margin:.1rem 0 .25rem}
+.goal-verdict .gv-k{font-size:.8rem;font-weight:900;margin:.1rem 0 .15rem}
+.goal-verdict .gv-k.ok{color:#86efac}
+.goal-verdict .gv-k.bad{color:#fca5a5}
+body.light .goal-verdict .gv-k.ok{color:#15803d}
+body.light .goal-verdict .gv-k.bad{color:#b91c1c}
+.goal-verdict ul{list-style:none;margin:0;padding:0}
+.goal-verdict li{font-size:.82rem;line-height:1.45;font-weight:600;margin:0 0 .35rem;color:var(--text)}
+.player-card .goal-verdict{margin:.35rem 0 0;padding:.4rem .5rem}
+.player-card .goal-verdict li{font-size:.75rem;color:#cbd5e1}
+body.light .class-pause-banner{background:#fff7ed;color:#9a3412}
 .toggle-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:.35rem 0;font-size:.85rem;color:var(--muted)}
 .cloud-warn{background:#7f1d1d;color:#fecaca;border-radius:10px;padding:.5rem .7rem;font-size:.82rem;margin:.4rem 0;font-weight:700;line-height:1.4}
 .status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:middle}
@@ -263,6 +293,7 @@ body.teacher-mode{max-width:960px}
   <div class="flags" id="flagLabel"></div>
   <div class="stats" id="statsBars"></div>
 </div>
+<div id="classPauseBanner" class="class-pause-banner" role="status">老師講解中</div>
 
 <section id="screen-start" class="screen card">
   <div class="hero"><div class="emo">🎲</div><h1>人生模擬</h1>
@@ -318,6 +349,9 @@ body.teacher-mode{max-width:960px}
   <p class="sub" id="endingBlurb"></p>
   <div class="final-grid" id="finalStats"></div>
   <p class="sub" id="goalResult"></p>
+  <h2 style="font-size:1rem;margin-top:.4rem">目標對照</h2>
+  <div class="radar-chart" id="radarChart"></div>
+  <div id="goalVerdict"></div>
   <h2 style="font-size:1rem;margin-top:.4rem">成長圖</h2>
   <div class="growth-chart" id="growthChart"></div>
   <h2 style="font-size:1rem;margin-top:.4rem">人生階段與財務需要</h2>
@@ -384,6 +418,10 @@ body.teacher-mode{max-width:960px}
     <div class="qr-wrap hidden" id="teacherQrWrap">
       <img id="teacherQrImg" alt="課室加入 QR" width="160" height="160" />
     </div>
+    <div class="btn-row">
+      <button type="button" class="big" id="btnClassPause">全班暫停</button>
+    </div>
+    <p class="sub" id="classPauseHint">全班暫停後，同學停止自動長大，並看到「老師講解中」。各人頂欄的暫停仍然可用。</p>
     <div class="teacher-stats">
       <span>已加入　<strong id="cntTotal">0</strong></span>
       <span>進行中　<strong id="cntPlaying">0</strong></span>
@@ -452,6 +490,9 @@ body.teacher-mode{max-width:960px}
   let lastPlayersSnap = null;
   let anonAuthPromise = null;
   let teacherAuthHooked = false;
+  let classPaused = false;
+  let teacherClassPaused = false;
+  let roomMetaUnsub = null;
 
   function cloudConfigured() {
     const keys = ["apiKey", "authDomain", "databaseURL", "projectId", "appId"];
@@ -521,6 +562,7 @@ body.teacher-mode{max-width:960px}
     }
     const hist = (S.history || []).slice(-15);
     const last = hist.length ? hist[hist.length - 1] : null;
+    const needs = (typeof compactFinancialNeeds === "function") ? compactFinancialNeeds(S) : [];
     let career = "";
     try { career = (typeof careerLab === "function") ? careerLab(S.career) : (S.career || ""); } catch (e) { career = S.career || ""; }
     return {
@@ -537,12 +579,16 @@ body.teacher-mode{max-width:960px}
       renting: !!(S.renting && !(S.hasHome || S.biggerHome)),
       earlyFI: !!S.earlyFI,
       retired: !!S.retired,
+      travel: !!S.travel,
+      cert: S.cert || 0,
+      careerId: S.career || null,
       stats: { h: S.h, w: S.w, t: S.t, hap: S.hap, rel: S.rel, sec: S.sec },
       status: ended ? "ended" : "playing",
       ending: endingName,
       decisions: S.decisions || 0,
       lastChoice: last ? { age: last.age, title: last.title, choice: last.choice, at: Date.now() } : null,
       history: hist,
+      needs: needs,
       updatedAt: Date.now()
     };
   }
@@ -577,7 +623,9 @@ body.teacher-mode{max-width:960px}
     ensureStudentAuth().then(function (user) {
       if (!user) return;
       playerId = user.uid;
-      return fbDb.ref("rooms/" + cloudRoom + "/players/" + user.uid).update(payload);
+      return fbDb.ref("rooms/" + cloudRoom + "/players/" + user.uid).update(payload).then(function () {
+        if (!roomMetaUnsub) listenStudentClassMeta();
+      });
     }).catch(function () { /* 同步失敗不阻斷遊戲 */ });
   }
 
@@ -590,7 +638,10 @@ body.teacher-mode{max-width:960px}
     cloudName = name;
     cloudRoom = (code && isValidRoomCode(code)) ? code : "";
     if (cloudRoom && cloudConfigured()) {
-      ensureStudentAuth().catch(function () {});
+      ensureStudentAuth().then(function () { listenStudentClassMeta(); }).catch(function () {});
+    } else {
+      stopClassMetaListener();
+      setClassPausedLocal(false);
     }
   }
 
@@ -600,6 +651,90 @@ body.teacher-mode{max-width:960px}
       roomPlayersUnsub = null;
     }
     roomPlayersRef = null;
+    stopClassMetaListener();
+  }
+
+  function stopClassMetaListener() {
+    if (roomMetaUnsub) {
+      try { roomMetaUnsub(); } catch (e) {}
+      roomMetaUnsub = null;
+    }
+  }
+
+  function updateClassPauseBanner() {
+    const ban = document.getElementById("classPauseBanner");
+    if (ban) {
+      if (classPaused) ban.classList.add("show");
+      else ban.classList.remove("show");
+    }
+    const hint = document.getElementById("classPauseHint");
+    const btn = document.getElementById("btnClassPause");
+    if (btn) btn.textContent = teacherClassPaused ? "繼續本堂" : "全班暫停";
+    if (hint) {
+      hint.textContent = teacherClassPaused
+        ? "本堂已暫停。同學停止自動長大，畫面顯示「老師講解中」。再按一次即可繼續。"
+        : "全班暫停後，同學停止自動長大，並看到「老師講解中」。各人頂欄的暫停仍然可用。";
+    }
+    if (typeof refreshIdleChrome === "function") refreshIdleChrome();
+    if (typeof renderSpeedBar === "function") renderSpeedBar();
+  }
+
+  function setClassPausedLocal(v) {
+    const next = !!v;
+    const was = classPaused;
+    classPaused = next;
+    updateClassPauseBanner();
+    if (classPaused) {
+      if (typeof clearAutoAge === "function") clearAutoAge();
+    } else if (was && !agePaused && typeof resumeIdleTimer === "function") {
+      resumeIdleTimer(400);
+    }
+  }
+
+  function listenClassMeta(code) {
+    stopClassMetaListener();
+    if (!code || !isValidRoomCode(code) || !cloudConfigured() || !initFirebase() || !fbDb) return;
+    const ref = fbDb.ref("rooms/" + code + "/meta");
+    const handler = function (snap) {
+      const m = snap.val() || {};
+      setClassPausedLocal(!!m.paused);
+    };
+    ref.on("value", handler, function () { /* 規則未部署時略過，不阻斷遊戲 */ });
+    roomMetaUnsub = function () {
+      try { ref.off("value", handler); } catch (e) {}
+    };
+  }
+
+  function listenStudentClassMeta() {
+    if (!cloudRoom) {
+      stopClassMetaListener();
+      setClassPausedLocal(false);
+      return;
+    }
+    listenClassMeta(cloudRoom);
+  }
+
+  function setTeacherClassPaused(next) {
+    const code = normalizeCode(document.getElementById("inpTeacherCode") && document.getElementById("inpTeacherCode").value);
+    if (!code || !isValidRoomCode(code)) {
+      alert("請先開始本堂或接續已有代碼。");
+      return;
+    }
+    if (!cloudConfigured() || !initFirebase() || !fbDb) {
+      alert("尚未接上雲端，無法全班暫停。");
+      return;
+    }
+    const val = !!next;
+    fbDb.ref("rooms/" + code + "/meta/paused").set(val).then(function () {
+      teacherClassPaused = val;
+      updateClassPauseBanner();
+    }).catch(function (err) {
+      alert("無法更新全班暫停：" + ((err && err.message) || "請確認已部署可寫入 paused 的規則。"));
+    });
+  }
+
+  function toggleClassPause() {
+    setTeacherClassPaused(!teacherClassPaused);
   }
 
   function stopTeacherPoll() {
@@ -731,6 +866,33 @@ body.teacher-mode{max-width:960px}
     }
   }
 
+  function teacherMiniStatsHTML(stats) {
+    stats = stats || {};
+    return STATS.map(function (m) {
+      const val = (typeof stats[m.key] === "number") ? stats[m.key] : "—";
+      const n = (typeof val === "number") ? val : 0;
+      const pct = Math.max(0, Math.min(100, n));
+      return '<div class="pst"><span>' + m.lab + '</span><strong>' + val + '</strong>' +
+        '<div class="bar ' + m.cls + '"><i style="width:' + pct + '%"></i></div></div>';
+    }).join("");
+  }
+
+  function teacherNeedsHTML(needs) {
+    let html = "<h4>已遇到的財務需要</h4>";
+    if (!Array.isArray(needs) || !needs.length) {
+      return html + '<p class="sub">尚未記錄到課綱財務需要。</p>';
+    }
+    const stageName = {};
+    (BAFS_STAGES || []).forEach(function (st) { stageName[st.id] = st.name; });
+    html += "<ul>";
+    needs.forEach(function (n) {
+      const st = stageName[n.stage] || (("階段" + (n.stage || "")));
+      html += "<li>" + st + "　" + (n.name || "") + (n.age != null ? ("（" + n.age + "歲）") : "") + "</li>";
+    });
+    html += "</ul>";
+    return html;
+  }
+
   function renderPlayerList(playersObj) {
     const box = document.getElementById("playerList");
     if (!box) return;
@@ -801,8 +963,26 @@ body.teacher-mode{max-width:960px}
       pl.className = "pl";
       pl.textContent = "最近：" + last;
 
+      const pstats = document.createElement("div");
+      pstats.className = "pstats";
+      pstats.innerHTML = teacherMiniStatsHTML(p.stats);
+
       const ph = document.createElement("div");
       ph.className = "phist";
+      const needBox = document.createElement("div");
+      needBox.className = "pneeds";
+      needBox.innerHTML = teacherNeedsHTML(p.needs);
+      ph.appendChild(needBox);
+      const radarBox = document.createElement("div");
+      radarBox.className = "pradar-wrap";
+      const rh = document.createElement("h4");
+      rh.textContent = "六項指標對照";
+      radarBox.appendChild(rh);
+      radarBox.insertAdjacentHTML("beforeend", renderRadarSVG(p.stats || {}, { size: "card", goals: p.goals || [] }));
+      if (typeof explainGoalsHTML === "function" && Array.isArray(p.goals) && p.goals.length) {
+        radarBox.insertAdjacentHTML("beforeend", explainGoalsHTML(p, { brief: true }));
+      }
+      ph.appendChild(radarBox);
       const htit = document.createElement("strong");
       htit.style.fontSize = ".8rem";
       htit.textContent = "決策歷程";
@@ -828,6 +1008,7 @@ body.teacher-mode{max-width:960px}
 
       card.appendChild(pn);
       card.appendChild(pm);
+      card.appendChild(pstats);
       card.appendChild(pl);
       card.appendChild(ph);
       card.onclick = function () {
@@ -871,6 +1052,18 @@ body.teacher-mode{max-width:960px}
     roomPlayersRef.on("value", handler);
     roomPlayersUnsub = function () {
       try { roomPlayersRef.off("value", handler); } catch (e) {}
+    };
+    const metaRef = fbDb.ref("rooms/" + code + "/meta");
+    const metaHandler = function (snap) {
+      const m = snap.val() || {};
+      teacherClassPaused = !!m.paused;
+      updateClassPauseBanner();
+    };
+    metaRef.on("value", metaHandler);
+    const prevUnsub = roomPlayersUnsub;
+    roomPlayersUnsub = function () {
+      try { prevUnsub(); } catch (e) {}
+      try { metaRef.off("value", metaHandler); } catch (e) {}
     };
   }
 
@@ -951,7 +1144,8 @@ body.teacher-mode{max-width:960px}
       meta: {
         createdAt: Date.now(),
         title: "FKYC- 人生模擬遊戲",
-        teacherEmail: teacherUser.email || null
+        teacherEmail: teacherUser.email || null,
+        paused: false
       }
     };
     const roomRef = fbDb.ref("rooms/" + code);
@@ -1049,6 +1243,7 @@ body.teacher-mode{max-width:960px}
     const btnCopyUrl = document.getElementById("btnCopyJoinUrl");
     const btnRefresh = document.getElementById("btnRefreshPlayers");
     const btnBack = document.getElementById("btnTeacherBack");
+    const btnClassPause = document.getElementById("btnClassPause");
     const inpCode = document.getElementById("inpTeacherCode");
     if (btnIn) btnIn.onclick = teacherSignIn;
     if (btnOut) btnOut.onclick = teacherSignOut;
@@ -1065,6 +1260,7 @@ body.teacher-mode{max-width:960px}
       copyText(u).then(function (ok) { if (ok) alert("已複製加入網址"); });
     };
     if (btnRefresh) btnRefresh.onclick = refreshTeacherPlayers;
+    if (btnClassPause) btnClassPause.onclick = toggleClassPause;
     if (btnBack) btnBack.onclick = function () {
       stopTeacherPoll();
       document.body.classList.remove("teacher-mode");
@@ -1206,6 +1402,14 @@ body.teacher-mode{max-width:960px}
         { k: "A", lab: "養一隻毛孩作伴", tip: "有年費／醫療開支；關係／開心小幅↑", d: [1, -4, -2, 6, 5, 1], pet: true },
         { k: "B", lab: "先做義工接觸動物", tip: "較少開支", d: [1, -1, -1, 3, 3, 1] },
         { k: "C", lab: "不養，把時間留給事業／興趣", tip: "無寵物開支", d: [0, 2, 2, 0, -2, 1] }
+      ]
+    },
+    31: {
+      tag: "人生事件", fin: true, title: "", sit: "", needFriendZone: true, storyStartDate: true,
+      opts: [
+        { k: "A", lab: "開始交往", tip: "約會有開支", d: [0, -3, -2, 8, 10, 2], partner: true },
+        { k: "B", lab: "繼續做朋友，暫不交往", tip: "維持朋友；可走單身／寵物線", d: [0, 0, 1, 1, 2, 1], friendZoneStay: true },
+        { k: "C", lab: "婉拒，想專注事業", tip: "之後較難成家", d: [0, 2, 2, -2, -4, 1], refusePartner: true }
       ]
     },
     32: {
@@ -2248,6 +2452,9 @@ body.teacher-mode{max-width:960px}
       emergency: false, bankrupt: false, everDebt: false,
       married: false, kids: false, kidsBirthAge: null, kidName: null, partner: false, refusedPartner: false,
       partnerName: null, declinedMarry: false,
+      friendZone: false, friendZoneAge: null, friendZoneAsked: false,
+      partnerSinceAge: null, marriedSinceAge: null, travelResolvedAge: null,
+      needsEncountered: [],
       hasPet: false, petName: null, petAsked: false,
       kidsAllowance: false, kidsAllowanceAsked: false,
       career: null, path: null, cert: 0, save: 0, travel: false,
@@ -2793,8 +3000,9 @@ body.teacher-mode{max-width:960px}
 
   function autoIdleHint() {
     if (S.age >= 68) return "即將進入一生回顧…";
+    if (classPaused) return "老師講解中，已暫停自動長大。";
     if (agePaused) return "已暫停。選速度或按「快轉到下一個抉擇」繼續。";
-    if (hasAnyFreeAction()) return "可選擇去旅行；歲數會繼續自動推進";
+    if (hasAnyFreeAction()) return "今年有旅行機會，請先選擇是否出發。";
     if (ageSpeed === 1) return "自動長大中…";
     return "自動長大中（每次跳 " + ageSpeed + " 歲；關鍵決策會在跳歲後出現）";
   }
@@ -2823,13 +3031,13 @@ body.teacher-mode{max-width:960px}
     });
     const skip = document.getElementById("btnSkipToKey");
     if (skip) {
-      const canSkip = !!(S && S.phase === "idle" && !agingLock && S.age < 68);
+      const canSkip = !!(S && S.phase === "idle" && !agingLock && S.age < 68 && !classPaused);
       skip.disabled = !canSkip;
     }
   }
 
   function resumeIdleTimer(delay) {
-    if (!S || S.phase !== "idle" || agePaused || S.age >= 68) return;
+    if (!S || S.phase !== "idle" || agePaused || classPaused || S.age >= 68) return;
     clearAutoAge();
     autoAgeTimer = setTimeout(() => { autoAgeTimer = null; doAgeUp(); }, delay || 400);
   }
@@ -2855,6 +3063,7 @@ body.teacher-mode{max-width:960px}
 
   function skipToNextDecision() {
     if (!S || agingLock) return;
+    if (classPaused) return;
     if (S.phase !== "idle") return;
     if (S.age >= 68) return;
     agePaused = false;
@@ -2866,7 +3075,8 @@ body.teacher-mode{max-width:960px}
     if (S.age >= 68) return true;
     if (checkKO()) return true;
     if (keyEligible(S.age)) return true;
-    /* 財務自由／結婚／生孩子改為常駐，不再打斷自動長大或快轉 */
+    if (typeof canShowTravel === "function" && canShowTravel()) return true;
+    /* 財務自由／結婚／生孩子不再以常駐按鈕打斷自動長大或快轉 */
     if (typeof canOfferKidsAllowance === "function" && canOfferKidsAllowance()) return true;
     if (typeof buildCriticalHelp === "function" && buildCriticalHelp()) return true;
     return false;
@@ -3156,7 +3366,8 @@ body.teacher-mode{max-width:960px}
     if (S.leverageStock >= 1) flags.push("高槓桿倉");
     if (S.married) flags.push("已婚");
     else if (S.partner) flags.push("戀愛中");
-    else if (S.refusedPartner || S.declinedMarry) flags.push("選擇單身");
+    else if (S.friendZone && !S.friendZoneAsked) flags.push("先做朋友");
+    else if (S.refusedPartner || S.declinedMarry || S.friendZoneAsked) flags.push("選擇單身");
     if (S.hasPet) flags.push("寵物・" + who().pet);
     if (S.kidsAllowance) flags.push("收子女家用");
     if (S.kids) {
@@ -3300,7 +3511,8 @@ body.teacher-mode{max-width:960px}
     if (S.w < 28) return false;
     if (!(fiEligible() || S.earlyFI || S.retired)) return false;
     if (S.lastTravelAge != null && (S.age - S.lastTravelAge) < 2) return false;
-    /* 該年見到提示但沒出發，同樣等兩年才再出現；同年內仍可出發 */
+    if (S.travelResolvedAge === S.age) return false;
+    /* 該年見到提示但沒出發，同樣等兩年才再出現 */
     if (S.lastTravelOfferAge != null && S.age > S.lastTravelOfferAge && (S.age - S.lastTravelOfferAge) < 2) return false;
     return true;
   }
@@ -3326,7 +3538,7 @@ body.teacher-mode{max-width:960px}
   function canShowKids() {
     if (!S || !S.married || S.kids) return false;
     if (S.declinedKids) return false;
-    if (S.age < 22 || S.age > 48) return false;
+    if (S.age < 22 || S.age > 40) return false;
     return true;
   }
   function hasAnyFreeAction() {
@@ -3336,7 +3548,7 @@ body.teacher-mode{max-width:960px}
 
   const LIFE_D_NO_ADD = [30, 34, 41, 58];
   const LIFE_D_MARRY_THEME = [36, 43];
-  const LIFE_D_KIDS_THEME = [36, 38, 43];
+  const LIFE_D_KIDS_THEME = [36, 38];
   const LIFE_D_FI_THEME = [46, 48, 52];
   const LIFE_D_LATE = [48, 50, 55];
 
@@ -3348,12 +3560,17 @@ body.teacher-mode{max-width:960px}
     if (n === 41 && !S.earlyFI && !S.retired) S.missedFI = true;
   }
 
+  function yearsWithPartner() {
+    if (!S || !S.partner) return 0;
+    if (S.partnerSinceAge == null) return null;
+    return S.age - S.partnerSinceAge;
+  }
   function canOfferMarryD() {
     return !!(S && S.partner && !S.married && !S.refusedPartner);
   }
   function canOfferKidsD() {
     if (!S || !S.married || S.kids || S.declinedKids) return false;
-    if (S.age < 22 || S.age > 48) return false;
+    if (S.age < 22 || S.age > 40) return false;
     return true;
   }
   function canOfferFID() {
@@ -3368,7 +3585,7 @@ body.teacher-mode{max-width:960px}
     age = Number(age);
     if (LIFE_D_LATE.indexOf(age) < 0) return false;
     if (kind === "marry") return LIFE_D_MARRY_THEME.indexOf(age) < 0 && age > 43;
-    if (kind === "kids") return LIFE_D_KIDS_THEME.indexOf(age) < 0 && age > 43;
+    if (kind === "kids") return false; /* 生育 D 最遲 40 歲，不走 41 歲以後的晚年補問 */
     if (kind === "fi") return LIFE_D_FI_THEME.indexOf(age) < 0 && age > 52;
     return false;
   }
@@ -3397,6 +3614,9 @@ body.teacher-mode{max-width:960px}
       if (kids) return "kids";
       if (fi) return "fi";
     }
+    if (marry) return "marry";
+    if (kids) return "kids";
+    if (fi) return "fi";
     return null;
   }
 
@@ -3404,13 +3624,17 @@ body.teacher-mode{max-width:960px}
     age = Number(age);
     const able = { marry: false, kids: false, fi: false };
     if (!S || LIFE_D_NO_ADD.indexOf(age) >= 0) return able;
-    if (canOfferMarryD() && marryDPending()) {
-      if (LIFE_D_MARRY_THEME.indexOf(age) >= 0) able.marry = true;
-      else if (isLateLifeD("marry", age) && !S.lateMarryOffered) able.marry = true;
+    if (canOfferMarryD()) {
+      const yrs = yearsWithPartner();
+      if (yrs != null && yrs >= 2) able.marry = true;
+      else if (marryDPending()) {
+        if (LIFE_D_MARRY_THEME.indexOf(age) >= 0) able.marry = true;
+        else if (isLateLifeD("marry", age) && !S.lateMarryOffered) able.marry = true;
+        else if (S.deferredMarry || S.missedMarry) able.marry = true;
+      }
     }
-    if (canOfferKidsD() && kidsDPending()) {
-      if (LIFE_D_KIDS_THEME.indexOf(age) >= 0) able.kids = true;
-      else if (isLateLifeD("kids", age) && !S.lateKidsOffered) able.kids = true;
+    if (canOfferKidsD()) {
+      able.kids = true;
     }
     if (canOfferFID() && fiDPending()) {
       if (LIFE_D_FI_THEME.indexOf(age) >= 0) able.fi = true;
@@ -3518,11 +3742,11 @@ body.teacher-mode{max-width:960px}
   function buildTravelFreeEvent() {
     return {
       tag: "自由行動", fin: true, title: "去旅行",
-      sit: "想現在用一筆儲蓄去旅行嗎？（約兩年後可再去）",
-      major: true, freeAction: true, freeKind: "travel",
+      sit: "今年有機會用一筆儲蓄去旅行。你會出發，還是今年不去、繼續過這一年？（約兩年後可再考慮）",
+      major: true, freeAction: true, freeKind: "travel", travelChoice: true,
       opts: [
         { k: "A", lab: "去旅行", tip: "花費一筆；開心／關係↑", d: [1, -8, -1, 10, 4, -2], travel: true, freeTravel: true },
-        { k: "B", lab: "暫時再說", tip: "維持現狀", d: [0, 0, 0, 0, 0, 0], travelOffer: true }
+        { k: "B", lab: "今年不去，繼續過這一年", tip: "維持現狀，約兩年後可再考慮", d: [0, 0, 0, 0, 0, 0], travelOffer: true }
       ]
     };
   }
@@ -3540,10 +3764,7 @@ body.teacher-mode{max-width:960px}
     if (!bar || !S) return;
     bar.innerHTML = "";
     const items = [];
-    if (canShowTravel()) {
-      items.push({ kind: "travel", cls: "cont", lab: "✈️ 去旅行" });
-      markTravelOffered();
-    }
+    /* 旅行改為出現機會時出選擇卡，不再用常駐按鈕 */
     if (!items.length) {
       bar.classList.add("hidden");
       return;
@@ -3585,10 +3806,15 @@ body.teacher-mode{max-width:960px}
     renderFreeActions();
     renderHUD();
     clearAutoAge();
+    if (canShowTravel() && !classPaused) {
+      markTravelOffered();
+      presentEvent(buildTravelFreeEvent());
+      return;
+    }
     if (S.age >= 68) {
       autoAgeTimer = setTimeout(() => { autoAgeTimer = null; doAgeUp(); }, 500);
-    } else if (agePaused) {
-      /* 已暫停：等學生選速度或快轉 */
+    } else if (agePaused || classPaused) {
+      /* 已暫停：等學生選速度、快轉，或等老師繼續本堂 */
     } else {
       autoAgeTimer = setTimeout(() => {
         autoAgeTimer = null;
@@ -3638,6 +3864,7 @@ body.teacher-mode{max-width:960px}
     }
     document.getElementById("sitText").textContent = headline;
     logEvent(headline, ev.fin || ev.keyAge != null ? "fin" : "note");
+    if (typeof noteFinancialNeed === "function") noteFinancialNeed(ev.title, ev.sit || headline);
     const box = document.getElementById("choices");
     box.innerHTML = "";
     ev.opts.forEach(opt => {
@@ -3654,12 +3881,19 @@ body.teacher-mode{max-width:960px}
     renderHUD();
   }
 
+  function copyStoryFlags(src, ev) {
+    if (!src || !ev) return ev;
+    Object.keys(src).forEach(function (k) {
+      if (k.indexOf("story") === 0) ev[k] = !!src[k];
+    });
+    return ev;
+  }
+
   function buildKeyEvent(age) {
     const src = KEY[age];
     const ev = {
       tag: src.tag, fin: !!src.fin, title: src.title, sit: src.sit,
       marry: !!src.marry,
-      storyConfess: !!src.storyConfess,
       kidsStory: !!src.kidsStory,
       kidsOlderStory: !!src.kidsOlderStory,
       needKidsOlder: !!src.needKidsOlder,
@@ -3667,10 +3901,12 @@ body.teacher-mode{max-width:960px}
       needEstateAsk: !!src.needEstateAsk,
       petAsk: !!src.petAsk,
       needPetOffer: !!src.needPetOffer,
+      needFriendZone: !!src.needFriendZone,
       keyAge: age, major: true,
       theme: src.theme,
       opts: src.opts.map(o => Object.assign({}, o, { d: o.d.slice() }))
     };
+    copyStoryFlags(src, ev);
     attachLifeD(ev, age);
     return ev;
   }
@@ -3726,6 +3962,7 @@ body.teacher-mode{max-width:960px}
     if (src.needKidsYoung && !kidsYoung(S)) return false;
     if (src.needMarried && !S.married) return false;
     if (src.needPartner && !S.partner) return false;
+    if (src.needFriendZone && !(S.friendZone && !S.partner && !S.married && !S.refusedPartner && !S.friendZoneAsked)) return false;
     if (src.needSingle && (S.partner || S.married || S.refusedPartner)) return false;
     if (src.needUnmarried && S.married) return false;
     if (src.minAge != null && S.age < src.minAge) return false;
@@ -3749,6 +3986,9 @@ body.teacher-mode{max-width:960px}
     const partner = S.partnerName || n.partner;
     if (src.storyConfess) {
       return { title: "", sit: n.crush + " 鼓起勇氣向你表白，你會？" };
+    }
+    if (src.storyStartDate) {
+      return { title: "", sit: n.crush + " 與你做了幾年朋友，最近問起要不要開始交往，你會？" };
     }
     if (src.storyBlind) {
       return { title: "", sit: "朋友把你介紹給 " + n.crush2 + "，對方想約你喝杯咖啡。" };
@@ -3961,58 +4201,20 @@ body.teacher-mode{max-width:960px}
 
   function buildRandEvent() {
     const src = pickRand();
-    return {
+    const ev = {
       tag: src.fin ? "本年理財" : "本年事件",
       fin: !!src.fin, title: "", sit: src.sit, major: !!src.fin,
-      storyBlind: !!src.storyBlind,
-      storyDateTrip: !!src.storyDateTrip,
-      storyFriction: !!src.storyFriction,
-      storyKidsTutor: !!src.storyKidsTutor,
-      storyPartTime: !!src.storyPartTime,
-      storyFurtherStudy: !!src.storyFurtherStudy,
-      storyFriendsHang: !!src.storyFriendsHang,
-      storyNewPhone: !!src.storyNewPhone,
-      storyLightInvest: !!src.storyLightInvest,
-      storyDatingSpend: !!src.storyDatingSpend,
-      storyRentPlan: !!src.storyRentPlan,
-      storySaveFlat: !!src.storySaveFlat,
-      storyNewlywedInsure: !!src.storyNewlywedInsure,
-      storyHoneymoon: !!src.storyHoneymoon,
-      storyFormula: !!src.storyFormula,
-      storyHouseholdUp: !!src.storyHouseholdUp,
-      storyBiggerHome: !!src.storyBiggerHome,
-      storySpouseCare: !!src.storySpouseCare,
-      storyKidsNight: !!src.storyKidsNight,
-      storySoloBudget: !!src.storySoloBudget,
-      storySoloSkill: !!src.storySoloSkill,
-      storyOlderTutor: !!src.storyOlderTutor,
-      storyOlderPhone: !!src.storyOlderPhone,
-      storyOlderAllowance: !!src.storyOlderAllowance,
-      storyOlderConflict: !!src.storyOlderConflict,
-      storyNearMPF: !!src.storyNearMPF,
-      storyNearHealthCheck: !!src.storyNearHealthCheck,
-      storyNearTravel: !!src.storyNearTravel,
-      storyNearEstate: !!src.storyNearEstate,
-      storyNearWindDown: !!src.storyNearWindDown,
-      storyNearDownsize: !!src.storyNearDownsize,
-      storyRetireMPFDraw: !!src.storyRetireMPFDraw,
-      storyRetireMedical: !!src.storyRetireMedical,
-      storyRetireTravel: !!src.storyRetireTravel,
-      storyRetireFall: !!src.storyRetireFall,
-      storyRetireChronic: !!src.storyRetireChronic,
-      storyRetireHospital: !!src.storyRetireHospital,
-      storyRetireLTC: !!src.storyRetireLTC,
-      storyRetireTripCost: !!src.storyRetireTripCost,
-      storyRetireAccident: !!src.storyRetireAccident,
-      storyRetirePartTime: !!src.storyRetirePartTime,
-      storyRetireVolunteer: !!src.storyRetireVolunteer,
-      storyRetireCheckup: !!src.storyRetireCheckup,
-      storyRetireGrand: !!src.storyRetireGrand,
       estateAsk: !!src.estateAsk,
       needEstateAsk: !!src.needEstateAsk,
+      petAsk: !!src.petAsk,
+      needPetOffer: !!src.needPetOffer,
+      needHasPet: !!src.needHasPet,
+      needKidsAllowanceOffer: !!src.needKidsAllowanceOffer,
       theme: src.theme,
       opts: src.opts.map(o => Object.assign({}, o, { d: o.d.slice() }))
     };
+    copyStoryFlags(src, ev);
+    return ev;
   }
 
   function keyEligible(age) {
@@ -4331,7 +4533,7 @@ body.teacher-mode{max-width:960px}
     if (!S || agingLock) return;
     if (S.phase !== "idle" && S.phase !== "aging") return;
     if (S.age >= 68) { endGame(); return; }
-    if (agePaused && !skipToKeyOnce) return;
+    if ((agePaused || classPaused) && !skipToKeyOnce) return;
 
     clearAutoAge();
     agingLock = true;
@@ -4512,19 +4714,37 @@ body.teacher-mode{max-width:960px}
     if (opt.save) { S.save = opt.save; S.prudence += 1; }
     if (opt.cert != null) { S.cert = opt.cert; if (opt.cert >= 1) S.prudence += 1; }
     if (opt.travel) S.travel = true;
-    if (opt.freeTravel) S.lastTravelAge = S.age;
-    if (opt.travelOffer) markTravelOffered();
+    if (opt.freeTravel) { S.lastTravelAge = S.age; S.travelResolvedAge = S.age; }
+    if (opt.travelOffer) { markTravelOffered(); S.travelResolvedAge = S.age; }
+    if (ev && ev.travelChoice) S.travelResolvedAge = S.age;
     if (opt.declinedKids) S.declinedKids = true;
     if (opt.deferMarry) S.deferredMarry = true;
     if (opt.deferKids) S.deferredKids = true;
     if (opt.deferFI) S.deferredFI = true;
-    if (opt.partner) {
-      S.partner = true; S.refusedPartner = false;
-      if (!S.partnerName) S.partnerName = (ev.storyConfess ? who().crush : who().crush2);
+    if (opt.friendZone) {
+      S.friendZone = true;
+      if (S.friendZoneAge == null) S.friendZoneAge = S.age;
     }
-    if (opt.refusePartner) { S.refusedPartner = true; S.partner = false; S.partnerName = null; }
+    if (opt.friendZoneStay) {
+      S.friendZone = true;
+      S.friendZoneAsked = true;
+    }
+    if (ev && ev.storyStartDate) S.friendZoneAsked = true;
+    if (opt.partner) {
+      S.partner = true; S.refusedPartner = false; S.friendZoneAsked = true;
+      if (S.partnerSinceAge == null) S.partnerSinceAge = S.age;
+      if (!S.partnerName) {
+        S.partnerName = (ev && (ev.storyConfess || ev.storyStartDate || S.friendZone)) ? who().crush : who().crush2;
+      }
+    }
+    if (opt.refusePartner) { S.refusedPartner = true; S.partner = false; S.partnerName = null; S.friendZoneAsked = true; }
     if (opt.declinedMarry) S.declinedMarry = true;
-    if (opt.marry) { S.married = true; S.partner = true; S.refusedPartner = false; S.declinedMarry = false; S.deferredMarry = false; addLifeMark(S, "marry", "結婚"); }
+    if (opt.marry) {
+      S.married = true; S.partner = true; S.refusedPartner = false; S.declinedMarry = false; S.deferredMarry = false;
+      if (S.partnerSinceAge == null) S.partnerSinceAge = S.age;
+      if (S.marriedSinceAge == null) S.marriedSinceAge = S.age;
+      addLifeMark(S, "marry", "結婚");
+    }
     if (opt.kids) { S.kids = true; if (S.kidsBirthAge == null) S.kidsBirthAge = S.age; if (!S.kidName) S.kidName = defaultKidName(); S.deferredKids = false; addLifeMark(S, "kids", "生孩子"); }
     if (opt.pet) {
       S.hasPet = true;
@@ -4692,9 +4912,11 @@ body.teacher-mode{max-width:960px}
     if (opt.declinedMarry) logEvent("決定暫時不結婚，維持獨立財務。", "note");
     if (opt.declinedKids) logEvent("決定不生育；此局不再出現生孩子提示。", "note");
     if (opt.freeTravel) logEvent("出發去旅行（自選）。", "good");
-    if (opt.friendZone) {
-      const fn = (ev.storyConfess ? who().crush : (who().crush2 || who().crush));
-      logEvent("與 " + fn + " 先做朋友，尚未正式交往。", "note");
+    if (opt.friendZone || opt.friendZoneStay) {
+      const fn = ((ev && (ev.storyConfess || ev.storyStartDate)) ? who().crush : (who().crush2 || who().crush));
+      logEvent(opt.friendZoneStay
+        ? ("與 " + fn + " 繼續做朋友，不開始交往。")
+        : ("與 " + fn + " 先做朋友，尚未正式交往。"), "note");
     }
     if (opt.partner && !opt.marry && !opt.friendZone) logEvent("開始與 " + S.partnerName + " 交往。", "good");
     if (opt.studentPartTime) logEvent("開始做兼職，求學期間多了一筆小收入。", "fin");
@@ -4768,6 +4990,132 @@ body.teacher-mode{max-width:960px}
     return hit / S.goals.length;
   }
 
+  function normalizeGoalState(s) {
+    if (!s) return null;
+    const st = (s.stats && typeof s.stats.h === "number") ? s.stats : s;
+    let career = s.careerId || null;
+    if (!career && (s.career === "edu" || s.career === "work" || s.career === "mix")) career = s.career;
+    if (!career && typeof s.career === "string") {
+      if (s.career.indexOf("升學") >= 0 || s.career.indexOf("高學歷") >= 0) career = "edu";
+    }
+    const num = function (v) { return typeof v === "number" && !isNaN(v) ? v : 0; };
+    return {
+      h: num(st.h), w: num(st.w), t: num(st.t), hap: num(st.hap), rel: num(st.rel), sec: num(st.sec),
+      married: !!s.married, kids: !!s.kids,
+      career: career, cert: s.cert != null ? s.cert : 0, travel: !!s.travel,
+      goals: Array.isArray(s.goals) ? s.goals.slice() : []
+    };
+  }
+
+  function metricReason(lab, val, need, ok) {
+    return lab + "為 " + val + "，" + (ok ? "已達到 " : "未達到 ") + need + " 的要求";
+  }
+
+  /* 達成判定必須與 scoreGoals 完全一致，不可另定門檻 */
+  function explainGoalVerdicts(s) {
+    const st = normalizeGoalState(s);
+    const out = { ok: [], bad: [], items: [] };
+    if (!st) return out;
+    const defs = {
+      stable: function () {
+        const secOk = st.sec >= 55, wOk = st.w >= 20;
+        return {
+          ok: secOk && wOk,
+          focus: "此目標看重安全感與金錢。",
+          reason: metricReason("安全感", st.sec, 55, secOk) + "；" + metricReason("金錢", st.w, 20, wOk) + "。"
+        };
+      },
+      family: function () {
+        const relOk = st.rel >= 55, familyOk = !!(st.married || st.kids);
+        let fam;
+        if (st.married && st.kids) fam = "已經結婚，並且育有子女";
+        else if (st.married) fam = "已經結婚";
+        else if (st.kids) fam = "已育有子女";
+        else fam = "尚未結婚，也尚未育有子女";
+        return {
+          ok: relOk && familyOk,
+          focus: "此目標看重關係，並且需要已婚或育有子女。",
+          reason: metricReason("關係", st.rel, 55, relOk) + "；" + fam + "。"
+        };
+      },
+      career: function () {
+        const wOk = st.w >= 35, pathOk = st.career === "edu" || st.cert >= 1;
+        let path;
+        if (st.career === "edu" && st.cert >= 1) path = "已選擇升學路線，並且已取得專業資格";
+        else if (st.career === "edu") path = "已選擇升學路線";
+        else if (st.cert >= 1) path = "已取得專業資格";
+        else path = "尚未選擇升學路線，也尚未取得專業資格";
+        return {
+          ok: wOk && pathOk,
+          focus: "此目標看重金錢，並且需要升學或取得專業資格。",
+          reason: metricReason("金錢", st.w, 35, wOk) + "；" + path + "。"
+        };
+      },
+      travel: function () {
+        const tripOk = !!st.travel, hapOk = st.hap >= 55;
+        let trip;
+        if (tripOk && hapOk) trip = "已有旅行經歷；" + metricReason("開心", st.hap, 55, true);
+        else if (tripOk) trip = "已有旅行經歷";
+        else if (hapOk) trip = "尚未有旅行經歷，但" + metricReason("開心", st.hap, 55, true);
+        else trip = "尚未有旅行經歷，而且" + metricReason("開心", st.hap, 55, false);
+        return {
+          ok: tripOk || hapOk,
+          focus: "此目標看重旅行經歷，或以開心程度作為替代條件。",
+          reason: trip + "。"
+        };
+      },
+      freedom: function () {
+        const wOk = st.w >= 45, secOk = st.sec >= 50;
+        return {
+          ok: wOk && secOk,
+          focus: "此目標看重金錢與安全感。",
+          reason: metricReason("金錢", st.w, 45, wOk) + "；" + metricReason("安全感", st.sec, 50, secOk) + "。"
+        };
+      },
+      health: function () {
+        const hOk = st.h >= 40, hapOk = st.hap >= 45;
+        return {
+          ok: hOk && hapOk,
+          focus: "此目標看重健康與開心。",
+          reason: metricReason("健康", st.h, 40, hOk) + "；" + metricReason("開心", st.hap, 45, hapOk) + "。"
+        };
+      }
+    };
+    (st.goals || []).forEach(function (id) {
+      const meta = GOALS.find(function (g) { return g.id === id; });
+      const fn = defs[id];
+      if (!meta || !fn) return;
+      const r = fn();
+      const item = { id: id, label: meta.label, ok: !!r.ok, focus: r.focus, reason: r.focus + r.reason };
+      out.items.push(item);
+      if (item.ok) out.ok.push(item);
+      else out.bad.push(item);
+    });
+    return out;
+  }
+
+  function explainGoalsHTML(s, opts) {
+    opts = opts || {};
+    const v = explainGoalVerdicts(s);
+    let html = '<div class="goal-verdict">';
+    html += '<div class="gv-h">' + (opts.brief ? "目標達成說明" : "人生目標達成說明") + "</div>";
+    if (!v.items.length) {
+      html += '<p class="sub">沒有選定人生目標，因此未能對照達成情況。</p></div>';
+      return html;
+    }
+    function block(title, cls, arr) {
+      if (!arr.length) return "";
+      return '<div class="gv-group"><div class="gv-k ' + cls + '">' + title + "</div><ul>" +
+        arr.map(function (it) {
+          return "<li><strong>" + (it.ok ? "已達成" : "未達成") + "「" + it.label + "」。</strong>" + it.reason + "</li>";
+        }).join("") + "</ul></div>";
+    }
+    html += block("已達成", "ok", v.ok);
+    html += block("未達成", "bad", v.bad);
+    html += "</div>";
+    return html;
+  }
+
   function pickEnding() {
     if (S.dead) return "healthOut";
     if (S.bankrupt) return "bankrupt";
@@ -4782,6 +5130,145 @@ body.teacher-mode{max-width:960px}
     return "balanced";
   }
 
+
+  const FIN_NEED_CATS = [
+    { id: "emergency", name: "應急金", re: /應急|備用金|緩衝/ },
+    { id: "insurance", name: "保險", re: /保險|保額|人壽|投保|醫療保障/ },
+    { id: "housing", name: "置業", re: /置業|買樓|首期|按揭|租住|住屋決策/ },
+    { id: "education", name: "子女教育", re: /教育儲蓄|子女成長|年長子女|補習|學費|升學／/ },
+    { id: "retirement", name: "退休策劃", re: /退休|強積金|財務自由|FIRE|年金/ },
+    { id: "estate", name: "遺產策劃", re: /遺囑|遺產|身後|受益人/ }
+  ];
+
+  function noteFinancialNeed(title, sit, stageId) {
+    if (!S) return;
+    const textNeed = String(title || "") + " " + String(sit || "");
+    const sid = stageId || (typeof bafsStageId === "function" ? bafsStageId(S) : "1");
+    if (!S.needsEncountered) S.needsEncountered = [];
+    FIN_NEED_CATS.forEach(function (cat) {
+      if (!cat.re.test(textNeed)) return;
+      if (S.needsEncountered.some(function (n) { return n.id === cat.id && n.stage === sid; })) return;
+      S.needsEncountered.push({ id: cat.id, stage: sid, name: cat.name, age: S.age });
+    });
+  }
+
+  function compactFinancialNeeds(s) {
+    s = s || S;
+    if (!s) return [];
+    const list = (s.needsEncountered || []).slice();
+    const seen = {};
+    list.forEach(function (n) { seen[n.id + ":" + n.stage] = true; });
+    function add(catId, stage, age) {
+      const cat = FIN_NEED_CATS.find(function (c) { return c.id === catId; });
+      if (!cat) return;
+      const key = cat.id + ":" + stage;
+      if (seen[key]) return;
+      seen[key] = true;
+      list.push({ id: cat.id, stage: stage, name: cat.name, age: age != null ? age : s.age });
+    }
+    (s.history || []).forEach(function (h) {
+      const t = (h.title || "") + " " + (h.choice || "");
+      const sid = h.stage || "1";
+      FIN_NEED_CATS.forEach(function (cat) {
+        if (cat.re.test(t)) add(cat.id, sid, h.age);
+      });
+    });
+    if (s.emergency) add("emergency", "1", s.age);
+    if (s.insured) add("insurance", s.married ? "2" : "1", s.age);
+    if (s.hasHome || s.biggerHome || s.savingHome || s.renting) add("housing", s.married ? "2" : "1", s.age);
+    if (s.eduSave) add("education", s.kids && (typeof kidYears === "function" && kidYears(s) >= 10) ? "4" : "3", s.age);
+    if (s.mpf || s.earlyFI || s.retired) add("retirement", s.retired ? "6" : ((s.age >= 55) ? "5" : (s.earlyFI ? "1" : "5")), s.age);
+    if (s.will || s.estate || s.estateAsked) add("estate", s.retired ? "6" : "5", s.age);
+    const order = ["emergency", "insurance", "housing", "education", "retirement", "estate"];
+    list.sort(function (a, b) {
+      const ia = order.indexOf(a.id), ib = order.indexOf(b.id);
+      if (ia !== ib) return ia - ib;
+      return String(a.stage).localeCompare(String(b.stage)) || ((a.age || 0) - (b.age || 0));
+    });
+    return list.slice(0, 18);
+  }
+
+  const GOAL_AXIS = {
+    stable:  { h: 55, w: 80, t: 50, hap: 50, rel: 50, sec: 90 },
+    family:  { h: 50, w: 50, t: 55, hap: 70, rel: 90, sec: 60 },
+    career:  { h: 45, w: 90, t: 35, hap: 50, rel: 45, sec: 70 },
+    travel:  { h: 60, w: 50, t: 80, hap: 90, rel: 55, sec: 40 },
+    freedom: { h: 50, w: 90, t: 80, hap: 65, rel: 50, sec: 80 },
+    health:  { h: 90, w: 40, t: 70, hap: 80, rel: 50, sec: 50 }
+  };
+
+  function goalAxisProfile(goalIds) {
+    const ids = (goalIds || []).filter(function (id) { return GOAL_AXIS[id]; });
+    if (!ids.length) return null;
+    const out = { h: 0, w: 0, t: 0, hap: 0, rel: 0, sec: 0 };
+    ids.forEach(function (id) {
+      STATS.forEach(function (m) { out[m.key] += GOAL_AXIS[id][m.key]; });
+    });
+    STATS.forEach(function (m) { out[m.key] = Math.round(out[m.key] / ids.length); });
+    return out;
+  }
+
+  function renderRadarSVG(stats, opts) {
+    opts = opts || {};
+    const size = opts.size === "mini" ? 200 : (opts.size === "card" ? 220 : 300);
+    const cx = size / 2, cy = size / 2, r = size * 0.34;
+    const isLight = typeof document !== "undefined" && document.body && document.body.classList.contains("light");
+    const axis = isLight ? "#64748b" : "#939bb0";
+    const grid = isLight ? "#cbd5e1" : "#353d55";
+    const txt = isLight ? "#0f172a" : "#f1f3f8";
+    const playerStroke = isLight ? "#0f766e" : "#5eead4";
+    const playerFill = isLight ? "rgba(15,118,110,.22)" : "rgba(94,234,212,.22)";
+    const goalStroke = isLight ? "#c2410c" : "#fb923c";
+    function pt(vals, i, scale) {
+      const ang = -Math.PI / 2 + i * Math.PI / 3;
+      const v = Math.max(0, Math.min(100, (vals && typeof vals[STATS[i].key] === "number") ? vals[STATS[i].key] : 0)) / 100;
+      const rr = r * v * (scale || 1);
+      return [cx + rr * Math.cos(ang), cy + rr * Math.sin(ang)];
+    }
+    function poly(vals, stroke, fill, dash, sw) {
+      const pts = STATS.map(function (_, i) { return pt(vals, i).join(","); }).join(" ");
+      return '<polygon points="' + pts + '" fill="' + (fill || "none") + '" stroke="' + stroke + '" stroke-width="' + (sw || 2) + '"' +
+        (dash ? ' stroke-dasharray="' + dash + '"' : "") + ' stroke-linejoin="round"/>';
+    }
+    let svg = '<svg viewBox="0 0 ' + size + " " + size + '" role="img" aria-label="六項指標六角形圖">';
+    [0.25, 0.5, 0.75, 1].forEach(function (sc) {
+      const pts = STATS.map(function (_, i) {
+        const ang = -Math.PI / 2 + i * Math.PI / 3;
+        return (cx + r * sc * Math.cos(ang)) + "," + (cy + r * sc * Math.sin(ang));
+      }).join(" ");
+      svg += '<polygon points="' + pts + '" fill="none" stroke="' + grid + '" stroke-width="1"/>';
+    });
+    STATS.forEach(function (m, i) {
+      const ang = -Math.PI / 2 + i * Math.PI / 3;
+      const x2 = cx + r * Math.cos(ang), y2 = cy + r * Math.sin(ang);
+      svg += '<line x1="' + cx + '" y1="' + cy + '" x2="' + x2 + '" y2="' + y2 + '" stroke="' + grid + '" stroke-width="1"/>';
+      const lx = cx + (r + size * 0.11) * Math.cos(ang);
+      const ly = cy + (r + size * 0.11) * Math.sin(ang);
+      svg += '<text x="' + lx + '" y="' + (ly + 4) + '" text-anchor="middle" font-size="' + (opts.size === "mini" ? 9 : 11) + '" font-weight="800" fill="' + txt + '">' + m.lab + "</text>";
+    });
+    const goals = goalAxisProfile(opts.goals || (S && S.goals) || []);
+    if (goals) svg += poly(goals, goalStroke, "none", "5 4", 2);
+    if (stats) svg += poly(stats, playerStroke, playerFill, "", 2.4);
+    svg += "</svg>";
+    if (opts.size !== "mini" && opts.size !== "card") {
+      svg += '<div class="radar-legend"><span><i style="background:' + playerStroke + ';height:3px"></i>現況</span>';
+      if (goals) svg += '<span><i style="background:' + goalStroke + ';height:3px"></i>人生目標輪廓</span>';
+      svg += "</div>";
+    }
+    return svg;
+  }
+
+  function renderRadarChart(host, s, opts) {
+    if (!host) return "";
+    opts = opts || {};
+    if (!s) {
+      host.innerHTML = "";
+      return "";
+    }
+    const stats = { h: s.h, w: s.w, t: s.t, hap: s.hap, rel: s.rel, sec: s.sec };
+    host.innerHTML = renderRadarSVG(stats, Object.assign({ goals: s.goals || [] }, opts));
+    return host.innerHTML;
+  }
 
   const GROWTH_LINES = [
     { key: "h", lab: "健康", color: "#f87171", light: "#dc2626" },
@@ -4811,9 +5298,9 @@ body.teacher-mode{max-width:960px}
       host.innerHTML = "<p class='sub'>本局沒有年度指標紀錄。</p>";
       return host.innerHTML;
     }
-    const hidden = host._hiddenKeys || (host._hiddenKeys = {});
-    const W = 640, H = 260;
-    const pad = { l: 36, r: 14, t: 16, b: 28 };
+    const hidden = host._hiddenKeys || (host._hiddenKeys = { h: true, t: true, sec: true });
+    const W = 680, H = 268;
+    const pad = { l: 36, r: 72, t: 16, b: 28 };
     const ages = hist.map(r => r.age);
     const minAge = Math.min.apply(null, ages);
     const maxAge = Math.max.apply(null, ages);
@@ -4861,7 +5348,13 @@ body.teacher-mode{max-width:960px}
     GROWTH_LINES.forEach(row => {
       if (hidden[row.key]) return;
       const pts = hist.map(r => xOf(r.age) + "," + yOf(typeof r[row.key] === "number" ? r[row.key] : 0));
-      svg += '<polyline fill="none" stroke="' + growthLineColor(row) + '" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="' + pts.join(" ") + '"/>';
+      svg += '<polyline fill="none" stroke="' + growthLineColor(row) + '" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round" points="' + pts.join(" ") + '"/>';
+      if (hist.length) {
+        const last = hist[hist.length - 1];
+        const lx = xOf(last.age);
+        const ly = yOf(typeof last[row.key] === "number" ? last[row.key] : 0);
+        svg += '<text x="' + (lx + 6) + '" y="' + (ly + 4) + '" font-size="11" font-weight="800" fill="' + growthLineColor(row) + '">' + row.lab + "</text>";
+      }
     });
 
     const marks = (s.lifeMarks || []).slice();
@@ -4920,6 +5413,10 @@ body.teacher-mode{max-width:960px}
     document.getElementById("goalResult").textContent =
       "目標達成度：" + Math.round(sc * 100) + "%　｜　" +
       (S.goals.map(g => GOALS.find(x => x.id === g).label).join("、") || "無");
+    const radarHost = document.getElementById("radarChart");
+    if (radarHost) renderRadarChart(radarHost, S, { size: "end" });
+    const verdictHost = document.getElementById("goalVerdict");
+    if (verdictHost) verdictHost.innerHTML = explainGoalsHTML(S);
     const chartHost = document.getElementById("growthChart");
     if (chartHost) renderGrowthChart(chartHost, S);
     document.getElementById("stageSummary").innerHTML = renderStageSummaryHTML(S);
@@ -4965,16 +5462,30 @@ body.teacher-mode{max-width:960px}
     if (opt.save) { S.save = opt.save; S.prudence += 1; }
     if (opt.cert != null) { S.cert = opt.cert; if (opt.cert >= 1) S.prudence += 1; }
     if (opt.travel) S.travel = true;
-    if (opt.freeTravel) S.lastTravelAge = S.age;
-    if (opt.travelOffer) markTravelOffered();
-    if (opt.partner) { S.partner = true; S.refusedPartner = false; if (!S.partnerName) S.partnerName = who().crush; }
-    if (opt.refusePartner) { S.refusedPartner = true; S.partner = false; S.partnerName = null; }
+    if (opt.freeTravel) { S.lastTravelAge = S.age; S.travelResolvedAge = S.age; }
+    if (opt.travelOffer) { markTravelOffered(); S.travelResolvedAge = S.age; }
+    if (opt.friendZone) {
+      S.friendZone = true;
+      if (S.friendZoneAge == null) S.friendZoneAge = age;
+    }
+    if (opt.friendZoneStay) { S.friendZone = true; S.friendZoneAsked = true; }
+    if (opt.partner) {
+      S.partner = true; S.refusedPartner = false; S.friendZoneAsked = true;
+      if (S.partnerSinceAge == null) S.partnerSinceAge = age;
+      if (!S.partnerName) S.partnerName = who().crush;
+    }
+    if (opt.refusePartner) { S.refusedPartner = true; S.partner = false; S.partnerName = null; S.friendZoneAsked = true; }
     if (opt.declinedMarry) S.declinedMarry = true;
     if (opt.declinedKids) S.declinedKids = true;
     if (opt.deferMarry) S.deferredMarry = true;
     if (opt.deferKids) S.deferredKids = true;
     if (opt.deferFI) S.deferredFI = true;
-    if (opt.marry) { S.married = true; S.partner = true; S.refusedPartner = false; S.declinedMarry = false; S.deferredMarry = false; addLifeMark(S, "marry", "結婚"); }
+    if (opt.marry) {
+      S.married = true; S.partner = true; S.refusedPartner = false; S.declinedMarry = false; S.deferredMarry = false;
+      if (S.partnerSinceAge == null) S.partnerSinceAge = age;
+      if (S.marriedSinceAge == null) S.marriedSinceAge = age;
+      addLifeMark(S, "marry", "結婚");
+    }
     if (opt.kids) { S.kids = true; if (S.kidsBirthAge == null) S.kidsBirthAge = age; if (!S.kidName) S.kidName = defaultKidName(); S.deferredKids = false; addLifeMark(S, "kids", "生孩子"); }
     if (opt.pet) { S.hasPet = true; if (!S.petName) S.petName = defaultPetName(); S.petAsked = true; }
     if (opt.petAsk || opt._petAsk) S.petAsked = true;
@@ -5160,6 +5671,7 @@ body.teacher-mode{max-width:960px}
       const fzOpt = (KEY[26] && KEY[26].opts || []).find(o => o.k === "B");
       if (fzOpt && fzOpt.partner) contradictions.push("friendzone_opt_still_has_partner_flag");
       if (fzOpt && fzOpt.refusePartner) contradictions.push("friendzone_opt_has_refusePartner");
+      if (!S.friendZone) contradictions.push("friendzone_flag_not_persisted");
     }
     /* 接受追求並結婚生育 */
     if (pathMap[26] === "A" && pathMap[30] === "B" && pathMap[34] === "A") {
@@ -5265,7 +5777,7 @@ body.teacher-mode{max-width:960px}
 
     const friendsFirst = {
       /* 先做朋友：不交往、可稍後仍單身／寵物；審慎路線 */
-      18: "A", 20: "A", 22: "A", 23: "B", 24: "C", 25: "C", 26: "B", 27: "A", 28: "B", 29: "A", 33: "B",
+      18: "A", 20: "A", 22: "A", 23: "B", 24: "C", 25: "C", 26: "B", 27: "A", 28: "B", 29: "A", 31: "B", 33: "B",
       30: "A", 32: "A", 34: "A", 36: "C", 38: "B", 40: "A",
       41: "B", 43: "C", 45: "B", 46: "C", 47: "A", 48: "A", 50: "C", 52: "A", 55: "C",
       58: "A", 60: "A", 62: "C", 63: "A", 65: "A", 66: "A", 67: "A"
@@ -5317,7 +5829,7 @@ body.teacher-mode{max-width:960px}
             bad.push(where + ":" + lab + ":car");
           if (/賣車/.test(lab) && o.car && !o.sellCar)
             bad.push(where + ":" + lab + ":car_without_sell");
-          if (/接受.*交往|開始交往/.test(lab) && !o.partner)
+          if ((/接受.*交往/.test(lab) || (/開始交往/.test(lab) && !/不交往|暫不交往|不開始/.test(lab))) && !o.partner)
             bad.push(where + ":" + lab + ":missing_partner");
         });
       }
@@ -5777,14 +6289,17 @@ body.teacher-mode{max-width:960px}
     if (keyEligible(65) || eventAllowed(KEY[65]) || eventAllowed(KEY[66]) || eventAllowed(KEY[67]))
       contra0("fi_age65_formal_retire_keys_still_allowed");
 
-    /* 達標時亦可有旅行按鈕，但不因此暫停自動長大；畫面沒有結婚／生育／財務自由常駐鈕 */
+    /* 達標時旅行機會會暫停自動長大並出選擇卡；畫面沒有結婚／生育／財務自由常駐鈕 */
     S = fresh(); S.gender = "male"; S.age = 42; S.career = "work"; S.phase = "idle"; S.w = 50;
     S.partner = true; S.married = false; S.refusedPartner = false; S.gotFirstJob = true;
+    S.lastTravelAge = null; S.lastTravelOfferAge = null; S.travelResolvedAge = null;
     agePaused = false; agingLock = false;
-    if (!canShowFI() && !canShowMarry()) contra0("free_action_setup_failed_for_autoage");
+    if (!canShowTravel()) contra0("travel_offer_setup_failed");
     showIdle();
-    if (S.phase !== "idle") contra0("showIdle_phase_not_idle:" + S.phase);
-    if (!autoAgeTimer) contra0("auto_age_not_scheduled_with_free_actions");
+    if (S.phase !== "event") contra0("travel_offer_did_not_pause_for_choice:" + S.phase);
+    if (autoAgeTimer) contra0("auto_age_still_scheduled_during_travel_choice");
+    const sitIdle = (document.getElementById("sitText") && document.getElementById("sitText").textContent) || "";
+    if (sitIdle.indexOf("旅行") < 0) contra0("travel_offer_sit_missing_on_idle:" + sitIdle);
     const barIdle = document.getElementById("freeBar");
     const barIdleText = barIdle ? barIdle.textContent : "";
     if (/結婚/.test(barIdleText) || /生孩子/.test(barIdleText) || /財務自由/.test(barIdleText))
@@ -5958,15 +6473,21 @@ body.teacher-mode{max-width:960px}
       if (extra) Object.assign(S, extra);
     }
 
-    /* idle 畫面沒有結婚／生孩子／財務自由常駐按鈕；達標時仍可有旅行按鈕 */
-    setupWork(45, { lastTravelAge: null });
+    /* idle 畫面沒有結婚／生孩子／財務自由常駐按鈕；達標時改出旅行選擇卡 */
+    setupWork(45, { lastTravelAge: null, lastTravelOfferAge: null, earlyFI: true });
     showIdle();
     const bar1 = document.getElementById("freeBar");
     const t1 = bar1 ? bar1.textContent : "";
     if (/結婚/.test(t1) || /生孩子/.test(t1) || /財務自由/.test(t1))
       contra0("idle_bar_has_removed_buttons:" + t1);
-    if (!canShowTravel()) contra0("travel_button_should_be_available_when_eligible");
-    else if (t1.indexOf("去旅行") < 0) contra0("travel_button_missing_when_eligible:" + t1);
+    if (!canShowTravel()) contra0("travel_offer_should_be_available_when_eligible");
+    const evPane = document.getElementById("eventPane");
+    const sitTravel = (document.getElementById("sitText") && document.getElementById("sitText").textContent) || "";
+    if (evPane && evPane.classList.contains("hidden")) contra0("travel_choice_card_not_shown");
+    if (sitTravel.indexOf("旅行") < 0) contra0("travel_choice_sit_missing:" + sitTravel);
+    const travelLabs = choiceLabs().join("|");
+    if (travelLabs.indexOf("去旅行") < 0 || travelLabs.indexOf("今年不去") < 0)
+      contra0("travel_choice_opts_missing:" + travelLabs);
     clearAutoAge();
 
     /* KEY 30/34/41 仍是三選正問，沒有多出一個 D */
@@ -5983,22 +6504,22 @@ body.teacher-mode{max-width:960px}
     if (dKindAt(58) === "fi" || dCountAt(58) !== 0)
       contra0("key58_should_not_have_fi_D");
 
-    /* 結婚推遲後，36 或 43 出現選擇 D；不在推遲的下一年（32）亂加 D */
+    /* 結婚推遲後，滿兩年或已暫緩／錯過正問時，適當 KEY 穩定出現選擇 D（仍避過 LIFE_D_NO_ADD） */
     setupWork(36, { partner: true, married: false, deferredMarry: true, declinedMarry: true });
     if (dKindAt(36) !== "marry") contra0("defer_marry_missing_D_at_36:" + dKindAt(36));
     if (dCountAt(36) !== 1) contra0("defer_marry_not_single_D_at_36:" + dCountAt(36));
     setupWork(32, { partner: true, married: false, deferredMarry: true, declinedMarry: true });
-    if (dKindAt(32)) contra0("defer_marry_D_on_non_theme_32:" + dKindAt(32));
+    if (dKindAt(32) !== "marry") contra0("defer_marry_missing_stable_D_at_32:" + dKindAt(32));
     setupWork(43, { partner: true, married: false, deferredMarry: true });
     if (dKindAt(43) !== "marry") contra0("defer_marry_missing_D_at_43:" + dKindAt(43));
 
-    /* 生育推遲後，在 36/38/43 出現 D；選了不生育後不再出 */
+    /* 生育推遲後，在 36/38 出現 D；43 歲已超過 40 歲上限，不再出生育 D；選了不生育後不再出 */
     setupWork(36, { married: true, partner: true, kids: false, deferredKids: true });
     if (dKindAt(36) !== "kids") contra0("defer_kids_missing_D_at_36:" + dKindAt(36));
     setupWork(38, { married: true, partner: true, kids: false, deferredKids: true });
     if (dKindAt(38) !== "kids") contra0("defer_kids_missing_D_at_38:" + dKindAt(38));
     setupWork(43, { married: true, partner: true, kids: false, deferredKids: true });
-    if (dKindAt(43) !== "kids") contra0("defer_kids_missing_D_at_43:" + dKindAt(43));
+    if (dKindAt(43) === "kids") contra0("defer_kids_D_at_43_over_cap:" + dKindAt(43));
     setupWork(36, { married: true, partner: true, kids: false, declinedKids: true, deferredKids: true });
     if (dKindAt(36)) contra0("declinedKids_still_has_D:" + dKindAt(36));
 
@@ -6142,17 +6663,203 @@ body.teacher-mode{max-width:960px}
     S.age = 47; S.career = "edu";
     if (careerLab("edu") !== "高學歷") contra0("careerLab_grad_not_高學歷:" + careerLab("edu"));
 
-    /* 見到旅行提示但沒出發，兩年內不再出現；同年仍可出發 */
-    setupWork(45, { lastTravelAge: null, lastTravelOfferAge: null, w: 50 });
+    /* 旅行選擇卡出現後標記已提示；選「今年不去」同年不再出卡，約兩年後可再考慮 */
+    setupWork(45, { lastTravelAge: null, lastTravelOfferAge: null, w: 50, earlyFI: true, travelResolvedAge: null });
     showIdle();
-    if (!canShowTravel()) contra0("travel_button_should_remain_same_year_after_offer");
     if (S.lastTravelOfferAge !== 45) contra0("travel_offer_not_marked:" + S.lastTravelOfferAge);
+    if (!clickChoice(/今年不去/)) contra0("travel_decline_btn_missing");
+    clearAutoAge();
+    if (S.travelResolvedAge !== 45) contra0("travel_decline_not_resolved:" + S.travelResolvedAge);
+    if (canShowTravel()) contra0("travel_offer_still_available_after_decline_same_year");
     S.age = 46;
-    if (canShowTravel()) contra0("travel_button_reappeared_next_year");
+    if (canShowTravel()) contra0("travel_offer_reappeared_next_year");
     S.age = 47;
-    if (!canShowTravel()) contra0("travel_button_missing_after_two_years");
-    setupWork(45, { lastTravelAge: 45, lastTravelOfferAge: 45, w: 50 });
-    if (canShowTravel()) contra0("travel_button_after_travel_same_year");
+    if (!canShowTravel()) contra0("travel_offer_missing_after_two_years");
+    setupWork(45, { lastTravelAge: 45, lastTravelOfferAge: 45, travelResolvedAge: 45, w: 50, earlyFI: true });
+    if (canShowTravel()) contra0("travel_offer_after_travel_same_year");
+
+    /* —— v7：缺題目、好友升級、穩定 D、旅行選擇卡、成長圖、六角形、後台 needs —— */
+    function presentStory(src) {
+      presentEvent(Object.assign({
+        tag: "本年理財", fin: true, title: "", sit: src.sit || "",
+        opts: (src.opts || [{ k: "A", lab: "A", d: [0,0,0,0,0,0] }]).map(o => Object.assign({}, o, { d: (o.d || [0,0,0,0,0,0]).slice() }))
+      }, src));
+      return (document.getElementById("sitText") && document.getElementById("sitText").textContent) || "";
+    }
+    S = fresh(); S.gender = "male"; S.age = 34; S.refusedPartner = true;
+    const hsSocial = presentStory({ storySingleSocial: true, sit: "", opts: KEY[26].opts });
+    if (!hsSocial || /本年理財/.test(hsSocial) && hsSocial.replace(/本年理財/g, "").trim() === "")
+      contra0("storySingleSocial_headline_blank:" + hsSocial);
+    if (hsSocial.indexOf("飯聚") < 0 && hsSocial.indexOf("朋友") < 0)
+      contra0("storySingleSocial_headline_missing_story:" + hsSocial);
+    S = fresh(); S.gender = "male"; S.hasPet = true; S.petName = "豆豆";
+    const hsPet = presentStory({ storyPetVet: true, sit: "" });
+    if (!hsPet || hsPet.indexOf("獸醫") < 0) contra0("storyPetVet_headline_missing:" + hsPet);
+    S = fresh(); S.gender = "male"; S.kids = true; S.kidsBirthAge = 34; S.age = 58; S.retired = true; S.rel = 70;
+    const hsAllow = presentStory({ storyKidsAllowance: true, sit: "" });
+    if (!hsAllow || hsAllow.indexOf("家用") < 0) contra0("storyKidsAllowance_headline_missing:" + hsAllow);
+
+    /* 先做朋友 → 31 歲交往專題；答應後可結婚／生育 D；再選暫不交往則不自動升級 */
+    setupWork(26, { partner: false, married: false });
+    const c26b = KEY[26].opts.find(o => o.k === "B");
+    applyOptFlags(c26b, 26);
+    if (!S.friendZone || S.partner) contra0("friendzone_apply_failed:" + S.friendZone + "/" + S.partner);
+    if (S.friendZoneAge !== 26) contra0("friendZoneAge_missing:" + S.friendZoneAge);
+    S.age = 31;
+    if (!eventAllowed(KEY[31]) || !keyEligible(31)) contra0("dating_key_not_offered_at_31");
+    const dateSit = resolveStory({ storyStartDate: true });
+    if (!dateSit || !dateSit.sit || dateSit.sit.indexOf("開始交往") < 0) contra0("dating_key_copy_missing:" + (dateSit && dateSit.sit));
+    applyOptFlags(KEY[31].opts.find(o => o.k === "A"), 31);
+    if (!S.partner || S.partnerSinceAge !== 31) contra0("dating_accept_no_partner:" + S.partner + "/" + S.partnerSinceAge);
+    S.age = 33;
+    if (dKindAt(33) !== "marry") contra0("dating_then_missing_marry_D_at_33:" + dKindAt(33));
+    applyOptFlags({ marry: true, d: [0,0,0,0,0,0] }, 33);
+    if (!S.married) contra0("marry_after_dating_upgrade_failed");
+    S.age = 36;
+    if (dKindAt(36) !== "kids") contra0("married_missing_kids_D_at_36:" + dKindAt(36));
+    setupWork(26, { partner: false, married: false });
+    applyOptFlags(KEY[26].opts.find(o => o.k === "B"), 26);
+    S.age = 31;
+    applyOptFlags(KEY[31].opts.find(o => o.k === "B"), 31);
+    if (S.partner) contra0("dating_stay_friends_set_partner");
+    if (!S.friendZoneAsked) contra0("dating_stay_friends_not_marked_asked");
+    S.age = 32;
+    if (eventAllowed(KEY[31])) contra0("dating_key_reoffered_after_stay_friends");
+    if (canOfferMarryD()) contra0("stay_friends_can_still_offer_marry_D");
+
+    /* 拒絕表白路徑不受影響 */
+    setupWork(26, {});
+    applyOptFlags(KEY[26].opts.find(o => o.k === "C"), 26);
+    S.age = 31;
+    if (eventAllowed(KEY[31])) contra0("dating_key_shown_after_refuse");
+
+    /* 已拍拖／已結婚不應出 31 歲專題 */
+    setupWork(31, { partner: true, friendZone: true });
+    if (eventAllowed(KEY[31])) contra0("dating_key_shown_while_partnered");
+    setupWork(31, { married: true, partner: true, friendZone: true });
+    if (eventAllowed(KEY[31])) contra0("dating_key_shown_while_married");
+
+    /* 生育 D 最遲 40 歲（當年仍算在上限內）；41 歲及以後不再出；選不生育後不再出 */
+    setupWork(40, { married: true, partner: true, kids: false });
+    if (dKindAt(40) !== "kids") contra0("kids_D_missing_at_40:" + dKindAt(40));
+    if (!canOfferKidsD()) contra0("canOfferKidsD_false_at_40");
+    setupWork(41, { married: true, partner: true, kids: false });
+    if (canOfferKidsD()) contra0("canOfferKidsD_true_at_41");
+    if (dKindAt(41) === "kids") contra0("kids_D_at_41:" + dKindAt(41));
+    setupWork(43, { married: true, partner: true, kids: false });
+    if (dKindAt(43) === "kids") contra0("kids_D_at_43_over_cap:" + dKindAt(43));
+    setupWork(48, { married: true, partner: true, kids: false });
+    if (dKindAt(48) === "kids") contra0("kids_D_at_48_over_cap:" + dKindAt(48));
+    setupWork(38, { married: true, partner: true, kids: false, declinedKids: true });
+    if (dKindAt(38)) contra0("kids_D_after_declined:" + dKindAt(38));
+
+    /* CONSEQ 旅行敘述不另出選擇卡 */
+    setupWork(45, { earlyFI: true, lifestyle: 2, lastTravelAge: 44, lastTravelOfferAge: 44, travelResolvedAge: 44, w: 50 });
+    const cqTrip = CONSEQ.find(c => c.id === "fi_health_trip");
+    if (!cqTrip) contra0("fi_health_trip_missing");
+    else {
+      const beforePhase = S.phase;
+      applyConsequence(cqTrip);
+      const evAfter = document.getElementById("eventPane");
+      const sitAfter = (document.getElementById("sitText") && document.getElementById("sitText").textContent) || "";
+      if (S.phase === "event" && sitAfter.indexOf("今年有機會用一筆儲蓄去旅行") >= 0)
+        contra0("conseq_travel_opened_choice_card");
+      if (S.travelResolvedAge !== 44) contra0("conseq_travel_changed_resolved_age");
+    }
+
+    /* 成長圖預設只顯示金錢、開心、關係；線末有標籤 */
+    S = fresh(); S.gender = "male";
+    [18, 20, 22, 24, 26].forEach(function (a) { S.age = a; snapshotStats(S); });
+    const ghost = document.getElementById("growthChart");
+    if (ghost) {
+      renderGrowthChart(ghost, S);
+      const ghtml = ghost.innerHTML || "";
+      const visLabs = Array.from(ghost.querySelectorAll(".growth-leg button")).filter(function (b) { return !b.classList.contains("off"); }).map(function (b) { return b.textContent.trim(); });
+      if (visLabs.indexOf("金錢") < 0 || visLabs.indexOf("開心") < 0 || visLabs.indexOf("關係") < 0)
+        contra0("growth_default_visible_missing:" + visLabs.join("|"));
+      const offLabs = Array.from(ghost.querySelectorAll(".growth-leg button.off")).map(function (b) { return b.textContent.trim(); });
+      if (offLabs.indexOf("健康") < 0 || offLabs.indexOf("空閒時間") < 0 || offLabs.indexOf("安全感") < 0)
+        contra0("growth_default_hidden_missing:" + offLabs.join("|"));
+      if (!/金錢/.test(ghtml) || (ghtml.match(/<text[^>]*>金錢<\/text>/) == null && ghtml.indexOf(">金錢<") < 0))
+        contra0("growth_end_label_missing_金錢");
+      const polys = ghost.querySelectorAll("polyline");
+      if (polys.length !== 3) contra0("growth_default_polyline_count:" + polys.length);
+    } else contra0("growth_chart_host_missing");
+
+    /* 進行中不應有六角形或目標達成說明；結局「目標對照」大圖與說明仍保留 */
+    S = fresh(); S.gender = "male"; S.goals = ["family", "stable"]; S.age = 30; S.phase = "idle";
+    show("play");
+    renderHUD();
+    if (document.getElementById("radarMini")) contra0("midgame_radar_still_present");
+    const hud = document.getElementById("hud");
+    if (hud && hud.querySelector("svg[aria-label='六項指標六角形圖']"))
+      contra0("midgame_hud_has_radar");
+    const play = document.getElementById("screen-play");
+    if (play && play.querySelector("svg[aria-label='六項指標六角形圖']"))
+      contra0("midgame_play_has_radar");
+    const midTxt = ((hud && hud.textContent) || "") + ((play && play.textContent) || "");
+    if (/已達成「|未達成「/.test(midTxt)) contra0("midgame_has_goal_verdict");
+    S.rel = 70; S.married = true; S.kids = false;
+    S.sec = 40; S.w = 10;
+    endGame();
+    const endR = document.getElementById("radarChart");
+    if (!endR || !endR.querySelector("svg")) contra0("ending_radar_missing");
+    const endTxt = endR ? endR.innerHTML : "";
+    if (endTxt.indexOf("現況") < 0 || endTxt.indexOf("人生目標輪廓") < 0)
+      contra0("ending_radar_legend_missing");
+    const gv = document.getElementById("goalVerdict");
+    const gvTxt = gv ? gv.textContent : "";
+    if (!gv || !gv.querySelector(".goal-verdict")) contra0("ending_goal_verdict_missing");
+    if (gvTxt.indexOf("已達成") < 0 || gvTxt.indexOf("幸福家庭") < 0)
+      contra0("ending_goal_verdict_missing_hit:" + gvTxt);
+    if (gvTxt.indexOf("未達成") < 0 || gvTxt.indexOf("安穩晚年") < 0)
+      contra0("ending_goal_verdict_missing_miss:" + gvTxt);
+    if (gvTxt.indexOf("關係") < 0 || gvTxt.indexOf("安全感") < 0 || gvTxt.indexOf("金錢") < 0)
+      contra0("ending_goal_verdict_reason_too_vague:" + gvTxt);
+    /* 說明只在結局圖下，不寫進六角形 SVG 本體 */
+    if (endR && /已達成「|未達成「/.test(endR.textContent || ""))
+      contra0("ending_radar_svg_contains_verdict");
+    /* 與 scoreGoals 一致：家庭達標、安穩未達標 */
+    const hitRate = scoreGoals();
+    if (hitRate !== 0.5) contra0("ending_goal_score_mismatch:" + hitRate);
+
+    /* 後台卡片：六條小指標、展開可見財務需要、payload 含 needs */
+    S = fresh(); S.gender = "male"; S.age = 36; S.goals = ["family"];
+    S.emergency = true; S.insured = true; S.hasHome = true; S.eduSave = 1; S.kids = true; S.kidsBirthAge = 34;
+    S.mpf = 1; S.estateAsked = true; S.will = true; S.retired = false;
+    noteFinancialNeed("緊急備用金", "應急金是否足夠支付 3 至 6 個月開支？", "1");
+    noteFinancialNeed("保險檢視", "保額是否足夠？", "2");
+    const payload = buildPlayerPayload("playing");
+    if (!payload || !Array.isArray(payload.needs) || !payload.needs.length)
+      contra0("payload_missing_needs");
+    else {
+      const names = payload.needs.map(function (n) { return n.name; }).join("|");
+      ["應急金", "保險", "置業", "子女教育"].forEach(function (n) {
+        if (names.indexOf(n) < 0) contra0("payload_needs_missing_" + n + ":" + names);
+      });
+    }
+    const listBox = document.getElementById("playerList");
+    const prevTeacher = document.body.classList.contains("teacher-mode");
+    renderPlayerList({ demo1: payload });
+    const card = document.querySelector("#playerList .player-card");
+    if (!card) contra0("teacher_card_missing");
+    else {
+      const pst = card.querySelectorAll(".pstats .pst");
+      if (pst.length !== 6) contra0("teacher_card_stats_count:" + pst.length);
+      const labs = Array.from(pst).map(function (el) { return el.textContent; }).join("");
+      ["健康", "金錢", "空閒時間", "開心", "關係", "安全感"].forEach(function (n) {
+        if (labs.indexOf(n) < 0) contra0("teacher_card_missing_stat_" + n);
+      });
+      card.classList.add("open");
+      const needsTxt = (card.querySelector(".pneeds") && card.querySelector(".pneeds").textContent) || "";
+      if (needsTxt.indexOf("應急金") < 0 || needsTxt.indexOf("保險") < 0)
+        contra0("teacher_card_needs_missing:" + needsTxt);
+      if (!card.querySelector(".pradar-wrap svg")) contra0("teacher_card_radar_missing");
+      const tVerdict = (card.querySelector(".pradar-wrap .goal-verdict") && card.querySelector(".pradar-wrap .goal-verdict").textContent) || "";
+      if (tVerdict.indexOf("幸福家庭") < 0 || (tVerdict.indexOf("已達成") < 0 && tVerdict.indexOf("未達成") < 0))
+        contra0("teacher_card_goal_verdict_missing:" + tVerdict);
+    }
+    if (listBox) listBox.innerHTML = '<p class="sub">開始本堂後，同學輸入代碼即可出現於此。</p>';
 
     const allC = results.flatMap(r => r.contradictions.map(c => r.label + ": " + c));
 
