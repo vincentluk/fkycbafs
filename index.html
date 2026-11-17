@@ -955,23 +955,21 @@ body.teacher-mode{max-width:960px}
       }
     };
     const roomRef = fbDb.ref("rooms/" + code);
+    function openRoom() {
+      setTeacherCodeDisplay(code);
+      startTeacherPoll();
+    }
+    /* 未建立的課室不能讀取，先讀會 permission_denied；改為能讀則接續，否則直接建立。 */
     roomRef.once("value").then(function (snap) {
-      if (snap.exists()) {
-        const owner = snap.child("owner").val();
-        if (owner === teacherUser.uid) {
-          setTeacherCodeDisplay(code);
-          startTeacherPoll();
-          return;
-        }
-        alert("此代碼已被使用，請換另一個代碼。");
+      if (snap.exists() && snap.child("owner").val() === teacherUser.uid) {
+        openRoom();
         return;
       }
-      return roomRef.set(payload).then(function () {
-        setTeacherCodeDisplay(code);
-        startTeacherPoll();
+      alert("此代碼已被使用，請換另一個代碼。");
+    }).catch(function () {
+      return roomRef.set(payload).then(openRoom).catch(function (err) {
+        alert("無法建立課室：" + ((err && err.message) || "此代碼可能已被使用，請換另一個再試。"));
       });
-    }).catch(function (err) {
-      alert("無法建立課室：" + ((err && err.message) || "請重試"));
     });
   }
 
