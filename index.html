@@ -6,7 +6,7 @@
 <title>FKYC- 人生模擬遊戲</title>
 <!--
   粉嶺救恩書院 BAFS 課堂自製（人生階段理財策劃）
-  頂欄速度（暫停／1x／2x／4x／8x／快轉到下一個抉擇）｜無老師後台｜自由行動｜事件日記｜危急少彈｜BAFS六階段｜繁中
+  頂欄速度（暫停／1x／2x／4x／8x／快轉到下一個抉擇）｜老師後台（Firebase Auth）｜自由行動｜事件日記｜危急少彈｜BAFS六階段｜繁中
 -->
 <style>
 :root {
@@ -207,6 +207,34 @@ body.light .growth-leg button{background:#fff}
 .status-dot.playing{background:#4ade80}
 .status-dot.ended{background:#60a5fa}
 body.light .cloud-warn{background:#fee2e2;color:#991b1b}
+
+.dist-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:.45rem 0}
+@media(min-width:680px){.dist-grid{grid-template-columns:1fr 1fr}}
+.dist-card{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:.55rem .7rem}
+.dist-card h3{font-size:.82rem;margin:0 0 .35rem;color:var(--accent)}
+.bar-row{display:flex;align-items:center;gap:6px;margin:3px 0;font-size:.78rem}
+.bar-row .lab{min-width:4.5em;color:var(--muted);font-weight:700}
+.bar-row .track{flex:1;height:8px;background:#2a3144;border-radius:999px;overflow:hidden}
+.bar-row .track>i{display:block;height:100%;background:linear-gradient(90deg,#fb923c,#f97316);border-radius:999px}
+.bar-row .n{min-width:1.6em;text-align:right;font-weight:800}
+.feed-list{max-height:160px;overflow:auto;margin:.35rem 0;background:var(--panel2);border-radius:10px;padding:.4rem .55rem;border:1px solid var(--line)}
+.feed-list .fi{font-size:.78rem;color:#cbd5e1;padding:3px 0;border-bottom:1px solid #2a3144;line-height:1.35}
+.feed-list .fi:last-child{border-bottom:0}
+.auth-box{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:.65rem .75rem;margin:.4rem 0}
+.auth-box .who{font-weight:800;font-size:.9rem}
+.join-url{font-size:.78rem;word-break:break-all;background:var(--panel2);border:1px dashed var(--line);border-radius:8px;padding:.45rem .55rem;margin:.35rem 0;color:#cbd5e1}
+.qr-wrap{text-align:center;margin:.4rem 0}
+.qr-wrap img{width:160px;height:160px;background:#fff;border-radius:8px;padding:6px}
+.btn-row{display:flex;flex-wrap:wrap;gap:8px;margin:.45rem 0}
+.btn-row .big{flex:1;min-width:140px}
+.btn-danger{background:#7f1d1d!important;border-color:#f87171!important}
+.btn-danger:hover{filter:brightness(1.08)}
+.btn-ghost{background:transparent;border:2px solid var(--line);color:var(--muted);border-radius:12px;padding:.55rem .9rem;font-weight:800;font-family:inherit;cursor:pointer}
+.btn-ghost:hover{border-color:var(--accent);color:var(--text)}
+#screen-teacher h2{margin-top:.2rem}
+.teacher-panel{margin-top:.5rem}
+body.teacher-mode{max-width:960px}
+
 </style>
 </head>
 <body>
@@ -240,6 +268,15 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
   <div class="hero"><div class="emo">🎲</div><h1>人生模擬</h1>
   <p class="sub">中五 BAFS 3.3　人生階段理財</p></div>
   <p class="sub">頂欄可調速度與快轉｜遇關鍵決策會停下｜BAFS 六階段｜事件日記</p>
+  <div class="field">
+    <label for="inpRoomCode">課室代碼（選填）</label>
+    <input id="inpRoomCode" type="text" maxlength="6" autocomplete="off" spellcheck="false" placeholder="老師提供的 6 位代碼" />
+  </div>
+  <div class="field">
+    <label for="inpDisplayName">座號或暱稱（選填）</label>
+    <input id="inpDisplayName" type="text" maxlength="16" autocomplete="off" spellcheck="false" placeholder="例如：12 或 小明" />
+  </div>
+  <p class="privacy">不填課室代碼亦可照常遊玩。填寫後進度會同步到本堂老師後台，僅供課堂即時回饋，下課後可清除。</p>
   <button type="button" class="big" id="btnStart">開始人生</button>
 </section>
 
@@ -314,28 +351,114 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
   </div>
 </div>
 
+<section id="screen-teacher" class="screen card hidden">
+  <h2>老師後台</h2>
+  <p class="sub">即時查看本堂同學進度，方便課堂回饋。請使用 Google 帳戶登入。</p>
+  <div id="teacherCloudWarn" class="cloud-warn hidden">尚未接上 Firebase。遊戲可離線遊玩；接上設定後即可開始本堂同步。</div>
+
+  <div class="auth-box" id="teacherAuthBox">
+    <p class="who" id="teacherWho">尚未登入</p>
+    <div class="btn-row">
+      <button type="button" class="big" id="btnTeacherSignIn">使用 Google 登入</button>
+      <button type="button" class="btn-ghost hidden" id="btnTeacherSignOut">登出</button>
+    </div>
+  </div>
+
+  <div id="teacherControls" class="teacher-panel hidden">
+    <div class="btn-row">
+      <button type="button" class="big" id="btnStartClass">開始本堂</button>
+      <button type="button" class="btn-ghost" id="btnResumeClass">接續已有代碼</button>
+    </div>
+    <div class="field">
+      <label for="inpTeacherCode">本堂課室代碼</label>
+      <input id="inpTeacherCode" type="text" maxlength="6" autocomplete="off" spellcheck="false" placeholder="開始本堂後自動產生" />
+    </div>
+    <div class="teacher-code" id="teacherCodeBig">——</div>
+    <div class="btn-row">
+      <button type="button" class="btn-ghost" id="btnCopyCode">複製代碼</button>
+      <button type="button" class="btn-ghost" id="btnCopyJoinUrl">複製加入網址</button>
+    </div>
+    <p class="sub" style="margin-bottom:.2rem">同學加入網址（可投影或製成當日 QR）</p>
+    <div class="join-url" id="teacherJoinUrl">—</div>
+    <div class="qr-wrap hidden" id="teacherQrWrap">
+      <img id="teacherQrImg" alt="課室加入 QR" width="160" height="160" />
+    </div>
+    <div class="teacher-stats">
+      <span>已加入　<strong id="cntTotal">0</strong></span>
+      <span>進行中　<strong id="cntPlaying">0</strong></span>
+      <span>已結束　<strong id="cntEnded">0</strong></span>
+    </div>
+    <div class="dist-grid">
+      <div class="dist-card">
+        <h3>年齡／階段分布</h3>
+        <div id="stageDist"></div>
+      </div>
+      <div class="dist-card">
+        <h3>關鍵決策分布</h3>
+        <div id="flagDist"></div>
+      </div>
+    </div>
+    <h3 style="font-size:.9rem;margin:.55rem 0 .25rem">最近重要選擇</h3>
+    <div class="feed-list" id="choiceFeed"><p class="sub">尚無資料</p></div>
+    <h3 style="font-size:.9rem;margin:.55rem 0 .25rem">同學名單</h3>
+    <div class="toggle-row">
+      <label><input type="checkbox" id="chkAutoPoll" checked /> 自動更新（備用輪詢）</label>
+      <button type="button" class="btn-ghost" id="btnRefreshPlayers" style="padding:.35rem .7rem;font-size:.8rem">重新整理</button>
+    </div>
+    <div class="player-list" id="playerList"><p class="sub">開始本堂後，同學輸入代碼即可出現於此。</p></div>
+    <div class="btn-row">
+      <button type="button" class="big btn-danger" id="btnEndClass">結束並清除本堂資料</button>
+    </div>
+  </div>
+  <p class="privacy">資料僅供本課室即時查看。建議每堂使用新代碼；下課請按「結束並清除本堂資料」。</p>
+  <button type="button" class="btn-ghost" id="btnTeacherBack" style="margin-top:.4rem">返回遊戲首頁</button>
+</section>
+
+<script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/11.6.0/firebase-database-compat.js"></script>
+
 <script>
 (function () {
   "use strict";
 
-  /* —— 課室雲端同步（Firebase Realtime Database REST；未設定則離線） —— */
-  const CLOUD = {
-    enabled: true,
-    baseUrl: "REPLACE_FIREBASE_RTDB_URL", // e.g. https://xxx-default-rtdb.asia-southeast1.firebasedatabase.app
-    pollMs: 2500
+  /* —— 課室雲端同步（Firebase Auth + Realtime Database；未設定則離線） —— */
+  const FIREBASE_CONFIG = {
+    apiKey: "AIzaSyBcqa_f1Mjqlwf8o_pVbY-HuWjlboYP74w",
+    authDomain: "bafs-lifesims.firebaseapp.com",
+    databaseURL: "https://bafs-lifesims-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "bafs-lifesims",
+    appId: "1:366794655305:web:7a67a300eb0deb272e6198"
   };
 
   const CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; /* 略過易混字 I O 0 1 */
+  const POLL_MS = 2500;
+
+  let fbApp = null;
+  let fbAuth = null;
+  let fbDb = null;
+  let fbReady = false;
   let cloudRoom = "";
-  let cloudName = "同學A";
-  let playerId = null;
+  let cloudName = "同學";
+  let playerId = null; /* Firebase Auth uid（學生匿名） */
   let syncTimer = null;
   let pollTimer = null;
+  let roomPlayersRef = null;
+  let roomPlayersUnsub = null;
   let expandedPlayerId = null;
   let teacherActive = false;
+  let teacherUser = null;
+  let lastPlayersSnap = null;
+  let anonAuthPromise = null;
+  let teacherAuthHooked = false;
 
   function cloudConfigured() {
-    return !!(CLOUD.enabled && CLOUD.baseUrl && CLOUD.baseUrl.indexOf("REPLACE_") !== 0);
+    const keys = ["apiKey", "authDomain", "databaseURL", "projectId", "appId"];
+    for (let i = 0; i < keys.length; i++) {
+      const v = FIREBASE_CONFIG[keys[i]];
+      if (!v || String(v).indexOf("REPLACE_") === 0) return false;
+    }
+    return true;
   }
 
   function normalizeCode(c) {
@@ -348,50 +471,46 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     return s;
   }
 
-  function getPlayerId() {
+  function isValidRoomCode(c) {
+    const n = normalizeCode(c);
+    if (n.length !== 6) return false;
+    for (let i = 0; i < n.length; i++) {
+      if (CODE_CHARS.indexOf(n.charAt(i)) < 0) return false;
+    }
+    return true;
+  }
+
+  function initFirebase() {
+    if (fbReady) return true;
+    if (!cloudConfigured()) return false;
+    if (typeof firebase === "undefined") return false;
     try {
-      let id = localStorage.getItem("fkyc_life_pid");
-      if (!id) {
-        id = "p_" + Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
-        localStorage.setItem("fkyc_life_pid", id);
+      if (!firebase.apps || !firebase.apps.length) {
+        fbApp = firebase.initializeApp(FIREBASE_CONFIG);
+      } else {
+        fbApp = firebase.app();
       }
-      return id;
+      fbAuth = firebase.auth();
+      fbDb = firebase.database();
+      fbReady = true;
+      return true;
     } catch (e) {
-      return "p_" + Math.random().toString(36).slice(2, 12);
+      fbReady = false;
+      return false;
     }
   }
 
-  function cloudUrl(path) {
-    const base = String(CLOUD.baseUrl || "").replace(/\/$/, "");
-    return base + "/" + String(path).replace(/^\//, "").replace(/\.json$/, "") + ".json";
+  function housingLab(s) {
+    if (!s) return "";
+    if (s.hasHome || s.biggerHome) return "已置業";
+    if (s.renting) return "租住中";
+    if (s.savingHome) return "儲首期";
+    return "";
   }
 
-  function cloudPut(path, data) {
-    if (!cloudConfigured()) return Promise.resolve(false);
-    return fetch(cloudUrl(path), {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    }).then(function (res) { return res.ok; }).catch(function () { return false; });
-  }
-
-  function cloudGet(path) {
-    if (!cloudConfigured()) return Promise.resolve(null);
-    return fetch(cloudUrl(path)).then(function (res) {
-      if (!res.ok) return null;
-      return res.json();
-    }).catch(function () { return null; });
-  }
-
-  function ensureRoomMeta(code) {
-    if (!code || !cloudConfigured()) return;
-    cloudGet("rooms/" + code + "/meta").then(function (meta) {
-      if (meta && meta.title) return;
-      cloudPut("rooms/" + code + "/meta", {
-        createdAt: Date.now(),
-        title: "FKYC- 人生模擬遊戲"
-      });
-    });
+  function defaultDisplayName() {
+    const suffix = String(Date.now()).slice(-4);
+    return "同學" + suffix;
   }
 
   function buildPlayerPayload(statusOverride) {
@@ -404,14 +523,24 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
         endingName = (ENDINGS[k] && ENDINGS[k].name) || k;
       } catch (e) { endingName = null; }
     }
-    const hist = (S.history || []).slice(-30);
+    const hist = (S.history || []).slice(-15);
     const last = hist.length ? hist[hist.length - 1] : null;
+    let career = "";
+    try { career = (typeof careerLab === "function") ? careerLab(S.career) : (S.career || ""); } catch (e) { career = S.career || ""; }
     return {
-      name: cloudName || "同學A",
-      gender: S.gender,
+      name: cloudName || defaultDisplayName(),
+      gender: S.gender || null,
       goals: (S.goals || []).slice(),
       age: S.age,
       stage: (typeof bafsStage === "function") ? bafsStage(S) : "",
+      career: career,
+      housing: housingLab(S),
+      married: !!S.married,
+      kids: !!S.kids,
+      hasHome: !!(S.hasHome || S.biggerHome),
+      renting: !!(S.renting && !(S.hasHome || S.biggerHome)),
+      earlyFI: !!S.earlyFI,
+      retired: !!S.retired,
       stats: { h: S.h, w: S.w, t: S.t, hap: S.hap, rel: S.rel, sec: S.sec },
       status: ended ? "ended" : "playing",
       ending: endingName,
@@ -422,33 +551,65 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     };
   }
 
+  function ensureStudentAuth() {
+    if (!initFirebase() || !fbAuth) return Promise.reject(new Error("no firebase"));
+    if (fbAuth.currentUser) return Promise.resolve(fbAuth.currentUser);
+    if (anonAuthPromise) return anonAuthPromise;
+    anonAuthPromise = fbAuth.signInAnonymously().then(function (cred) {
+      anonAuthPromise = null;
+      return cred.user;
+    }).catch(function (err) {
+      anonAuthPromise = null;
+      throw err;
+    });
+    return anonAuthPromise;
+  }
+
   function scheduleSync(statusOverride) {
-    if (!cloudRoom || !cloudConfigured() || !playerId || !S) return;
+    if (!cloudRoom || !cloudConfigured() || !S) return;
     clearTimeout(syncTimer);
     syncTimer = setTimeout(function () {
-      const payload = buildPlayerPayload(statusOverride);
-      if (!payload) return;
-      cloudPut("rooms/" + cloudRoom + "/players/" + playerId, payload);
+      syncNow(statusOverride);
     }, 800);
   }
 
   function syncNow(statusOverride) {
-    if (!cloudRoom || !cloudConfigured() || !playerId || !S) return;
+    if (!cloudRoom || !cloudConfigured() || !S) return;
     clearTimeout(syncTimer);
     const payload = buildPlayerPayload(statusOverride);
     if (!payload) return;
-    cloudPut("rooms/" + cloudRoom + "/players/" + playerId, payload);
+    ensureStudentAuth().then(function (user) {
+      if (!user) return;
+      playerId = user.uid;
+      return fbDb.ref("rooms/" + cloudRoom + "/players/" + user.uid).update(payload);
+    }).catch(function () { /* 同步失敗不阻斷遊戲 */ });
   }
 
   function readJoinFields() {
-    /* 已取消老師後台與課室同步 */
-    cloudName = "同學A";
-    cloudRoom = "";
+    const roomEl = document.getElementById("inpRoomCode");
+    const nameEl = document.getElementById("inpDisplayName");
+    const code = normalizeCode(roomEl && roomEl.value);
+    let name = String((nameEl && nameEl.value) || "").trim().slice(0, 16);
+    if (!name) name = defaultDisplayName();
+    cloudName = name;
+    cloudRoom = (code && isValidRoomCode(code)) ? code : "";
+    if (cloudRoom && cloudConfigured()) {
+      ensureStudentAuth().catch(function () {});
+    }
+  }
+
+  function stopTeacherListeners() {
+    if (roomPlayersUnsub) {
+      try { roomPlayersUnsub(); } catch (e) {}
+      roomPlayersUnsub = null;
+    }
+    roomPlayersRef = null;
   }
 
   function stopTeacherPoll() {
     teacherActive = false;
     if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+    stopTeacherListeners();
   }
 
   function setTeacherCodeDisplay(code) {
@@ -457,11 +618,127 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     const n = normalizeCode(code);
     if (inp) inp.value = n;
     if (big) big.textContent = n || "——";
+    updateJoinUrl(n);
+  }
+
+  function classJoinUrl(code) {
+    const n = normalizeCode(code);
+    if (!n) return "";
+    try {
+      const u = new URL(window.location.href);
+      u.search = "";
+      u.hash = "";
+      u.searchParams.set("room", n);
+      return u.toString();
+    } catch (e) {
+      return "?room=" + n;
+    }
+  }
+
+  function updateJoinUrl(code) {
+    const urlEl = document.getElementById("teacherJoinUrl");
+    const wrap = document.getElementById("teacherQrWrap");
+    const img = document.getElementById("teacherQrImg");
+    const url = classJoinUrl(code);
+    if (urlEl) urlEl.textContent = url || "—";
+    if (url && wrap && img) {
+      wrap.classList.remove("hidden");
+      img.src = "https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=" + encodeURIComponent(url);
+      img.alt = "課室 " + code + " 加入 QR";
+    } else if (wrap) {
+      wrap.classList.add("hidden");
+    }
+  }
+
+  function barRows(items, total) {
+    const max = Math.max(1, total || 0);
+    return items.map(function (it) {
+      const pct = Math.round((it.n / max) * 100);
+      return '<div class="bar-row"><span class="lab">' + it.lab + '</span>' +
+        '<div class="track"><i style="width:' + pct + '%"></i></div>' +
+        '<span class="n">' + it.n + '</span></div>';
+    }).join("");
+  }
+
+  function renderOverview(playersObj) {
+    const rows = [];
+    if (playersObj && typeof playersObj === "object") {
+      Object.keys(playersObj).forEach(function (pid) {
+        const p = playersObj[pid];
+        if (p && typeof p === "object") rows.push({ id: pid, p: p });
+      });
+    }
+    const stageMap = {};
+    let married = 0, kids = 0, home = 0, fi = 0;
+    rows.forEach(function (r) {
+      const st = r.p.stage || "未開始";
+      stageMap[st] = (stageMap[st] || 0) + 1;
+      if (r.p.married) married++;
+      if (r.p.kids) kids++;
+      if (r.p.hasHome) home++;
+      if (r.p.earlyFI) fi++;
+    });
+    const stageItems = Object.keys(stageMap).sort().map(function (k) {
+      return { lab: k, n: stageMap[k] };
+    });
+    /* 年齡粗分 */
+    const ageBuckets = { "18–25": 0, "26–40": 0, "41–55": 0, "56+": 0, "—": 0 };
+    rows.forEach(function (r) {
+      const a = r.p.age;
+      if (a == null) ageBuckets["—"]++;
+      else if (a <= 25) ageBuckets["18–25"]++;
+      else if (a <= 40) ageBuckets["26–40"]++;
+      else if (a <= 55) ageBuckets["41–55"]++;
+      else ageBuckets["56+"]++;
+    });
+    const ageItems = Object.keys(ageBuckets).filter(function (k) { return ageBuckets[k] > 0; })
+      .map(function (k) { return { lab: k, n: ageBuckets[k] }; });
+
+    const stageBox = document.getElementById("stageDist");
+    if (stageBox) {
+      if (!rows.length) stageBox.innerHTML = '<p class="sub">尚無資料</p>';
+      else {
+        stageBox.innerHTML =
+          '<p class="sub" style="margin:0 0 4px">年齡</p>' + barRows(ageItems, rows.length) +
+          '<p class="sub" style="margin:8px 0 4px">階段</p>' + barRows(stageItems, rows.length);
+      }
+    }
+    const flagBox = document.getElementById("flagDist");
+    if (flagBox) {
+      if (!rows.length) flagBox.innerHTML = '<p class="sub">尚無資料</p>';
+      else {
+        flagBox.innerHTML = barRows([
+          { lab: "結婚", n: married },
+          { lab: "生育", n: kids },
+          { lab: "置業", n: home },
+          { lab: "財務自由", n: fi }
+        ], rows.length);
+      }
+    }
+    const feed = document.getElementById("choiceFeed");
+    if (feed) {
+      const recent = rows.filter(function (r) { return r.p.lastChoice; })
+        .sort(function (a, b) {
+          return ((b.p.lastChoice && b.p.lastChoice.at) || b.p.updatedAt || 0) -
+            ((a.p.lastChoice && a.p.lastChoice.at) || a.p.updatedAt || 0);
+        })
+        .slice(0, 12);
+      if (!recent.length) feed.innerHTML = '<p class="sub">尚無資料</p>';
+      else {
+        feed.innerHTML = recent.map(function (r) {
+          const lc = r.p.lastChoice;
+          return '<div class="fi"><strong>' + (r.p.name || "同學") + '</strong>　' +
+            (lc.age != null ? lc.age + "歲　" : "") +
+            (lc.title || "") + " → " + (lc.choice || "") + "</div>";
+        }).join("");
+      }
+    }
   }
 
   function renderPlayerList(playersObj) {
     const box = document.getElementById("playerList");
     if (!box) return;
+    lastPlayersSnap = playersObj || null;
     const rows = [];
     if (playersObj && typeof playersObj === "object") {
       Object.keys(playersObj).forEach(function (pid) {
@@ -484,6 +761,8 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
     if (elE) elE.textContent = String(ended);
     if (elT) elT.textContent = String(rows.length);
 
+    renderOverview(playersObj);
+
     if (!rows.length) {
       box.innerHTML = '<p class="sub">尚無學生加入。請把課室代碼告訴同學。</p>';
       return;
@@ -500,6 +779,13 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
         ? (p.lastChoice.age + "歲　" + (p.lastChoice.title || "") + " → " + (p.lastChoice.choice || ""))
         : "尚未作出重大決策";
       const endNote = p.ending ? ("　｜　" + p.ending) : "";
+      const flags = [];
+      if (p.married) flags.push("已婚");
+      if (p.kids) flags.push("有子女");
+      if (p.hasHome) flags.push("已置業");
+      else if (p.renting) flags.push("租住中");
+      if (p.earlyFI) flags.push("財務自由");
+      if (p.retired) flags.push("已退休");
 
       const pn = document.createElement("div");
       pn.className = "pn";
@@ -511,7 +797,9 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
       const pm = document.createElement("div");
       pm.className = "pm";
       pm.textContent = (p.age != null ? p.age : "—") + " 歲　｜　" + (p.stage || "") +
-        "　｜　" + stLab + endNote + "　｜　決策 " + (p.decisions || 0);
+        (p.career ? ("　｜　" + p.career) : "") +
+        "　｜　" + stLab + endNote + "　｜　決策 " + (p.decisions || 0) +
+        (flags.length ? ("　｜　" + flags.join("、")) : "");
 
       const pl = document.createElement("div");
       pl.className = "pl";
@@ -559,46 +847,240 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
   function refreshTeacherPlayers() {
     const code = normalizeCode(document.getElementById("inpTeacherCode") && document.getElementById("inpTeacherCode").value);
     setTeacherCodeDisplay(code);
-    if (!code || code.length !== 6) {
+    if (!code || !isValidRoomCode(code)) {
       const box = document.getElementById("playerList");
       if (box) box.innerHTML = '<p class="sub">請輸入或產生 6 位課室代碼。</p>';
       return;
     }
-    if (!cloudConfigured()) {
+    if (!cloudConfigured() || !initFirebase()) {
       const box = document.getElementById("playerList");
       if (box) box.innerHTML = '<p class="sub">尚未接上雲端，無法讀取學生資料。</p>';
       return;
     }
-    cloudGet("rooms/" + code + "/players").then(function (data) {
-      renderPlayerList(data);
+    fbDb.ref("rooms/" + code + "/players").once("value").then(function (snap) {
+      renderPlayerList(snap.val());
+    }).catch(function () {
+      const box = document.getElementById("playerList");
+      if (box) box.innerHTML = '<p class="sub">讀取失敗。請確認已登入，且代碼屬於本帳戶。</p>';
     });
   }
 
+  function attachRoomListener(code) {
+    stopTeacherListeners();
+    if (!initFirebase() || !isValidRoomCode(code)) return;
+    roomPlayersRef = fbDb.ref("rooms/" + code + "/players");
+    const handler = function (snap) {
+      renderPlayerList(snap.val());
+    };
+    roomPlayersRef.on("value", handler);
+    roomPlayersUnsub = function () {
+      try { roomPlayersRef.off("value", handler); } catch (e) {}
+    };
+  }
+
   function startTeacherPoll() {
-    stopTeacherPoll();
     teacherActive = true;
-    refreshTeacherPlayers();
-    const chk = document.getElementById("chkAutoPoll");
-    if (chk && !chk.checked) return;
+    const code = normalizeCode(document.getElementById("inpTeacherCode") && document.getElementById("inpTeacherCode").value);
+    if (code && isValidRoomCode(code) && cloudConfigured() && initFirebase()) {
+      attachRoomListener(code);
+    } else {
+      refreshTeacherPlayers();
+    }
+    if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
     pollTimer = setInterval(function () {
       if (!teacherActive) return;
       const chk2 = document.getElementById("chkAutoPoll");
       if (chk2 && !chk2.checked) return;
-      refreshTeacherPlayers();
-    }, CLOUD.pollMs || 2500);
+      /* realtime 已接上時作輕量備援 */
+      if (!roomPlayersUnsub) refreshTeacherPlayers();
+    }, POLL_MS);
+  }
+
+  function updateTeacherAuthUI() {
+    const who = document.getElementById("teacherWho");
+    const btnIn = document.getElementById("btnTeacherSignIn");
+    const btnOut = document.getElementById("btnTeacherSignOut");
+    const controls = document.getElementById("teacherControls");
+    const signed = !!(teacherUser && teacherUser.email);
+    if (who) {
+      who.textContent = signed
+        ? ("已登入：" + (teacherUser.email || teacherUser.displayName || "老師"))
+        : "尚未登入";
+    }
+    if (btnIn) btnIn.classList.toggle("hidden", signed);
+    if (btnOut) btnOut.classList.toggle("hidden", !signed);
+    if (controls) controls.classList.toggle("hidden", !signed || !cloudConfigured());
+  }
+
+  function teacherSignIn() {
+    if (!cloudConfigured() || !initFirebase()) {
+      alert("尚未接上 Firebase，無法登入。");
+      return;
+    }
+    const provider = new firebase.auth.GoogleAuthProvider();
+    fbAuth.signInWithPopup(provider).catch(function (err) {
+      if (err && (err.code === "auth/popup-blocked" || err.code === "auth/popup-closed-by-user")) {
+        return fbAuth.signInWithRedirect(provider);
+      }
+      alert("登入失敗：" + ((err && err.message) || "請重試"));
+    });
+  }
+
+  function teacherSignOut() {
+    stopTeacherPoll();
+    if (fbAuth) fbAuth.signOut().catch(function () {});
+    teacherUser = null;
+    updateTeacherAuthUI();
+  }
+
+  function startClassSession() {
+    if (!teacherUser || !teacherUser.email) {
+      alert("請先使用 Google 登入。");
+      return;
+    }
+    if (!initFirebase()) return;
+    const code = genRoomCode();
+    const payload = {
+      owner: teacherUser.uid,
+      meta: {
+        createdAt: Date.now(),
+        title: "FKYC- 人生模擬遊戲",
+        teacherEmail: teacherUser.email || null
+      }
+    };
+    fbDb.ref("rooms/" + code).set(payload).then(function () {
+      setTeacherCodeDisplay(code);
+      startTeacherPoll();
+    }).catch(function (err) {
+      alert("無法建立課室：" + ((err && err.message) || "請重試"));
+    });
+  }
+
+  function resumeClassSession() {
+    if (!teacherUser || !teacherUser.email) {
+      alert("請先使用 Google 登入。");
+      return;
+    }
+    if (!initFirebase()) return;
+    const code = normalizeCode(document.getElementById("inpTeacherCode") && document.getElementById("inpTeacherCode").value);
+    if (!isValidRoomCode(code)) {
+      alert("請輸入有效的 6 位課室代碼。");
+      return;
+    }
+    fbDb.ref("rooms/" + code + "/owner").once("value").then(function (snap) {
+      const owner = snap.val();
+      if (!owner) {
+        alert("找不到此課室代碼。");
+        return;
+      }
+      if (owner !== teacherUser.uid) {
+        alert("此代碼不屬於目前登入帳戶。");
+        return;
+      }
+      setTeacherCodeDisplay(code);
+      startTeacherPoll();
+    }).catch(function (err) {
+      alert("無法接續課室：" + ((err && err.message) || "請重試"));
+    });
+  }
+
+  function endClassSession() {
+    if (!teacherUser || !teacherUser.email) return;
+    if (!initFirebase()) return;
+    const code = normalizeCode(document.getElementById("inpTeacherCode") && document.getElementById("inpTeacherCode").value);
+    if (!isValidRoomCode(code)) {
+      alert("沒有可清除的課室代碼。");
+      return;
+    }
+    if (!window.confirm("確定結束本堂並清除課室 " + code + " 的所有同學進度？此操作無法復原。")) return;
+    stopTeacherListeners();
+    fbDb.ref("rooms/" + code).remove().then(function () {
+      setTeacherCodeDisplay("");
+      renderPlayerList(null);
+      const box = document.getElementById("playerList");
+      if (box) box.innerHTML = '<p class="sub">本堂資料已清除。</p>';
+    }).catch(function (err) {
+      alert("清除失敗：" + ((err && err.message) || "請重試"));
+    });
+  }
+
+  function copyText(str) {
+    if (!str) return Promise.resolve(false);
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(str).then(function () { return true; }).catch(function () { return false; });
+    }
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = str;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      return Promise.resolve(true);
+    } catch (e) {
+      return Promise.resolve(false);
+    }
+  }
+
+  function wireTeacherUi() {
+    const btnIn = document.getElementById("btnTeacherSignIn");
+    const btnOut = document.getElementById("btnTeacherSignOut");
+    const btnStart = document.getElementById("btnStartClass");
+    const btnResume = document.getElementById("btnResumeClass");
+    const btnEnd = document.getElementById("btnEndClass");
+    const btnCopy = document.getElementById("btnCopyCode");
+    const btnCopyUrl = document.getElementById("btnCopyJoinUrl");
+    const btnRefresh = document.getElementById("btnRefreshPlayers");
+    const btnBack = document.getElementById("btnTeacherBack");
+    const inpCode = document.getElementById("inpTeacherCode");
+    if (btnIn) btnIn.onclick = teacherSignIn;
+    if (btnOut) btnOut.onclick = teacherSignOut;
+    if (btnStart) btnStart.onclick = startClassSession;
+    if (btnResume) btnResume.onclick = resumeClassSession;
+    if (btnEnd) btnEnd.onclick = endClassSession;
+    if (btnCopy) btnCopy.onclick = function () {
+      const c = normalizeCode(document.getElementById("inpTeacherCode") && document.getElementById("inpTeacherCode").value);
+      copyText(c).then(function (ok) { if (ok) alert("已複製代碼：" + c); });
+    };
+    if (btnCopyUrl) btnCopyUrl.onclick = function () {
+      const c = normalizeCode(document.getElementById("inpTeacherCode") && document.getElementById("inpTeacherCode").value);
+      const u = classJoinUrl(c);
+      copyText(u).then(function (ok) { if (ok) alert("已複製加入網址"); });
+    };
+    if (btnRefresh) btnRefresh.onclick = refreshTeacherPlayers;
+    if (btnBack) btnBack.onclick = function () {
+      stopTeacherPoll();
+      document.body.classList.remove("teacher-mode");
+      document.getElementById("hud").classList.add("hidden");
+      show("start");
+    };
+    if (inpCode) {
+      inpCode.addEventListener("change", function () {
+        setTeacherCodeDisplay(inpCode.value);
+      });
+    }
   }
 
   function openTeacher() {
     document.getElementById("hud").classList.add("hidden");
+    document.body.classList.add("teacher-mode");
     const warn = document.getElementById("teacherCloudWarn");
     if (warn) warn.classList.toggle("hidden", cloudConfigured());
-    const fromStart = normalizeCode(document.getElementById("inpRoomCode") && document.getElementById("inpRoomCode").value);
-    const cur = normalizeCode(document.getElementById("inpTeacherCode") && document.getElementById("inpTeacherCode").value);
-    if (!cur && fromStart) setTeacherCodeDisplay(fromStart);
     show("teacher");
-    startTeacherPoll();
+    updateTeacherAuthUI();
+    if (cloudConfigured() && initFirebase() && fbAuth) {
+      if (!teacherAuthHooked) {
+        teacherAuthHooked = true;
+        fbAuth.onAuthStateChanged(function (user) {
+          /* 老師頁只認有電郵的 Google 帳戶；匿名學生登入不算老師 */
+          teacherUser = (user && user.email) ? user : null;
+          updateTeacherAuthUI();
+          if (teacherUser && teacherActive) startTeacherPoll();
+        });
+      }
+      fbAuth.getRedirectResult().catch(function () {});
+    }
   }
-
 
 
   const GOALS = [
@@ -2696,8 +3178,11 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
   }
 
   function show(id) {
-    stopTeacherPoll();
-    ["start", "gender", "goals", "play", "end"].forEach(s => {
+    if (id !== "teacher") {
+      stopTeacherPoll();
+      document.body.classList.remove("teacher-mode");
+    }
+    ["start", "gender", "goals", "play", "end", "teacher"].forEach(s => {
       const el = document.getElementById("screen-" + s);
       if (el) el.classList.toggle("hidden", s !== id);
     });
@@ -5686,7 +6171,16 @@ body.light .cloud-warn{background:#fee2e2;color:#991b1b}
   };
 
   try {
-    /* 已取消課室代碼／老師後台入口 */
+    wireTeacherUi();
+    const params = new URLSearchParams(window.location.search || "");
+    const preRoom = normalizeCode(params.get("room"));
+    if (preRoom) {
+      const roomEl = document.getElementById("inpRoomCode");
+      if (roomEl) roomEl.value = preRoom;
+    }
+    if (params.get("teacher") === "1" || params.get("admin") === "1") {
+      openTeacher();
+    }
   } catch (e) {}
 
 })();
