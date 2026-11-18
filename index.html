@@ -212,6 +212,17 @@ body.light .growth-leg button{background:#fff}
 .player-card .pneeds li{font-size:.75rem;color:#cbd5e1;margin-bottom:3px}
 .player-card .pradar-wrap{margin-top:.45rem}
 .player-card .pradar-wrap svg{width:100%;max-width:240px;height:auto;display:block;margin:0 auto}
+.teacher-roster{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-top:6px}
+.player-list{flex:0 1 260px;min-width:200px;max-height:70vh;overflow:auto}
+.player-detail{flex:1 1 320px;min-width:260px}
+.player-row{display:block;width:100%;text-align:left;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:.45rem .6rem;margin-bottom:6px;cursor:pointer;color:var(--text);font-family:inherit}
+.player-row:hover{border-color:#60a5fa}
+.player-row.selected{border-color:var(--accent);background:var(--panel)}
+.player-row .rn{font-weight:900;font-size:.95rem}
+.player-row .rm{color:var(--muted);font-size:.74rem;margin-top:2px}
+.player-row .rf{color:#cbd5e1;font-size:.72rem;margin-top:2px}
+.player-row .fresh-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#34d399;margin-right:6px;vertical-align:middle}
+.player-detail .empty-detail{color:var(--muted);font-size:.85rem;padding:.6rem 0}
 .class-pause-banner{display:none;background:#78350f;color:#fde68a;border:1px solid #fbbf24;border-radius:10px;padding:.45rem .7rem;font-weight:800;font-size:.88rem;text-align:center;margin:4px 0 6px}
 .class-pause-banner.show{display:block}
 .radar-chart{margin:.45rem 0 .7rem;background:var(--panel2);border-radius:12px;padding:.55rem .6rem .5rem}
@@ -444,12 +455,17 @@ body.teacher-mode{max-width:960px}
       <label><input type="checkbox" id="chkAutoPoll" checked /> 自動更新（備用輪詢）</label>
       <button type="button" class="btn-ghost" id="btnRefreshPlayers" style="padding:.35rem .7rem;font-size:.8rem">重新整理</button>
     </div>
-    <div class="player-list" id="playerList"><p class="sub">開始本堂後，同學輸入代碼即可出現於此。</p></div>
+    <div class="teacher-roster">
+      <div class="player-list" id="playerList"><p class="sub">開始本堂後，同學輸入代碼即可出現於此。</p></div>
+      <div class="player-detail" id="playerDetail"><p class="empty-detail">請點選同學，查看即時狀況與全部決策。</p></div>
+    </div>
     <div class="btn-row">
+      <button type="button" class="big" id="btnSaveClass">儲存本堂資料</button>
+      <button type="button" class="btn-ghost" id="btnSaveEndClass">先儲存再結束</button>
       <button type="button" class="big btn-danger" id="btnEndClass">結束並清除本堂資料</button>
     </div>
   </div>
-  <p class="privacy">資料僅供本課室即時查看。建議每堂使用新代碼；下課請按「結束並清除本堂資料」。</p>
+  <p class="privacy">資料僅供本課室即時查看。下課前可先按「儲存本堂資料」下載試算表與完整紀錄，再按「結束並清除本堂資料」。建議每堂使用新代碼。</p>
   <button type="button" class="btn-ghost" id="btnTeacherBack" style="margin-top:.4rem">返回遊戲首頁</button>
 </section>
 
@@ -485,6 +501,7 @@ body.teacher-mode{max-width:960px}
   let roomPlayersRef = null;
   let roomPlayersUnsub = null;
   let expandedPlayerId = null;
+  let classDataSaved = false;
   let teacherActive = false;
   let teacherUser = null;
   let lastPlayersSnap = null;
@@ -560,7 +577,7 @@ body.teacher-mode{max-width:960px}
         endingName = (ENDINGS[k] && ENDINGS[k].name) || k;
       } catch (e) { endingName = null; }
     }
-    const hist = (S.history || []).slice(-15);
+    const hist = (S.history || []).slice();
     const last = hist.length ? hist[hist.length - 1] : null;
     const needs = (typeof compactFinancialNeeds === "function") ? compactFinancialNeeds(S) : [];
     let career = "";
@@ -898,10 +915,43 @@ body.teacher-mode{max-width:960px}
     return html;
   }
 
-  function renderPlayerList(playersObj) {
-    const box = document.getElementById("playerList");
-    if (!box) return;
-    lastPlayersSnap = playersObj || null;
+
+  function playerFlagList(p) {
+    const flags = [];
+    if (!p) return flags;
+    if (p.married) flags.push(p.partnerName ? ("已婚・" + p.partnerName) : "已婚");
+    else if (p.partner) flags.push(p.partnerName ? ("戀愛中・" + p.partnerName) : "戀愛中");
+    else if (p.partnerName) flags.push("朋友・" + p.partnerName);
+    if (p.kids) flags.push(p.kidName ? ("子女・" + p.kidName) : "有子女");
+    if (p.hasPet) flags.push(p.petName ? ("寵物・" + p.petName) : "有寵物");
+    if (p.hasHome) flags.push("已置業");
+    else if (p.renting) flags.push("租住中");
+    if (p.earlyFI) flags.push("財務自由");
+    if (p.retired) flags.push("已退休");
+    return flags;
+  }
+
+  function teacherHistoryHTML(p) {
+    const hist = (p && Array.isArray(p.history)) ? p.history : [];
+    if (!hist.length) return '<p class="sub">無決策紀錄</p>';
+    const stageName = {};
+    (BAFS_STAGES || []).forEach(function (st) { stageName[st.id] = st.name; });
+    let html = '<strong style="font-size:.8rem">決策歷程（全部）</strong>';
+    let lastStage = null;
+    html += "<ul>";
+    hist.forEach(function (h) {
+      const st = String(h.stage || "");
+      if (st !== lastStage) {
+        html += '</ul><h4 style="font-size:.8rem;margin:.45rem 0 .2rem">' + (stageName[st] || (st ? ("階段" + st) : "其他")) + "</h4><ul>";
+        lastStage = st;
+      }
+      html += "<li><strong>" + (h.age != null ? h.age + "歲　" : "") + (h.title || "") + "</strong><br>→ " + (h.choice || "") + "</li>";
+    });
+    html += "</ul>";
+    return html;
+  }
+
+  function collectPlayerRows(playersObj) {
     const rows = [];
     if (playersObj && typeof playersObj === "object") {
       Object.keys(playersObj).forEach(function (pid) {
@@ -911,8 +961,92 @@ body.teacher-mode{max-width:960px}
       });
     }
     rows.sort(function (a, b) {
-      return (b.p.updatedAt || 0) - (a.p.updatedAt || 0);
+      const na = a.p.name || "同學";
+      const nb = b.p.name || "同學";
+      const c = na.localeCompare(nb, "zh-Hant", { numeric: true, sensitivity: "base" });
+      if (c) return c;
+      return String(a.id).localeCompare(String(b.id));
     });
+    return rows;
+  }
+
+  function renderPlayerDetail(p, pid) {
+    const box = document.getElementById("playerDetail");
+    if (!box) return;
+    box.innerHTML = "";
+    if (!p) {
+      box.innerHTML = '<p class="empty-detail">請點選同學，查看即時狀況與全部決策。</p>';
+      return;
+    }
+    const card = document.createElement("div");
+    card.className = "player-card open";
+    card.dataset.pid = pid || "";
+    const st = p.status === "ended" ? "ended" : "playing";
+    const stLab = st === "ended" ? "已結束" : "進行中";
+    const last = p.lastChoice
+      ? (p.lastChoice.age + "歲　" + (p.lastChoice.title || "") + " → " + (p.lastChoice.choice || ""))
+      : "尚未作出重大決策";
+    const endNote = p.ending ? ("　｜　" + p.ending) : "";
+    const flags = playerFlagList(p);
+
+    const pn = document.createElement("div");
+    pn.className = "pn";
+    const dot = document.createElement("span");
+    dot.className = "status-dot " + st;
+    pn.appendChild(dot);
+    pn.appendChild(document.createTextNode(p.name || "同學"));
+
+    const pm = document.createElement("div");
+    pm.className = "pm";
+    pm.textContent = (p.age != null ? p.age : "—") + " 歲　｜　" + (p.stage || "") +
+      (p.career ? ("　｜　" + p.career) : "") +
+      "　｜　" + stLab + endNote + "　｜　決策 " + (p.decisions || 0) +
+      (flags.length ? ("　｜　" + flags.join("、")) : "");
+
+    const pl = document.createElement("div");
+    pl.className = "pl";
+    pl.textContent = "最近：" + last;
+
+    const pstats = document.createElement("div");
+    pstats.className = "pstats";
+    pstats.innerHTML = teacherMiniStatsHTML(p.stats);
+
+    const ph = document.createElement("div");
+    ph.className = "phist";
+    ph.style.display = "block";
+    const needBox = document.createElement("div");
+    needBox.className = "pneeds";
+    needBox.innerHTML = teacherNeedsHTML(p.needs);
+    ph.appendChild(needBox);
+    const radarBox = document.createElement("div");
+    radarBox.className = "pradar-wrap";
+    const rh = document.createElement("h4");
+    rh.textContent = "六項指標對照";
+    radarBox.appendChild(rh);
+    radarBox.insertAdjacentHTML("beforeend", renderRadarSVG(p.stats || {}, { size: "card", goals: p.goals || [] }));
+    if (typeof explainGoalsHTML === "function" && Array.isArray(p.goals) && p.goals.length) {
+      radarBox.insertAdjacentHTML("beforeend", explainGoalsHTML(p, { brief: true }));
+    }
+    ph.appendChild(radarBox);
+    const histBox = document.createElement("div");
+    histBox.className = "phist-all";
+    histBox.innerHTML = teacherHistoryHTML(p);
+    ph.appendChild(histBox);
+
+    card.appendChild(pn);
+    card.appendChild(pm);
+    card.appendChild(pstats);
+    card.appendChild(pl);
+    card.appendChild(ph);
+    box.appendChild(card);
+  }
+
+  function renderPlayerList(playersObj) {
+    const box = document.getElementById("playerList");
+    if (!box) return;
+    const prevScroll = box.scrollTop;
+    lastPlayersSnap = playersObj || null;
+    const rows = collectPlayerRows(playersObj);
     let playing = 0, ended = 0;
     rows.forEach(function (r) {
       if (r.p.status === "ended") ended++; else playing++;
@@ -926,107 +1060,61 @@ body.teacher-mode{max-width:960px}
 
     renderOverview(playersObj);
 
+    if (expandedPlayerId && !rows.some(function (r) { return r.id === expandedPlayerId; })) {
+      expandedPlayerId = null;
+    }
+
     if (!rows.length) {
       box.innerHTML = '<p class="sub">尚無學生加入。請把課室代碼告訴同學。</p>';
+      renderPlayerDetail(null);
       return;
     }
+    const now = Date.now();
     box.innerHTML = "";
     rows.forEach(function (r) {
       const p = r.p;
-      const card = document.createElement("div");
-      card.className = "player-card" + (expandedPlayerId === r.id ? " open" : "");
-      card.dataset.pid = r.id;
-      const st = p.status === "ended" ? "ended" : "playing";
-      const stLab = st === "ended" ? "已結束" : "進行中";
-      const last = p.lastChoice
-        ? (p.lastChoice.age + "歲　" + (p.lastChoice.title || "") + " → " + (p.lastChoice.choice || ""))
-        : "尚未作出重大決策";
-      const endNote = p.ending ? ("　｜　" + p.ending) : "";
-      const flags = [];
-      if (p.married) flags.push(p.partnerName ? ("已婚・" + p.partnerName) : "已婚");
-      else if (p.partner) flags.push(p.partnerName ? ("戀愛中・" + p.partnerName) : "戀愛中");
-      else if (p.partnerName) flags.push("朋友・" + p.partnerName);
-      if (p.kids) flags.push(p.kidName ? ("子女・" + p.kidName) : "有子女");
-      if (p.hasPet) flags.push(p.petName ? ("寵物・" + p.petName) : "有寵物");
-      if (p.hasHome) flags.push("已置業");
-      else if (p.renting) flags.push("租住中");
-      if (p.earlyFI) flags.push("財務自由");
-      if (p.retired) flags.push("已退休");
-
-      const pn = document.createElement("div");
-      pn.className = "pn";
-      const dot = document.createElement("span");
-      dot.className = "status-dot " + st;
-      pn.appendChild(dot);
-      pn.appendChild(document.createTextNode(p.name || "同學"));
-
-      const pm = document.createElement("div");
-      pm.className = "pm";
-      pm.textContent = (p.age != null ? p.age : "—") + " 歲　｜　" + (p.stage || "") +
-        (p.career ? ("　｜　" + p.career) : "") +
-        "　｜　" + stLab + endNote + "　｜　決策 " + (p.decisions || 0) +
-        (flags.length ? ("　｜　" + flags.join("、")) : "");
-
-      const pl = document.createElement("div");
-      pl.className = "pl";
-      pl.textContent = "最近：" + last;
-
-      const pstats = document.createElement("div");
-      pstats.className = "pstats";
-      pstats.innerHTML = teacherMiniStatsHTML(p.stats);
-
-      const ph = document.createElement("div");
-      ph.className = "phist";
-      const needBox = document.createElement("div");
-      needBox.className = "pneeds";
-      needBox.innerHTML = teacherNeedsHTML(p.needs);
-      ph.appendChild(needBox);
-      const radarBox = document.createElement("div");
-      radarBox.className = "pradar-wrap";
-      const rh = document.createElement("h4");
-      rh.textContent = "六項指標對照";
-      radarBox.appendChild(rh);
-      radarBox.insertAdjacentHTML("beforeend", renderRadarSVG(p.stats || {}, { size: "card", goals: p.goals || [] }));
-      if (typeof explainGoalsHTML === "function" && Array.isArray(p.goals) && p.goals.length) {
-        radarBox.insertAdjacentHTML("beforeend", explainGoalsHTML(p, { brief: true }));
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "player-row" + (expandedPlayerId === r.id ? " selected" : "");
+      btn.dataset.pid = r.id;
+      const st = p.status === "ended" ? "已結束" : "進行中";
+      const flags = playerFlagList(p);
+      const fresh = (p.updatedAt && (now - p.updatedAt) < 8000);
+      const rn = document.createElement("div");
+      rn.className = "rn";
+      if (fresh) {
+        const d = document.createElement("span");
+        d.className = "fresh-dot";
+        d.title = "剛剛更新";
+        rn.appendChild(d);
       }
-      ph.appendChild(radarBox);
-      const htit = document.createElement("strong");
-      htit.style.fontSize = ".8rem";
-      htit.textContent = "決策歷程";
-      ph.appendChild(htit);
-      if (Array.isArray(p.history) && p.history.length) {
-        const ul = document.createElement("ul");
-        p.history.forEach(function (h) {
-          const li = document.createElement("li");
-          const strong = document.createElement("strong");
-          strong.textContent = h.age + "歲　" + (h.title || "");
-          li.appendChild(strong);
-          li.appendChild(document.createElement("br"));
-          li.appendChild(document.createTextNode("→ " + (h.choice || "")));
-          ul.appendChild(li);
-        });
-        ph.appendChild(ul);
-      } else {
-        const empty = document.createElement("p");
-        empty.className = "sub";
-        empty.textContent = "無決策紀錄";
-        ph.appendChild(empty);
+      rn.appendChild(document.createTextNode(p.name || "同學"));
+      const rm = document.createElement("div");
+      rm.className = "rm";
+      rm.textContent = (p.age != null ? p.age : "—") + " 歲　｜　" + (p.stage || "") +
+        (p.career ? ("　｜　" + p.career) : "") + "　｜　" + st +
+        "　｜　決策 " + (p.decisions || 0);
+      btn.appendChild(rn);
+      btn.appendChild(rm);
+      if (flags.length) {
+        const rf = document.createElement("div");
+        rf.className = "rf";
+        rf.textContent = flags.join("、");
+        btn.appendChild(rf);
       }
-
-      card.appendChild(pn);
-      card.appendChild(pm);
-      card.appendChild(pstats);
-      card.appendChild(pl);
-      card.appendChild(ph);
-      card.onclick = function () {
+      btn.onclick = function () {
         expandedPlayerId = (expandedPlayerId === r.id) ? null : r.id;
-        document.querySelectorAll("#playerList .player-card").forEach(function (c) {
-          c.classList.toggle("open", c.dataset.pid === expandedPlayerId);
+        document.querySelectorAll("#playerList .player-row").forEach(function (c) {
+          c.classList.toggle("selected", c.dataset.pid === expandedPlayerId);
         });
+        const chosen = rows.find(function (x) { return x.id === expandedPlayerId; });
+        renderPlayerDetail(chosen ? chosen.p : null, expandedPlayerId);
       };
-      box.appendChild(card);
+      box.appendChild(btn);
     });
+    box.scrollTop = prevScroll;
+    const selected = rows.find(function (r) { return r.id === expandedPlayerId; });
+    renderPlayerDetail(selected ? selected.p : null, expandedPlayerId);
   }
 
   function refreshTeacherPlayers() {
@@ -1158,6 +1246,8 @@ body.teacher-mode{max-width:960px}
     };
     const roomRef = fbDb.ref("rooms/" + code);
     function openRoom() {
+      classDataSaved = false;
+      expandedPlayerId = null;
       setTeacherCodeDisplay(code);
       startTeacherPoll();
     }
@@ -1196,6 +1286,8 @@ body.teacher-mode{max-width:960px}
         alert("此代碼不屬於目前登入帳戶。");
         return;
       }
+      classDataSaved = false;
+      expandedPlayerId = null;
       setTeacherCodeDisplay(code);
       startTeacherPoll();
     }).catch(function (err) {
@@ -1203,7 +1295,106 @@ body.teacher-mode{max-width:960px}
     });
   }
 
-  function endClassSession() {
+
+  function classSaveStamp() {
+    const d = new Date();
+    const p2 = function (n) { return (n < 10 ? "0" : "") + n; };
+    return d.getFullYear() + p2(d.getMonth() + 1) + p2(d.getDate()) + "_" + p2(d.getHours()) + p2(d.getMinutes());
+  }
+
+  function csvCell(v) {
+    const s = (v == null ? "" : String(v));
+    if (/[",\n\r]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+    return s;
+  }
+
+  function downloadTextFile(filename, mime, text) {
+    const blob = new Blob([text], { type: mime || "text/plain;charset=utf-8" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () {
+      URL.revokeObjectURL(a.href);
+      if (a.parentNode) a.parentNode.removeChild(a);
+    }, 800);
+  }
+
+  function snapshotClassData() {
+    const code = normalizeCode(document.getElementById("inpTeacherCode") && document.getElementById("inpTeacherCode").value);
+    const rows = collectPlayerRows(lastPlayersSnap);
+    const students = rows.map(function (r) {
+      const p = r.p || {};
+      const st = p.stats || {};
+      return {
+        id: r.id,
+        name: p.name || "同學",
+        age: p.age,
+        stage: p.stage || "",
+        career: p.career || "",
+        status: p.status || "",
+        ending: p.ending || "",
+        goals: (p.goals || []).slice(),
+        flags: playerFlagList(p),
+        partnerName: p.partnerName || "",
+        kidName: p.kidName || "",
+        petName: p.petName || "",
+        decisions: p.decisions || 0,
+        stats: { h: st.h, w: st.w, t: st.t, hap: st.hap, rel: st.rel, sec: st.sec },
+        needs: Array.isArray(p.needs) ? p.needs : [],
+        history: Array.isArray(p.history) ? p.history.slice() : []
+      };
+    });
+    return {
+      savedAt: new Date().toISOString(),
+      code: code || "",
+      students: students
+    };
+  }
+
+  function buildClassCsv(data) {
+    const lines = [];
+    lines.push(["課室代碼", "儲存時間（ISO）", "人數"].map(csvCell).join(","));
+    lines.push([data.code, data.savedAt, data.students.length].map(csvCell).join(","));
+    lines.push("");
+    lines.push(["姓名", "年齡", "階段", "職業", "狀態", "結局", "目標", "標記", "伴侶", "子女", "寵物", "決策次數", "健康", "金錢", "空閒", "開心", "關係", "安全感"].map(csvCell).join(","));
+    data.students.forEach(function (s) {
+      const st = s.stats || {};
+      lines.push([
+        s.name, s.age, s.stage, s.career, s.status, s.ending,
+        (s.goals || []).join("、"), (s.flags || []).join("、"),
+        s.partnerName, s.kidName, s.petName, s.decisions,
+        st.h, st.w, st.t, st.hap, st.rel, st.sec
+      ].map(csvCell).join(","));
+    });
+    lines.push("");
+    lines.push(["姓名", "歲", "階段", "題目", "選擇"].map(csvCell).join(","));
+    data.students.forEach(function (s) {
+      (s.history || []).forEach(function (h) {
+        lines.push([s.name, h.age, h.stage, h.title, h.choice].map(csvCell).join(","));
+      });
+    });
+    return "\ufeff" + lines.join("\r\n");
+  }
+
+  function exportClassData() {
+    const data = snapshotClassData();
+    if (!data.students.length) {
+      alert("尚無同學資料可儲存。");
+      return false;
+    }
+    const stamp = classSaveStamp();
+    const base = "FKYC_人生模擬_課堂_" + (data.code || "classroom") + "_" + stamp;
+    downloadTextFile(base + ".json", "application/json;charset=utf-8", JSON.stringify(data, null, 2));
+    setTimeout(function () {
+      downloadTextFile(base + ".csv", "text/csv;charset=utf-8", buildClassCsv(data));
+    }, 350);
+    classDataSaved = true;
+    return true;
+  }
+
+  function endClassSession(opts) {
     if (!teacherUser || !teacherUser.email) return;
     if (!initFirebase()) return;
     const code = normalizeCode(document.getElementById("inpTeacherCode") && document.getElementById("inpTeacherCode").value);
@@ -1211,16 +1402,29 @@ body.teacher-mode{max-width:960px}
       alert("沒有可清除的課室代碼。");
       return;
     }
-    if (!window.confirm("確定結束本堂並清除課室 " + code + " 的所有同學進度？此操作無法復原。")) return;
+    if (!(opts && opts.afterSave) && !classDataSaved) {
+      if (!window.confirm("尚未儲存本堂資料。結束並清除後，本堂進度將無法復原。若要先儲存，請按「取消」，再按「儲存本堂資料」。確定直接清除課室 " + code + " ？")) return;
+    } else if (!window.confirm("確定結束本堂並清除課室 " + code + " 的所有同學進度？此操作無法復原。")) {
+      return;
+    }
     stopTeacherListeners();
     fbDb.ref("rooms/" + code).remove().then(function () {
       setTeacherCodeDisplay("");
+      expandedPlayerId = null;
+      classDataSaved = false;
+      lastPlayersSnap = null;
       renderPlayerList(null);
       const box = document.getElementById("playerList");
       if (box) box.innerHTML = '<p class="sub">本堂資料已清除。</p>';
+      renderPlayerDetail(null);
     }).catch(function (err) {
       alert("清除失敗：" + ((err && err.message) || "請重試"));
     });
+  }
+
+  function saveThenEndClass() {
+    if (!exportClassData()) return;
+    endClassSession({ afterSave: true });
   }
 
   function copyText(str) {
@@ -1247,6 +1451,8 @@ body.teacher-mode{max-width:960px}
     const btnStart = document.getElementById("btnStartClass");
     const btnResume = document.getElementById("btnResumeClass");
     const btnEnd = document.getElementById("btnEndClass");
+    const btnSave = document.getElementById("btnSaveClass");
+    const btnSaveEnd = document.getElementById("btnSaveEndClass");
     const btnCopy = document.getElementById("btnCopyCode");
     const btnCopyUrl = document.getElementById("btnCopyJoinUrl");
     const btnRefresh = document.getElementById("btnRefreshPlayers");
@@ -1257,7 +1463,9 @@ body.teacher-mode{max-width:960px}
     if (btnOut) btnOut.onclick = teacherSignOut;
     if (btnStart) btnStart.onclick = startClassSession;
     if (btnResume) btnResume.onclick = resumeClassSession;
-    if (btnEnd) btnEnd.onclick = endClassSession;
+    if (btnEnd) btnEnd.onclick = function () { endClassSession(); };
+    if (btnSave) btnSave.onclick = exportClassData;
+    if (btnSaveEnd) btnSaveEnd.onclick = saveThenEndClass;
     if (btnCopy) btnCopy.onclick = function () {
       const c = normalizeCode(document.getElementById("inpTeacherCode") && document.getElementById("inpTeacherCode").value);
       copyText(c).then(function (ok) { if (ok) alert("已複製代碼：" + c); });
@@ -2108,6 +2316,31 @@ body.teacher-mode{max-width:960px}
       { k: "A", lab: "聽完即場買產品", d: [0, -6, 0, 1, 0, -4], risk: "med", riskLoss: 8, riskMild: 3, riskWin: 2 },
       { k: "B", lab: "不去", d: [0, 0, 1, -1, -1, 1] },
       { k: "C", lab: "去聽知識部分，推銷則回家再查證", tip: "先查證", d: [0, 0, -1, 2, 1, 3], prudence: 1 }
+    ]},
+    { sit: "", fin: true, needRetiredOrFI: true, minAge: 55, theme: "estateDispute", storyEstateDispute: true, opts: [
+      { k: "A", lab: "請律師協助訂立或修訂遺囑，把安排寫清楚", tip: "開支換減少爭議", d: [0, -4, -2, -2, 2, 5], will: true, prudence: 1 },
+      { k: "B", lab: "召開家庭會議，先聽訴求再決定", tip: "費時但可緩關係", d: [-1, -1, -2, 0, 3, 2] },
+      { k: "C", lab: "暫時不處理，避免正面衝突", tip: "眼前少爭拗、問題仍在", d: [0, 0, 1, -1, -4, -3] }
+    ]},
+    { sit: "", fin: true, needRetiredOrFI: true, theme: "inflationRetire", storyInflationRetire: true, opts: [
+      { k: "A", lab: "削減非必要開支，守住本金", tip: "生活緊一點、現金較穩", d: [0, 3, 0, -3, 0, 4], cutLifestyle: true, prudence: 1 },
+      { k: "B", lab: "把一部分儲蓄轉到較抗通脹的配置", tip: "有機會保值，亦有波動", d: [0, -2, 0, 0, 0, 1], risk: "med", riskLoss: 6, riskMild: 2, riskWin: 5 },
+      { k: "C", lab: "動用本金，維持現有生活水平", tip: "眼前舒適、長錢壓力↑", d: [0, -6, 1, 3, 0, -4], lifestyle: 1 }
+    ]},
+    { sit: "", fin: true, needRetiredOrFI: true, needKidsGrown: true, theme: "kidsSupport", storyKidsSupport: true, opts: [
+      { k: "A", lab: "量力資助一部分，並說明這是上限", tip: "關係可維持、財富略減", d: [0, -6, -1, 0, 3, -2], prudence: 1 },
+      { k: "B", lab: "答應較大額資助", tip: "關係↑、積蓄與安全感明顯↓", d: [0, -14, -1, 2, 5, -6] },
+      { k: "C", lab: "婉拒，鼓勵他們自行安排財務", tip: "守住積蓄、關係或暫時緊張", d: [0, 1, 0, -1, -3, 3] }
+    ]},
+    { sit: "", fin: true, needRetiredOrFI: true, minAge: 50, theme: "elderScam", storyElderScam: true, opts: [
+      { k: "A", lab: "掛線，並致電官方熱線查證", tip: "花一點時間、避免受騙", d: [0, 0, -1, 0, 0, 4], prudence: 2 },
+      { k: "B", lab: "按對方指示操作", tip: "極高風險", d: [-2, -18, 0, -8, -1, -12] },
+      { k: "C", lab: "先暫停，詢問家人或可靠朋友", tip: "多一重把關", d: [0, 0, -1, 0, 2, 3], prudence: 1 }
+    ]},
+    { sit: "", fin: true, needRetiredOrFI: true, needFamily: true, theme: "familyIllness", storyFamilyIllness: true, opts: [
+      { k: "A", lab: "用儲備應付醫療，並親自照顧", tip: "金錢與時間↓、關係↑", d: [-2, -8, -6, -2, 4, -2] },
+      { k: "B", lab: "請人照顧，自己量力探望", tip: "開支↑、自己較可負荷", d: [-1, -6, -2, 0, 2, 0] },
+      { k: "C", lab: "主要依賴公營醫療，能幫則幫", tip: "較省錢，或需輪候", d: [-1, -1, -3, -2, 1, -2] }
     ]},
     { sit: "公司提供股份獎勵，要你用部分積蓄認購，並有鎖定期。", fin: true, needJob: true, minAge: 26, maxAge: 55, opts: [
       { k: "A", lab: "盡量多認購", d: [0, -8, 0, 2, 0, -4], risk: "med", riskLoss: 8, riskMild: 3, riskWin: 6, invest: 1 },
@@ -3546,10 +3779,10 @@ body.teacher-mode{max-width:960px}
     if (!S) return false;
     if (S.w < 28) return false;
     if (!(fiEligible() || S.earlyFI || S.retired)) return false;
+    /* 財務自由或退休後，同一張旅行選擇卡最多出現一次 */
+    if (S.lastTravelOfferAge != null) return false;
     if (S.lastTravelAge != null && (S.age - S.lastTravelAge) < 2) return false;
     if (S.travelResolvedAge === S.age) return false;
-    /* 該年見到提示但沒出發，同樣等兩年才再出現 */
-    if (S.lastTravelOfferAge != null && S.age > S.lastTravelOfferAge && (S.age - S.lastTravelOfferAge) < 2) return false;
     return true;
   }
   function canRetireFree() {
@@ -3778,11 +4011,11 @@ body.teacher-mode{max-width:960px}
   function buildTravelFreeEvent() {
     return {
       tag: "自由行動", fin: true, title: "去旅行",
-      sit: "今年有機會用一筆儲蓄去旅行。你會出發，還是今年不去、繼續過這一年？（約兩年後可再考慮）",
+      sit: "今年有機會用一筆儲蓄去旅行。你會出發，還是今年不去、繼續過這一年？",
       major: true, freeAction: true, freeKind: "travel", travelChoice: true,
       opts: [
         { k: "A", lab: "去旅行", tip: "花費一筆；開心／關係↑", d: [1, -8, -1, 10, 4, -2], travel: true, freeTravel: true },
-        { k: "B", lab: "今年不去，繼續過這一年", tip: "維持現狀，約兩年後可再考慮", d: [0, 0, 0, 0, 0, 0], travelOffer: true }
+        { k: "B", lab: "今年不去，繼續過這一年", tip: "維持現狀", d: [0, 0, 0, 0, 0, 0], travelOffer: true }
       ]
     };
   }
@@ -3970,6 +4203,8 @@ body.teacher-mode{max-width:960px}
     if (src.needWealth != null && S.w < src.needWealth) return false;
     if (src.needEarlyFI && !S.earlyFI) return false;
     if (src.needRetired && !S.retired) return false;
+    if (src.needRetiredOrFI && !(S.retired || S.earlyFI)) return false;
+    if (src.needFamily && !(S.partner || S.married || S.kids)) return false;
     if (S.earlyFI && !S.retired) {
       if (src.theme === "retireMPFDraw" || src.theme === "chronicMed" || src.theme === "retireMedicalPrep") return false;
       const evTxt = (src.title || "") + (src.sit || "");
@@ -4186,6 +4421,21 @@ body.teacher-mode{max-width:960px}
     if (src.storyKidsAllowance) {
       return { title: "子女家用", sit: n.kid + " 說：「爸媽，你們" + (S.retired ? "退休了" : "已財務自由") + "，我們想每月給一點家用。」你會？" };
     }
+    if (src.storyEstateDispute) {
+      return { title: "家人爭產", sit: "家人為身後財產的分配起了爭執，有人認為自己分得不公，家裡氣氛變得緊張。" };
+    }
+    if (src.storyInflationRetire) {
+      return { title: "通脹壓力", sit: "物價持續上升，你發覺每月的生活開支明顯加重，儲蓄或定期收入沒有以前那麼夠用。" };
+    }
+    if (src.storyKidsSupport) {
+      return { title: "資助晚輩", sit: n.kid + " 向你開口，希望你資助一筆升學或置業費用。你會？" };
+    }
+    if (src.storyElderScam) {
+      return { title: "懷疑詐騙來電", sit: "你接到來電，對方自稱銀行或政府部門職員，說你的帳戶有異常，要你立刻轉帳或提供驗證碼。" };
+    }
+    if (src.storyFamilyIllness) {
+      return { title: "家人病重", sit: "家人突然病重，需要住院及照顧，開支與時間都突然增加。" };
+    }
     return null;
   }
 
@@ -4208,6 +4458,14 @@ body.teacher-mode{max-width:960px}
     if (src.needKidsAllowanceOffer) w += 4;
     if (src.needJob && isWorking()) w += 1;
     if (src.needEarlyFI && S.earlyFI) w += 2;
+    if (src.needRetiredOrFI && (S.retired || S.earlyFI)) w += 5;
+    if (S.retired || S.earlyFI) {
+      if (src.storyRetireMedical || src.storyRetireChronic || src.storyRetireHospital || src.storyRetireLTC ||
+          src.theme === "chronicMed" || src.theme === "retireMedicalPrep" || src.theme === "familyIllness")
+        w += 3;
+      if (src.theme === "estateDispute" || src.theme === "inflationRetire" || src.theme === "elderScam" || src.theme === "kidsSupport")
+        w += 2;
+    }
     return w;
   }
 
@@ -4272,7 +4530,11 @@ body.teacher-mode{max-width:960px}
       noteSkippedOfficialKey(S.age);
       S.doneKey[S.age] = true;
     }
-    if (isStart || Math.random() < 0.92) {
+    const lateIndependent = !!(S.retired || S.earlyFI);
+    const hasUnusedRand = RAND.some(function (ev, i) {
+      return S.randUsed.indexOf(i) < 0 && eventAllowed(ev);
+    });
+    if (isStart || (lateIndependent && hasUnusedRand) || (!lateIndependent && Math.random() < 0.92)) {
       presentEvent(buildRandEvent());
     } else {
       showIdle();
@@ -6532,12 +6794,12 @@ body.teacher-mode{max-width:960px}
 
     /* idle 畫面沒有結婚／生孩子／財務自由常駐按鈕；達標時改出旅行選擇卡 */
     setupWork(45, { lastTravelAge: null, lastTravelOfferAge: null, earlyFI: true });
+    if (!canShowTravel()) contra0("travel_offer_should_be_available_when_eligible");
     showIdle();
     const bar1 = document.getElementById("freeBar");
     const t1 = bar1 ? bar1.textContent : "";
     if (/結婚/.test(t1) || /生孩子/.test(t1) || /財務自由/.test(t1))
       contra0("idle_bar_has_removed_buttons:" + t1);
-    if (!canShowTravel()) contra0("travel_offer_should_be_available_when_eligible");
     const evPane = document.getElementById("eventPane");
     const sitTravel = (document.getElementById("sitText") && document.getElementById("sitText").textContent) || "";
     if (evPane && evPane.classList.contains("hidden")) contra0("travel_choice_card_not_shown");
@@ -6720,7 +6982,7 @@ body.teacher-mode{max-width:960px}
     S.age = 47; S.career = "edu";
     if (careerLab("edu") !== "高學歷") contra0("careerLab_grad_not_高學歷:" + careerLab("edu"));
 
-    /* 旅行選擇卡出現後標記已提示；選「今年不去」同年不再出卡，約兩年後可再考慮 */
+    /* 旅行選擇卡出現後標記已提示；財務自由／退休後最多一次，兩年後不再重問 */
     setupWork(45, { lastTravelAge: null, lastTravelOfferAge: null, w: 50, earlyFI: true, travelResolvedAge: null });
     showIdle();
     if (S.lastTravelOfferAge !== 45) contra0("travel_offer_not_marked:" + S.lastTravelOfferAge);
@@ -6731,9 +6993,38 @@ body.teacher-mode{max-width:960px}
     S.age = 46;
     if (canShowTravel()) contra0("travel_offer_reappeared_next_year");
     S.age = 47;
-    if (!canShowTravel()) contra0("travel_offer_missing_after_two_years");
+    if (canShowTravel()) contra0("travel_offer_reappeared_after_two_years");
     setupWork(45, { lastTravelAge: 45, lastTravelOfferAge: 45, travelResolvedAge: 45, w: 50, earlyFI: true });
     if (canShowTravel()) contra0("travel_offer_after_travel_same_year");
+    setupWork(62, { lastTravelAge: null, lastTravelOfferAge: 58, travelResolvedAge: 58, w: 50, retired: true, earlyFI: false });
+    if (canShowTravel()) contra0("travel_offer_after_retire_second_time");
+
+    /* 新晚年題：財務自由或退休後可出，主題同一局不重複 */
+    function lateEv(theme) { return RAND.find(function (ev) { return ev.theme === theme; }); }
+    ["estateDispute", "inflationRetire", "kidsSupport", "elderScam", "familyIllness"].forEach(function (th) {
+      const ev = lateEv(th);
+      if (!ev) contra0("late_event_missing:" + th);
+      else if (!ev.opts || ev.opts.length < 3) contra0("late_event_need_three_opts:" + th);
+    });
+    S = fresh(); S.gender = "male"; S.age = 62; S.retired = true; S.earlyFI = false; S.w = 40;
+    S.kids = true; S.kidsBirthAge = 34; S.married = true; S.partner = true; S.themeUsed = {};
+    if (!eventAllowed(lateEv("estateDispute"))) contra0("estateDispute_blocked_when_retired");
+    if (!eventAllowed(lateEv("inflationRetire"))) contra0("inflationRetire_blocked_when_retired");
+    if (!eventAllowed(lateEv("elderScam"))) contra0("elderScam_blocked_when_retired");
+    if (!eventAllowed(lateEv("familyIllness"))) contra0("familyIllness_blocked_when_family_retired");
+    if (!eventAllowed(lateEv("kidsSupport"))) contra0("kidsSupport_blocked_when_grown_kids");
+    S.kids = false; S.kidsBirthAge = null;
+    if (eventAllowed(lateEv("kidsSupport"))) contra0("kidsSupport_allowed_without_kids");
+    S = fresh(); S.gender = "male"; S.age = 52; S.retired = false; S.earlyFI = true; S.w = 50;
+    S.married = true; S.partner = true; S.themeUsed = {};
+    if (!eventAllowed(lateEv("inflationRetire"))) contra0("inflationRetire_blocked_when_FI");
+    if (!eventAllowed(lateEv("elderScam"))) contra0("elderScam_blocked_when_FI");
+    S = fresh(); S.gender = "male"; S.age = 40; S.retired = false; S.earlyFI = false; S.w = 40;
+    if (eventAllowed(lateEv("estateDispute"))) contra0("estateDispute_allowed_before_FI_or_retire");
+    if (eventAllowed(lateEv("inflationRetire"))) contra0("inflationRetire_allowed_before_FI_or_retire");
+    S = fresh(); S.gender = "male"; S.age = 62; S.retired = true; S.themeUsed = {};
+    markTheme({ theme: "estateDispute" });
+    if (eventAllowed(lateEv("estateDispute"))) contra0("estateDispute_not_mutex");
 
     /* —— v7：缺題目、好友升級、穩定 D、旅行選擇卡、成長圖、六角形、後台 needs —— */
     function presentStory(src) {
@@ -6893,6 +7184,36 @@ body.teacher-mode{max-width:960px}
       contra0("teacher_names_missing:" + nameListTxt.replace(/\s+/g, " ").slice(0, 200));
     if (nameListBox) nameListBox.innerHTML = nameListPrev;
 
+    /* 後台名單按姓名穩定排序，不因 updatedAt 置頂；決策歷程同步全部而非最近 15 項 */
+    expandedPlayerId = "b";
+    renderPlayerList({
+      z: { name: "陳大文", age: 30, status: "playing", updatedAt: 900, stats: {}, goals: [], needs: [], history: [] },
+      a: { name: "12 小明", age: 28, status: "playing", updatedAt: 100, stats: {}, goals: [], needs: [], history: [] },
+      b: { name: "08 阿美", age: 40, status: "playing", updatedAt: 500, stats: {}, goals: [], needs: [],
+           history: new Array(18).fill(0).map(function (_, i) { return { age: 20 + i, title: "題" + (i + 1), choice: "A", stage: "1" }; }) }
+    });
+    const rosterNames = Array.from(document.querySelectorAll("#playerList .player-row .rn")).map(function (el) { return el.textContent.trim(); });
+    if (rosterNames.join("|") !== "08 阿美|12 小明|陳大文")
+      contra0("teacher_list_not_sorted_by_name:" + rosterNames.join("|"));
+    const histBox = document.querySelector("#playerDetail .phist-all");
+    const histTxt = (histBox && histBox.textContent) || "";
+    if (histTxt.indexOf("題1") < 0 || histTxt.indexOf("題18") < 0)
+      contra0("teacher_detail_missing_full_history:" + histTxt.replace(/\s+/g, " ").slice(0, 180));
+    S = fresh(); S.gender = "male"; S.age = 40;
+    S.history = new Array(20).fill(0).map(function (_, i) { return { age: 18 + i, title: "H" + (i + 1), choice: "A", stage: "1" }; });
+    const fullPay = buildPlayerPayload("playing");
+    if (!fullPay || !fullPay.history || fullPay.history.length !== 20)
+      contra0("payload_history_not_full:" + (fullPay && fullPay.history && fullPay.history.length));
+    if (typeof snapshotClassData === "function") {
+      lastPlayersSnap = { b: { name: "08 阿美", history: S.history, stats: {}, goals: [], needs: [] } };
+      const snap = snapshotClassData();
+      if (!snap || !snap.students || snap.students.length !== 1 || snap.students[0].history.length !== 20)
+        contra0("snapshot_missing_full_history");
+      const csv = buildClassCsv(snap);
+      if (!csv || csv.indexOf("08 阿美") < 0 || csv.indexOf("H20") < 0)
+        contra0("class_csv_missing_rows");
+    } else contra0("snapshotClassData_missing");
+
     /* 生育 D 最遲 40 歲（當年仍算在上限內）；41 歲及以後不再出；選不生育後不再出 */
     setupWork(40, { married: true, partner: true, kids: false });
     if (dKindAt(40) !== "kids") contra0("kids_D_missing_at_40:" + dKindAt(40));
@@ -6994,8 +7315,9 @@ body.teacher-mode{max-width:960px}
     }
     const listBox = document.getElementById("playerList");
     const prevTeacher = document.body.classList.contains("teacher-mode");
+    expandedPlayerId = "demo1";
     renderPlayerList({ demo1: payload });
-    const card = document.querySelector("#playerList .player-card");
+    const card = document.querySelector("#playerDetail .player-card");
     if (!card) contra0("teacher_card_missing");
     else {
       const pst = card.querySelectorAll(".pstats .pst");
@@ -7004,7 +7326,6 @@ body.teacher-mode{max-width:960px}
       ["健康", "金錢", "空閒時間", "開心", "關係", "安全感"].forEach(function (n) {
         if (labs.indexOf(n) < 0) contra0("teacher_card_missing_stat_" + n);
       });
-      card.classList.add("open");
       const needsTxt = (card.querySelector(".pneeds") && card.querySelector(".pneeds").textContent) || "";
       if (needsTxt.indexOf("應急金") < 0 || needsTxt.indexOf("保險") < 0)
         contra0("teacher_card_needs_missing:" + needsTxt);
