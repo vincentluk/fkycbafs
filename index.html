@@ -574,7 +574,12 @@ body.teacher-mode{max-width:960px}
       career: career,
       housing: housingLab(S),
       married: !!S.married,
+      partner: !!S.partner,
+      partnerName: S.partnerName || null,
       kids: !!S.kids,
+      kidName: S.kidName || null,
+      hasPet: !!S.hasPet,
+      petName: S.petName || null,
       hasHome: !!(S.hasHome || S.biggerHome),
       renting: !!(S.renting && !(S.hasHome || S.biggerHome)),
       earlyFI: !!S.earlyFI,
@@ -938,8 +943,11 @@ body.teacher-mode{max-width:960px}
         : "尚未作出重大決策";
       const endNote = p.ending ? ("　｜　" + p.ending) : "";
       const flags = [];
-      if (p.married) flags.push("已婚");
-      if (p.kids) flags.push("有子女");
+      if (p.married) flags.push(p.partnerName ? ("已婚・" + p.partnerName) : "已婚");
+      else if (p.partner) flags.push(p.partnerName ? ("戀愛中・" + p.partnerName) : "戀愛中");
+      else if (p.partnerName) flags.push("朋友・" + p.partnerName);
+      if (p.kids) flags.push(p.kidName ? ("子女・" + p.kidName) : "有子女");
+      if (p.hasPet) flags.push(p.petName ? ("寵物・" + p.petName) : "有寵物");
       if (p.hasHome) flags.push("已置業");
       else if (p.renting) flags.push("租住中");
       if (p.earlyFI) flags.push("財務自由");
@@ -2391,8 +2399,16 @@ body.teacher-mode{max-width:960px}
     const base = NAMES[S && S.gender === "female" ? "female" : "male"];
     return Object.assign({}, base, {
       kid: (S && S.kidName) ? S.kidName : base.kid,
-      pet: (S && S.petName) ? S.petName : base.pet
+      pet: (S && S.petName) ? S.petName : base.pet,
+      crush: (S && S.partnerName) ? S.partnerName : "心儀對象",
+      crush2: "新認識的人",
+      partner: (S && S.partnerName) ? S.partnerName : "另一半"
     });
+  }
+
+  function rememberPartnerName(opt) {
+    if (!S || !opt) return;
+    if (opt.refusePartner) S.partnerName = null;
   }
 
   function isSingleLife(s) {
@@ -3122,12 +3138,22 @@ body.teacher-mode{max-width:960px}
       if (renameLabel) {
         renameLabel.textContent = opts.renameKind === "pet"
           ? "為寵物命名（之後事件會用這個名字）"
-          : "為孩子命名（之後事件會用這個名字）";
+          : (opts.renameKind === "partner"
+            ? "為對方命名（之後事件會用這個名字）"
+            : "為孩子命名（之後事件會用這個名字）");
       }
-      renameInput.value = opts.renameDefault || (opts.renameKind === "pet" ? defaultPetName() : defaultKidName());
-      setTimeout(() => { try { renameInput.focus(); renameInput.select(); } catch (e) {} }, 30);
+      if (opts.renameKind === "partner") {
+        renameInput.value = "";
+        renameInput.placeholder = "請輸入對方的名字";
+        setTimeout(() => { try { renameInput.focus(); } catch (e) {} }, 30);
+      } else {
+        renameInput.placeholder = "";
+        renameInput.value = opts.renameDefault || (opts.renameKind === "pet" ? defaultPetName() : defaultKidName());
+        setTimeout(() => { try { renameInput.focus(); renameInput.select(); } catch (e) {} }, 30);
+      }
     } else {
       renameInput.value = "";
+      renameInput.placeholder = "";
     }
     const chips = document.getElementById("popupChips");
     const choiceBox = document.getElementById("popupChoices");
@@ -3173,10 +3199,16 @@ body.teacher-mode{max-width:960px}
   function commitPopupRename() {
     if (!popupPending || !popupPending.rename || !S) return;
     const raw = (document.getElementById("kidNameInput").value || "").trim();
-    const fallback = popupPending.renameKind === "pet" ? defaultPetName() : defaultKidName();
-    const name = (raw || popupPending.renameDefault || fallback).slice(0, 12);
-    if (popupPending.renameKind === "pet") S.petName = name;
-    else S.kidName = name;
+    if (popupPending.renameKind === "pet") {
+      const fallback = defaultPetName();
+      S.petName = (raw || popupPending.renameDefault || fallback).slice(0, 12);
+    } else if (popupPending.renameKind === "partner") {
+      const fallback = popupPending.renameFallback || "另一半";
+      S.partnerName = (raw || fallback).slice(0, 12);
+    } else {
+      const fallback = defaultKidName();
+      S.kidName = (raw || popupPending.renameDefault || fallback).slice(0, 12);
+    }
   }
 
   function resolvePopupChoice(cq, opt, done) {
@@ -3253,10 +3285,14 @@ body.teacher-mode{max-width:960px}
     if (pending && pending.rename && S) {
       if (pending.renameKind === "pet" && S.petName) {
         logEvent("寵物正式命名為「" + S.petName + "」。往後事件都會用這個名字。", "good");
+      } else if (pending.renameKind === "partner" && S.partnerName) {
+        if (S.partner) logEvent("開始與「" + S.partnerName + "」交往。往後事件都會用這個名字。", "good");
+        else logEvent("與「" + S.partnerName + "」先做朋友。往後若再提起這段關係，都會用這個名字。", "note");
       } else if (S.kidName) {
         logEvent("孩子正式命名為「" + S.kidName + "」。往後事件都會用這個名字。", "good");
       }
       renderHUD();
+      if (typeof scheduleSync === "function") scheduleSync("playing");
     }
     if (fn) fn();
   }
@@ -3852,7 +3888,7 @@ body.teacher-mode{max-width:960px}
         : "感情穩定。會否結婚？";
       ev.title = "是否結婚？";
     }
-    /* 避免標題與故事句重覆（如 Lisa 表白） */
+    /* 避免標題與故事句重覆（如表白） */
     let headline;
     if (ev.title && sit) {
       if (sit.indexOf(ev.title) >= 0 || (ev.title.length >= 4 && sit.indexOf(ev.title.slice(0, 4)) >= 0))
@@ -3985,13 +4021,14 @@ body.teacher-mode{max-width:960px}
     const n = who();
     const partner = S.partnerName || n.partner;
     if (src.storyConfess) {
-      return { title: "", sit: n.crush + " 鼓起勇氣向你表白，你會？" };
+      return { title: "", sit: "你的心儀對象向你表白，你會？" };
     }
     if (src.storyStartDate) {
-      return { title: "", sit: n.crush + " 與你做了幾年朋友，最近問起要不要開始交往，你會？" };
+      const crush = (S && S.partnerName && S.partnerName !== "心儀對象") ? S.partnerName : "你的心儀對象";
+      return { title: "", sit: crush + " 與你做了幾年朋友，最近問起要不要開始交往，你會？" };
     }
     if (src.storyBlind) {
-      return { title: "", sit: "朋友把你介紹給 " + n.crush2 + "，對方想約你喝杯咖啡。" };
+      return { title: "", sit: "朋友把你介紹給一位新認識的人，對方想約你喝杯咖啡。" };
     }
     if (src.storyDateTrip) {
       return { title: "", sit: partner + " 想趁長假去旅行慶祝，你會？" };
@@ -4721,6 +4758,7 @@ body.teacher-mode{max-width:960px}
     if (opt.deferMarry) S.deferredMarry = true;
     if (opt.deferKids) S.deferredKids = true;
     if (opt.deferFI) S.deferredFI = true;
+    rememberPartnerName(opt);
     if (opt.friendZone) {
       S.friendZone = true;
       if (S.friendZoneAge == null) S.friendZoneAge = S.age;
@@ -4733,9 +4771,6 @@ body.teacher-mode{max-width:960px}
     if (opt.partner) {
       S.partner = true; S.refusedPartner = false; S.friendZoneAsked = true;
       if (S.partnerSinceAge == null) S.partnerSinceAge = S.age;
-      if (!S.partnerName) {
-        S.partnerName = (ev && (ev.storyConfess || ev.storyStartDate || S.friendZone)) ? who().crush : who().crush2;
-      }
     }
     if (opt.refusePartner) { S.refusedPartner = true; S.partner = false; S.partnerName = null; S.friendZoneAsked = true; }
     if (opt.declinedMarry) S.declinedMarry = true;
@@ -4825,6 +4860,21 @@ body.teacher-mode{max-width:960px}
     if (opt.lifestyle >= 3) logEvent("生活方式升級，每年開支明顯上升。", "bad");
     /* 人生大事隊列：出生／結婚／置業／買車／FIRE —— 用醒目彈窗 */
     const majors = [];
+    if (((opt.partner && !opt.marry) || opt.friendZone || opt.friendZoneStay) && !S.partnerName && !opt.refusePartner) {
+      const asPartner = !!(opt.partner && !opt.friendZone);
+      const fallback = asPartner ? "另一半" : "心儀對象";
+      majors.push({
+        kind: "good", major: true,
+        emo: asPartner ? "💕" : "🤝",
+        tag: asPartner ? "人生大事・開始交往" : "人生大事・先做朋友",
+        main: asPartner ? "你決定開始交往。" : "你決定先做朋友。",
+        sub: "請輸入對方的名字；之後事件都會用這個名字。若沒有填寫，將以「" + fallback + "」稱呼。",
+        rename: true, renameKind: "partner",
+        renameFallback: fallback,
+        okLabel: "確認名字，繼續",
+        d: null
+      });
+    }
     if (opt.kids) {
       if (!S.kidName) S.kidName = defaultKidName();
       majors.push({
@@ -4913,12 +4963,19 @@ body.teacher-mode{max-width:960px}
     if (opt.declinedKids) logEvent("決定不生育；此局不再出現生孩子提示。", "note");
     if (opt.freeTravel) logEvent("出發去旅行（自選）。", "good");
     if (opt.friendZone || opt.friendZoneStay) {
-      const fn = ((ev && (ev.storyConfess || ev.storyStartDate)) ? who().crush : (who().crush2 || who().crush));
-      logEvent(opt.friendZoneStay
-        ? ("與 " + fn + " 繼續做朋友，不開始交往。")
-        : ("與 " + fn + " 先做朋友，尚未正式交往。"), "note");
+      if (S.partnerName) {
+        const fn = S.partnerName;
+        logEvent(opt.friendZoneStay
+          ? ("與 " + fn + " 繼續做朋友，不開始交往。")
+          : ("與 " + fn + " 先做朋友，尚未正式交往。"), "note");
+      } else {
+        logEvent(opt.friendZoneStay ? "決定繼續做朋友（可命名）。" : "決定先做朋友（可命名）。", "note");
+      }
     }
-    if (opt.partner && !opt.marry && !opt.friendZone) logEvent("開始與 " + S.partnerName + " 交往。", "good");
+    if (opt.partner && !opt.marry && !opt.friendZone) {
+      if (S.partnerName) logEvent("開始與 " + S.partnerName + " 交往。", "good");
+      else logEvent("開始交往（可命名）。", "good");
+    }
     if (opt.studentPartTime) logEvent("開始做兼職，求學期間多了一筆小收入。", "fin");
     if (opt.renting) logEvent("開始租住，每月住屋開支固定出現。", "fin");
     if (opt.savingHome) logEvent("開始為首期儲蓄。", "fin");
@@ -5464,6 +5521,7 @@ body.teacher-mode{max-width:960px}
     if (opt.travel) S.travel = true;
     if (opt.freeTravel) { S.lastTravelAge = S.age; S.travelResolvedAge = S.age; }
     if (opt.travelOffer) { markTravelOffered(); S.travelResolvedAge = S.age; }
+    rememberPartnerName(opt);
     if (opt.friendZone) {
       S.friendZone = true;
       if (S.friendZoneAge == null) S.friendZoneAge = age;
@@ -5472,7 +5530,6 @@ body.teacher-mode{max-width:960px}
     if (opt.partner) {
       S.partner = true; S.refusedPartner = false; S.friendZoneAsked = true;
       if (S.partnerSinceAge == null) S.partnerSinceAge = age;
-      if (!S.partnerName) S.partnerName = who().crush;
     }
     if (opt.refusePartner) { S.refusedPartner = true; S.partner = false; S.partnerName = null; S.friendZoneAsked = true; }
     if (opt.declinedMarry) S.declinedMarry = true;
@@ -5708,7 +5765,7 @@ body.teacher-mode{max-width:960px}
       if (!hit.find(h => h.age === 20) && !S.dead && !S.bankrupt)
         contradictions.push("mix_path_missed_salary_20");
     }
-    /* Lisa 文案不重覆 */
+    /* 表白文案不重覆 */
     const confessSit = resolveStory({ storyConfess: true });
     if (confessSit.title && confessSit.sit && confessSit.sit.indexOf(confessSit.title) >= 0)
       contradictions.push("lisa_title_duplicates_sit");
@@ -6738,6 +6795,103 @@ body.teacher-mode{max-width:960px}
     if (eventAllowed(KEY[31])) contra0("dating_key_shown_while_partnered");
     setupWork(31, { married: true, partner: true, friendZone: true });
     if (eventAllowed(KEY[31])) contra0("dating_key_shown_while_married");
+
+    /* 表白卡：不出現預設名，可輸入對方名字 */
+    const confessCopy = resolveStory({ storyConfess: true });
+    if (!confessCopy || confessCopy.sit.indexOf("你的心儀對象向你表白") < 0)
+      contra0("confess_copy_missing:" + (confessCopy && confessCopy.sit));
+    if (/Lisa|Ken/.test(confessCopy.sit))
+      contra0("confess_still_has_default_name:" + confessCopy.sit);
+    const blindCopy = resolveStory({ storyBlind: true });
+    if (!blindCopy || blindCopy.sit.indexOf("新認識的人") < 0)
+      contra0("blind_copy_missing:" + (blindCopy && blindCopy.sit));
+    if (/Amy|Alex|Lisa|Ken/.test(blindCopy.sit))
+      contra0("blind_still_has_default_name:" + blindCopy.sit);
+    function flushToastAndConfirmPartner(name) {
+      if (typeof hideToast === "function") hideToast();
+      const popup = document.getElementById("popupMask");
+      const input = document.getElementById("kidNameInput");
+      const label = document.getElementById("renameLabel");
+      if (!popup || popup.classList.contains("hidden") || !input)
+        return "popup_missing";
+      if (label && label.textContent.indexOf("為對方命名") < 0)
+        return "popup_label:" + label.textContent;
+      if ((input.value || "") !== "")
+        return "popup_not_empty:" + input.value;
+      input.value = name || "";
+      hidePopup();
+      return null;
+    }
+    function partnerPopupIsOpen() {
+      const popup = document.getElementById("popupMask");
+      const label = document.getElementById("renameLabel");
+      return !!(popup && !popup.classList.contains("hidden") && label && label.textContent.indexOf("為對方命名") >= 0);
+    }
+    S = fresh(); S.gender = "male"; S.age = 26;
+    const hsConfess = presentStory({ storyConfess: true, sit: "", opts: KEY[26].opts });
+    if (document.getElementById("partnerNameBox") || document.getElementById("partnerNameInput"))
+      contra0("confess_name_field_still_on_card");
+    if (hsConfess.indexOf("你的心儀對象向你表白") < 0)
+      contra0("confess_headline_missing:" + hsConfess);
+    pick({ storyConfess: true, title: "", sit: hsConfess, tag: "人生事件", fin: true, opts: KEY[26].opts }, KEY[26].opts.find(o => o.k === "A"));
+    var err = flushToastAndConfirmPartner("小薇");
+    if (err) contra0("confess_accept_popup_" + err);
+    if (S.partnerName !== "小薇" || !S.partner) contra0("confess_accept_name_not_saved:" + S.partnerName + "/" + S.partner);
+    S = fresh(); S.gender = "male"; S.age = 26;
+    presentStory({ storyConfess: true, sit: "", opts: KEY[26].opts });
+    pick({ storyConfess: true, title: "", sit: "", tag: "人生事件", fin: true, opts: KEY[26].opts }, KEY[26].opts.find(o => o.k === "B"));
+    err = flushToastAndConfirmPartner("阿明");
+    if (err) contra0("confess_friendzone_popup_" + err);
+    if (S.partner) contra0("confess_friendzone_set_partner");
+    if (S.partnerName !== "阿明") contra0("confess_friendzone_name_not_saved:" + S.partnerName);
+    const dateSitNamed = resolveStory({ storyStartDate: true });
+    if (!dateSitNamed || dateSitNamed.sit.indexOf("阿明") < 0)
+      contra0("dating_key_missing_entered_name:" + (dateSitNamed && dateSitNamed.sit));
+    S = fresh(); S.gender = "male"; S.age = 31; S.friendZone = true; S.partnerName = "阿明";
+    const hsDateNamed = presentStory({ storyStartDate: true, sit: "", opts: KEY[31].opts });
+    if (hsDateNamed.indexOf("阿明") < 0) contra0("dating_headline_missing_entered_name:" + hsDateNamed);
+    pick({ storyStartDate: true, title: "", sit: hsDateNamed, tag: "人生事件", fin: true, opts: KEY[31].opts }, KEY[31].opts.find(o => o.k === "A"));
+    if (typeof hideToast === "function") hideToast();
+    if (partnerPopupIsOpen()) contra0("dating_rename_popup_when_already_named");
+    if (S.partnerName !== "阿明") contra0("dating_existing_name_overwritten:" + S.partnerName);
+    S = fresh(); S.gender = "male"; S.age = 26;
+    presentStory({ storyConfess: true, sit: "", opts: KEY[26].opts });
+    pick({ storyConfess: true, title: "", sit: "", tag: "人生事件", fin: true, opts: KEY[26].opts }, KEY[26].opts.find(o => o.k === "C"));
+    if (typeof hideToast === "function") hideToast();
+    if (partnerPopupIsOpen()) contra0("confess_refuse_showed_name_popup");
+    if (S.partnerName) contra0("confess_refuse_kept_name:" + S.partnerName);
+    S = fresh(); S.gender = "male"; S.age = 26;
+    presentStory({ storyConfess: true, sit: "", opts: KEY[26].opts });
+    pick({ storyConfess: true, title: "", sit: "", tag: "人生事件", fin: true, opts: KEY[26].opts }, KEY[26].opts.find(o => o.k === "A"));
+    err = flushToastAndConfirmPartner("");
+    if (err) contra0("confess_empty_popup_" + err);
+    if (S.partnerName !== "另一半") contra0("confess_empty_name_fallback:" + S.partnerName);
+    S = fresh(); S.gender = "male"; S.age = 26;
+    presentStory({ storyConfess: true, sit: "", opts: KEY[26].opts });
+    pick({ storyConfess: true, title: "", sit: "", tag: "人生事件", fin: true, opts: KEY[26].opts }, KEY[26].opts.find(o => o.k === "B"));
+    err = flushToastAndConfirmPartner("");
+    if (err) contra0("confess_friendzone_empty_popup_" + err);
+    if (S.partnerName !== "心儀對象") contra0("confess_friendzone_empty_fallback:" + S.partnerName);
+    S = fresh();
+    S.partner = true; S.partnerName = "小薇"; S.married = true;
+    S.kids = true; S.kidName = "小晴";
+    S.hasPet = true; S.petName = "豆豆";
+    const namePay = buildPlayerPayload();
+    if (!namePay || namePay.partnerName !== "小薇" || namePay.kidName !== "小晴" || namePay.petName !== "豆豆" || !namePay.hasPet)
+      contra0("payload_names_missing:" + JSON.stringify(namePay && { partnerName: namePay.partnerName, kidName: namePay.kidName, petName: namePay.petName, hasPet: namePay.hasPet }));
+    const nameListBox = document.getElementById("playerList");
+    const nameListPrev = nameListBox ? nameListBox.innerHTML : "";
+    renderPlayerList({ t1: {
+      name: "測試生", age: 30, status: "playing",
+      partner: true, partnerName: "小薇", married: true,
+      kids: true, kidName: "小晴",
+      hasPet: true, petName: "豆豆",
+      updatedAt: 1, stats: {}, goals: [], needs: [], history: []
+    }});
+    const nameListTxt = (nameListBox && nameListBox.textContent) || "";
+    if (nameListTxt.indexOf("小薇") < 0 || nameListTxt.indexOf("小晴") < 0 || nameListTxt.indexOf("豆豆") < 0)
+      contra0("teacher_names_missing:" + nameListTxt.replace(/\s+/g, " ").slice(0, 200));
+    if (nameListBox) nameListBox.innerHTML = nameListPrev;
 
     /* 生育 D 最遲 40 歲（當年仍算在上限內）；41 歲及以後不再出；選不生育後不再出 */
     setupWork(40, { married: true, partner: true, kids: false });
